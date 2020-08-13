@@ -1,0 +1,26 @@
+<resources>
+
+    <!-- Strings for Main Activity -->
+    <string name="app_name">Clout</string>
+    <string name="clout_score">0</string>
+    <string name="event_agreement">Event Agreement</string>
+    <string name="item_agreement">Item Agreement</string>
+
+    <!-- Strings for Login Activity -->
+    <string name="email">EMAIL</string>
+    <string name="password">PASSWORD</string>
+    <string name="retype_password">Retype PASSWORD</string>
+    <string name="submit">SUBMIT</string>
+    <string name="login_title">CLOUT</string>
+    <string name="retype">RETYPE PASSWORD</string>
+    <string name="borrower_email_or_accountname">Borrower Email OR @AccountName</string>
+    <string name="who_will_borrow_funds">Who will borrow funds?</string>
+    <string name="how_much_will_you_send">How Much Will You Send?</string>
+    <string name="dollar_amount">$Dollar Amount$</string>
+    <string name="what_date_must_the_funds_be_returned">What Date Must The Funds Be Returned?</string>
+    <string name="choose_date">Choose Date</string>
+    <string name="these_funds_don_t_need_to_be_returned">These Funds Don\'t Need to Be Returned</string>
+    <string name="overAmount">You can not transact an amount over $2000.00</string>
+    <string name="addAmount">How Much Cash Would You Like To Add?</string>
+
+</resources>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivities.AddPaymentMethodActivity">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:text="Placing A Payment Method On File Allows You To Do Business Through The Clout Platform"
+        android:textSize="20sp"
+        android:textColor="#891699"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintStart_toEndOf="@+id/imageView4"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:srcCompat="@drawable/master" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:srcCompat="@drawable/visa" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:srcCompat="@drawable/amex" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:srcCompat="@drawable/discover" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/cardNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView4">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:fontFamily="sans-serif-thin"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/roundededittext"
+            android:hint="Please Enter Card Number"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/exp_date_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:text="Please Enter Payment Method Expiration Date"
+        android:textSize="20sp"
+        android:textColor="#891699"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardNumber" />
+
+    <TextView
+        android:id="@+id/cvc_enter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:text="Please Enter CVC Code Written on the Back of Your Card"
+        android:textSize="20sp"
+        android:textColor="#891699"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exp_month" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/exp_month"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exp_date_text">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:fontFamily="sans-serif-thin"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/roundededittext"
+            android:gravity="center"
+            android:hint="MM"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColorHint="#FFFFFF" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/enter_cvc"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cvc_enter">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/roundededittext"
+            android:gravity="center_horizontal"
+            android:hint="CVC"
+            android:fontFamily="sans-serif-thin"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColorHint="#FFFFFF" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/exp_year"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintStart_toEndOf="@+id/exp_month"
+        app:layout_constraintTop_toBottomOf="@+id/exp_date_text">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:fontFamily="sans-serif-thin"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/roundededittext"
+            android:gravity="center"
+            android:hint="YYYY"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColorHint="#FFFFFF" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addPaymentMethodButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="#E3E3E3"
+        android:fontFamily="sans-serif-thin"
+        android:text="Submit"
+        android:textColor="#F46B00"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/enter_cvc"
+        android:layout_marginRight="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

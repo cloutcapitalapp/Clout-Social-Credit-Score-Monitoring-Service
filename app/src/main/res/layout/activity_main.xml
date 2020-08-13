@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/Main_Frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbarSize="100dp"
+    tools:context=".MainActivities.MainActivity">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/CloutScore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:gravity="center"
+        android:text="@string/clout_score"
+        android:textColor="#00CC8F"
+        android:textSize="60sp"
+        app:backgroundTint="#CBDFC1"
+        app:cornerRadius="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/dateTV"
+        android:layout_width="match_parent"
+        android:layout_height="9dp"
+        android:background="#CF790E"
+        android:gravity="center"
+        android:text="date"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/CloutScore" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#BDA4A4"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:text="0.00"
+        android:textColor="#FFFFFF"
+        android:textSize="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/CloutScore" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
