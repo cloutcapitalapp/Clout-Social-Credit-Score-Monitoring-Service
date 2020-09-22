@@ -7,6 +7,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import com.example.clout.MainActivities.CreateNewSession;
 import com.example.clout.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,14 +20,18 @@ import java.util.Objects;
 // This class needs to take in a score entry and add to the standing score or decrease the standing score.
 public class ScoreHandler extends CreateNewSession {
     FirebaseDatabase mDatabaseRef = FirebaseDatabase.getInstance();
-    DatabaseReference mRef = mDatabaseRef.getReference("users");
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseUser mCurrentUser = mAuth.getCurrentUser();
+    DatabaseReference mRef = mDatabaseRef.getReference("Users");
     DatabaseReference mVal = mDatabaseRef.getReference("cashval");
+    AccountKeyGenerator accKey;
     TextView textView3;
 
     // T.O.D.O: there is an issue with this code. It keeps making a nonstop connection loop to the data base
     // The above issue has been rectified.
     public void sessionStartScoreIncrease(final double valuePlus){
-        mRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        accKey = new AccountKeyGenerator();
+        mRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.getValue(String.class);
@@ -44,7 +50,6 @@ public class ScoreHandler extends CreateNewSession {
     }
     public void cashValueAdjust(){
         // Read from the database
-
     }
 
     // TODO: API Build: Section 2: End date is reached, now the score needs to update based on successful transaction or failed transaction

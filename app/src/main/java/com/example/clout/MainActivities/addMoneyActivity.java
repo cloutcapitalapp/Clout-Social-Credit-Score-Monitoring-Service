@@ -1,10 +1,15 @@
 package com.example.clout.MainActivities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +32,7 @@ import java.text.DecimalFormat;
 
 public class addMoneyActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE_LOCATION = 1;
     EditText howMuchEditText;
     TextView howMuchTextView;
     TextView valueTextView;
@@ -43,17 +49,17 @@ public class addMoneyActivity extends AppCompatActivity {
 
         df = new DecimalFormat("0.00");
         database = FirebaseDatabase.getInstance();
-        mAddCashRef = database.getReference("cashval");
+        mAddCashRef = database.getReference("Users");
         howMuchEditText = findViewById(R.id.howMuchEditText);
         valueTextView = findViewById(R.id.valueTextView);
         submitButton = findViewById(R.id.submitButton);
         withdrawCashTextView = findViewById(R.id.withdrawButton);
 
+        fineLocationPermissionCheck();
         amountUpdater();
         submitButtonFunction();
         withdrawCashButton();
     }
-
     private void amountUpdater(){
         howMuchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -88,7 +94,6 @@ public class addMoneyActivity extends AppCompatActivity {
             }
         });
     }
-
     private void submitButtonFunction(){
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,7 +164,6 @@ public class addMoneyActivity extends AppCompatActivity {
         });
 
     }
-
     private void addCashAlert(){
         AlertDialog.Builder addCashCheck = new AlertDialog.Builder(this);
         addCashCheck.setTitle("Add Cash?");
@@ -179,5 +183,21 @@ public class addMoneyActivity extends AppCompatActivity {
         });
         addCashCheck.create();
         addCashCheck.show();
+    }
+    private void fineLocationPermissionCheck(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+            // REQUEST_CODE_LOCATION should be defined on your app level
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE_LOCATION);
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_LOCATION && grantResults.length > 0
+                && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            throw new RuntimeException("Location services are required in order to " +
+                    "connect to a reader.");
+        }
     }
 }

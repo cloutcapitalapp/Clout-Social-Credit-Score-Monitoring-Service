@@ -27,11 +27,11 @@
         android:id="@+id/continueArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="116dp"
+        android:layout_marginTop="16dp"
         android:background="#FFFFFF"
-        android:rotation="180"
+        android:rotation="90"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.587"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/noReturnButton"
         app:srcCompat="@drawable/ic_baseline_arrow_upward_24"
@@ -41,10 +41,11 @@
         android:id="@+id/backArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="144dp"
         android:background="#FFFFFF"
+        android:rotation="-90"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.268"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_baseline_arrow_back_72"
@@ -54,13 +55,15 @@
         android:id="@+id/chooseDateButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:background="@android:color/transparent"
         android:text="@string/choose_date"
         android:textColor="#00BCD4"
         app:backgroundTint="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/whoTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/dateTextView" />
 
     <Button
         android:id="@+id/noReturnButton"
@@ -74,5 +77,15 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chooseDateButton" />
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Date Selected"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/whoTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

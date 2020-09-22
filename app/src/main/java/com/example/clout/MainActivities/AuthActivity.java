@@ -3,33 +3,39 @@ package com.example.clout.MainActivities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.clout.MainActivities.Classes.AccountKeyGenerator;
+import com.example.clout.MainActivities.objects.UserObject;
 import com.example.clout.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.datepicker.MaterialTextInputPicker;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.crypto.KeyGenerator;
 
 
 // The login activity must be attractive as it will be the introduction of the user to the app
-public class LoginActivity extends AppCompatActivity {
+public class AuthActivity extends AppCompatActivity {
     /* Init Vars */
     private TextInputLayout username;
     private TextInputLayout password;
@@ -42,6 +48,8 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseUser mCurrentUser;
     private Button loginButton;
     private TabLayout logAndSignTab;
+    private AccountKeyGenerator keyGenerator;
+    private UserObject userObject;
 
     // onCreate method should be confound to Vars and method calls
     @Override
@@ -62,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
-        mRefUsers = db.getReference("users");
+        mRefUsers = db.getReference("Users");
 
         // App functionality
         loginButton.setVisibility(View.INVISIBLE);
@@ -77,31 +85,54 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
 
         if (mCurrentUser != null){
-            Intent toProfileActivity = new Intent(LoginActivity.this, MainActivity.class);
+            Intent toProfileActivity = new Intent(AuthActivity.this, MainActivity.class);
             startActivity(toProfileActivity);
         }else{
-            Toast.makeText(LoginActivity.this, "Please Create Account!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AuthActivity.this, "Please Create Account!", Toast.LENGTH_SHORT).show();
         }
     } /* If there is no user, user will be prompted to create an account. */
 
     // Firebase method: if email is properly formated and passwords match firebase user will be created and cashed.
-    public void createAccount(String email, String password){
+    public void createAccount(final String email, String password){
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    private Object AsyncStripeTask;
+
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             //Log.d("success", "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            FirebaseUser fireUser = mAuth.getCurrentUser();
+                            keyGenerator = new AccountKeyGenerator();
+                            userObject = new UserObject();
+                            String accKey = keyGenerator.createAccountKey(email);
+                            Log.d("New Pass", "" + accKey);
 
-                            Intent toMain = new Intent(LoginActivity.this, MainActivity.class);
+                            // Send a userObject to firebase RTDB
+                            //
+                            //
+                            mRefUsers.child(accKey);
+                            mRefUsers.child(accKey).child("Email").setValue(fireUser.getEmail());
+                            mRefUsers.child(accKey).child("Score").setValue("200.00");
+                            mRefUsers.child(accKey).child("Cash").setValue("0.00");
+                            mRefUsers.child(accKey).child("isCardOnFile").setValue("No");
+                            mRefUsers.child(accKey).child("isFirstTimeUserIntro").setValue("yes");
+                            mRefUsers.child(accKey).child("isFirstTimeUserScore").setValue("yes");
+                            mRefUsers.child(accKey).child("isFirstTimeUserCash").setValue("yes");
+                            mRefUsers.child(accKey).child("TransactionList").setValue("Null");
+                            new AsyncStripeTask().execute(AsyncStripeTask);
+
+                            //
+                            //
+                            // DONE
+
+                            Intent toMain = new Intent(AuthActivity.this, MainActivity.class);
                             startActivity(toMain);
-
                         } else {
                             // If sign in fails, display a message to the user.
                             //Log.w("Failed", "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                            Toast.makeText(AuthActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
                         // ...
@@ -121,12 +152,12 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("isLoggedIn", "signInWithEmail:success");
-                            Intent passToMain = new Intent(LoginActivity.this, MainActivity.class);
+                            Intent passToMain = new Intent(AuthActivity.this, MainActivity.class);
                             startActivity(passToMain);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("isLoggedIn", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                            Toast.makeText(AuthActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
                         // ...
@@ -227,4 +258,43 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    class AsyncStripeTask extends AsyncTask {
+        @SuppressLint("WrongThread")
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            com.stripe.Stripe.apiKey = "sk_test_51GuYBuLsgkZ2wTkEPW1f3aeAOcqJTWWgDTq2frFZSpsn2dtM1zLtiGQd3E90OGFNo7VPmL9Y2w62zpvwiwf5nwW5007TNe558H";
+            FirebaseUser fireUser = mAuth.getCurrentUser();
+            String accKey = keyGenerator.createAccountKey(fireUser.getEmail());
+            String mapUsernameString = username.getEditText().getText().toString().replace(" ", "");
+            Map<String, Object> mapCustomer = new HashMap<String, Object>();
+            mapCustomer.put("email", mapUsernameString);
+            try {
+                Customer newCustomer = Customer.create(mapCustomer);
+                String custID = newCustomer.getId();
+                Log.d("CustomerID", custID);
+                mRefUsers.child(accKey);
+                mRefUsers.child(accKey).child("stripeCustomerID").setValue(custID);
+            } catch (StripeException e) {
+                e.printStackTrace();
+            }            return null;
+        }
+    }
+
+    /* This method doesn't need to be used as it is not delivered Asynchronously */
+    /* Create stripe customer */
+    /*public void createStripeCustomer(){
+        com.stripe.Stripe.apiKey = "sk_live_PRhe9eFUANmDRa7KlIqQF2mj00LBHktQVS";
+        String mapUsernameString = username.getEditText().getText().toString().replace(" ", "");
+        Map <String, Object> mapCustomer = new HashMap<String, Object>();
+        mapCustomer.put("email", mapUsernameString);
+        try {
+            Customer newCustomer = Customer.create(mapCustomer);
+            String custID = newCustomer.getId();
+            Log.d("CustomerID", custID);
+            mRef.child(mapUsernameString.replace(".", ""));
+            mRef.child(mapUsernameString.replace(".", "")).child("customerID").setValue(custID);
+        } catch (StripeException e) {
+            e.printStackTrace();
+        }
+    }*/
 }

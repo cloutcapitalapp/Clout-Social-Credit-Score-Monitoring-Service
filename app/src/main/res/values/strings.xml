@@ -13,7 +13,7 @@
     <string name="submit">SUBMIT</string>
     <string name="login_title">CLOUT</string>
     <string name="retype">RETYPE PASSWORD</string>
-    <string name="borrower_email_or_accountname">Borrower Email OR @AccountName</string>
+    <string name="borrower_email_or_accountname">Borrower Email OR &amp;AccountName</string>
     <string name="who_will_borrow_funds">Who will borrow funds?</string>
     <string name="how_much_will_you_send">How Much Will You Send?</string>
     <string name="dollar_amount">$Dollar Amount$</string>
@@ -22,5 +22,8 @@
     <string name="these_funds_don_t_need_to_be_returned">These Funds Don\'t Need to Be Returned</string>
     <string name="overAmount">You can not transact an amount over $2000.00</string>
     <string name="addAmount">How Much Cash Would You Like To Add?</string>
+    <string name="money_sign">$</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
 
 </resources>
