@@ -1,6 +1,7 @@
-package com.example.clout.MainActivities;
+package com.example.clout.MainActivities.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,9 +21,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.clout.MainActivities.Classes.AccountKeyGenerator;
+import com.example.clout.MainActivities.Classes.AccountKeyManager;
+import com.example.clout.MainActivities.Classes.SessionActivityID;
 import com.example.clout.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -36,24 +36,27 @@ import com.google.firebase.database.ValueEventListener;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
-import com.stripe.model.PaymentMethod;
-
 import org.jetbrains.annotations.NotNull;
 
-public class CreateNewSession_2 extends AppCompatActivity {
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Locale;
 
+public class CreateNewSession_2 extends AppCompatActivity {
+    String receiver;
     ImageButton continueButton;
     ImageButton backArrow;
     EditText amountEditText;
     TextView amountTextView;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser mCurrentUser = mAuth.getCurrentUser();
-    AccountKeyGenerator accKey;
+    AccountKeyManager accKey;
     FirebaseDatabase mDataBase = FirebaseDatabase.getInstance();
     DatabaseReference userReference = mDataBase.getReference("Users");
     DatabaseReference transactionRef = mDataBase.getReference("User_Transactions");
-    String defaultSource;
-    private Object AsyncStripeTask;
+    SessionActivityID sessionActivityID;
+    //private Object AsyncStripeTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +66,25 @@ public class CreateNewSession_2 extends AppCompatActivity {
         amountTextView = findViewById(R.id.amountTextView);
         continueButton = findViewById(R.id.continueArrow);
         backArrow = findViewById(R.id.backArrow);
-        accKey = new AccountKeyGenerator();
-        new AsyncStripeTask().execute(AsyncStripeTask);
+        accKey = new AccountKeyManager();
+        sessionActivityID = new SessionActivityID();
+        //new AsyncStripeTask().execute(AsyncStripeTask);
+
         openAnimations();
         continueButtonMethod();
         amountUpdater();
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        getExtras();
+    }
+
+    private void getExtras(){
+        Bundle intentExtras = getIntent().getExtras();
+        receiver = intentExtras.getString("receiver");
+        Log.d("recieverTest", "extras : " + receiver);
     }
 
     private void continueButtonMethod(){
@@ -75,7 +92,11 @@ public class CreateNewSession_2 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stage2Transaction();
+                Bundle extras = new Bundle();
                 Intent toStage2 = new Intent(CreateNewSession_2.this, CreateNewSession_3.class);
+                String getReceiver = receiver;
+                extras.putString("receiver", "" + getReceiver.toString());
+                toStage2.putExtras(extras);
                 startActivity(toStage2);
             }
         });
@@ -93,7 +114,7 @@ public class CreateNewSession_2 extends AppCompatActivity {
             }
             @Override
             public void afterTextChanged(Editable s) {
-                amountTextView.setText(getString(R.string.money_sign) + String.valueOf(Double.valueOf(amountEditText.getText().toString())/100), TextView.BufferType.EDITABLE);
+                amountTextView.setText(MessageFormat.format("{0}{1}", getString(R.string.money_sign), String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(amountEditText.getText().toString()) / 100)), TextView.BufferType.EDITABLE);
                 //TODO: cause textView to decrease size when divisible by 1000
                 if(Double.parseDouble(amountEditText.getText().toString()) % 10000 != 0 ||
                         Double.parseDouble(amountEditText.getText().toString()) % 10000 == 0){
@@ -112,12 +133,11 @@ public class CreateNewSession_2 extends AppCompatActivity {
                 }
             }
         });
-
     }
     
     // Async Task MUST BE USED to create a payment processing.
-    @SuppressLint("NewApi")
-    private class AsyncStripeTask extends AsyncTask {
+    //@SuppressLint("NewApi")
+    /*private class AsyncStripeTask extends AsyncTask {
         @SuppressLint("WrongThread")
         @Override
         protected Void doInBackground(Object... objects) {
@@ -135,7 +155,6 @@ public class CreateNewSession_2 extends AppCompatActivity {
                         // This method is called once with the initial value and again
                         // whenever data at this location is updated.
                         String value = dataSnapshot.getValue(String.class);
-                        Toast.makeText(CreateNewSession_2.this, value, Toast.LENGTH_SHORT).show();
                         Log.d("dbcheck", "" + value);
 
                         @SuppressLint("NewApi")
@@ -144,11 +163,10 @@ public class CreateNewSession_2 extends AppCompatActivity {
                             @Override
                             protected Void doInBackground(Object... objects) {
                                 assert value != null;
-                                Looper.prepare();
+
                                 try {
                                     if(Customer.retrieve(value) != null){
                                         customoer[0] = Customer.retrieve(value);
-                                        Toast.makeText(CreateNewSession_2.this, value + " " + customoer[0], Toast.LENGTH_SHORT).show();
                                         Log.d("check", value);
                                         customerSource[0] = Customer.retrieve(value);
                                         if(customerSource[0].getSources() == null){
@@ -159,7 +177,6 @@ public class CreateNewSession_2 extends AppCompatActivity {
 
                                         //Log.d("getCustID", "Value is: " + value + " : " + customoer[0]);
                                     }else{
-                                        Toast.makeText(CreateNewSession_2.this, "no customer id", Toast.LENGTH_SHORT).show();
                                         isPaymentSourceAlert();
                                     }
                                 } catch (StripeException ex) {
@@ -181,8 +198,8 @@ public class CreateNewSession_2 extends AppCompatActivity {
             }
             return null;
         }
-    }
-    public void isPaymentSourceAlert(){
+    }*/
+    private void isPaymentSourceAlert(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(getApplicationContext()).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -208,13 +225,17 @@ public class CreateNewSession_2 extends AppCompatActivity {
         confirm.create();
         confirm.show();
     }
-    public void stage2Transaction(){
+    private void stage2Transaction(){
         transactionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                transactionRef.child(accKey.createAccountKey(mCurrentUser.getEmail()));
-                transactionRef.child(accKey.createAccountKey(mCurrentUser.getEmail()))
-                        .child("Amount").setValue(amountEditText.getText().toString());
+                LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
+                transactionRef.child(/*** This needs to be changed to the accountSessionID ***/ sessionActivityID.generateSessionID(
+                        accKey.createAccountKey(mCurrentUser.getEmail()), /*This value needs to be the received extra*/ receiver, String.valueOf(currentDate)));
+                transactionRef.child(/*** This needs to be changed to the accountSessionID ***/ sessionActivityID.generateSessionID(
+                        accKey.createAccountKey(mCurrentUser.getEmail()), /*This value needs to be the received extra*/ receiver, String.valueOf(currentDate)))
+                        .child("amount").setValue(String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(amountEditText.getText().toString())));
             }
 
             @Override
@@ -223,7 +244,7 @@ public class CreateNewSession_2 extends AppCompatActivity {
             }
         });
     }
-    public void openAnimations(){
+    private void openAnimations(){
 
         ObjectAnimator animForwardArrow = ObjectAnimator.ofFloat(continueButton, "translationY", -150f);
         animForwardArrow.setDuration(1700);

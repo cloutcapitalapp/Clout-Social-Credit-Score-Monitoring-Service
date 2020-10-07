@@ -13,7 +13,7 @@
     <string name="submit">SUBMIT</string>
     <string name="login_title">CLOUT</string>
     <string name="retype">RETYPE PASSWORD</string>
-    <string name="borrower_email_or_accountname">Borrower Email OR &amp;AccountName</string>
+    <string name="borrower_email_or_accountname">Borrower &amp;AccountName</string>
     <string name="who_will_borrow_funds">Who will borrow funds?</string>
     <string name="how_much_will_you_send">How Much Will You Send?</string>
     <string name="dollar_amount">$Dollar Amount$</string>
@@ -25,5 +25,11 @@
     <string name="money_sign">$</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
+    <string name="usdCurSign">$</string>
+    <string name="no_date_selected">No Date Selected</string>
+    <string name="addCash">ADD CASH</string>
+    <string name="withdrawnow">WITHDRAW FUNDS NOW</string>
+    <string name="yes">YES</string>
+    <string name="add_friend">ADD FRIEND</string>
 
 </resources>

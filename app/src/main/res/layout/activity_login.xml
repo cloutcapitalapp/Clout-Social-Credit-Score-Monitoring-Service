@@ -5,7 +5,7 @@
     android:id="@+id/loginFrame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivities.AuthActivity">
+    tools:context=".MainActivities.activities.AuthActivity">
 
     <TextView
         android:id="@+id/passwordAssistText"

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/CardView"
+        android:layout_width="390dp"
+        android:layout_height="170dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/roundededittext"
+        android:elevation="100dp"
+        android:orientation="vertical"
+        app:cardBackgroundColor="#82E0AA"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/loanBorrowerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:text="Loaner : Borrower" />
+
+        <TextView
+            android:id="@+id/loanAmountTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="58dp"
+            android:text="Loan Amount" />
+
+        <TextView
+            android:id="@+id/amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="78dp"
+            android:gravity="center"
+            android:text="AMOUNT"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+
+        <View
+            android:id="@+id/midView"
+            android:layout_width="140dp"
+            android:layout_height="1dp"
+            android:layout_marginLeft="160dp"
+            android:layout_marginTop="110dp"
+            android:background="#62FFA5" />
+
+        <TextView
+            android:id="@+id/returnDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="115dp"
+            android:text="Date Loan Will Be Returned" />
+
+        <TextView
+            android:id="@+id/currentDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="80dp"
+            android:text="Start Date" />
+
+        <TextView
+            android:id="@+id/current_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="100dp"
+            android:text="current_date"
+            android:textColor="#FFFFFF"
+            app:fontFamily="sans-serif-condensed-light" />
+
+        <TextView
+            android:id="@+id/Transacting_Users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="20dp"
+            android:text="Transacting_Users"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/topView"
+            android:layout_width="140dp"
+            android:layout_height="1dp"
+            android:layout_marginLeft="160dp"
+            android:layout_marginTop="50dp"
+            android:background="#62FFA5" />
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="40dp"
+            android:includeFontPadding="false"
+            android:scrollbarStyle="outsideInset"
+            android:text="Location"
+            android:textColor="@color/colorPrimary"
+            android:textColorHint="#D6A600"
+            app:fontFamily="sans-serif-thin" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="135dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:scrollbarStyle="outsideInset"
+            android:text="Date"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            app:fontFamily="sans-serif-thin" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/ic_baseline_person_24"
+            app:civ_border_color="#FFFFFF"
+            app:civ_border_width=".5dp"
+            app:civ_circle_background_color="#D1F2EB"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

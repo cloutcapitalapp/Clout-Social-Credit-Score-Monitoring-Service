@@ -4,26 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivities.AddPaymentMethodActivity">
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-thin"
-        android:text="Placing A Payment Method On File Allows You To Do Business Through The Clout Platform"
-        android:textSize="20sp"
-        android:textColor="#891699"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    tools:context=".MainActivities.activities.LoadCashActivity">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="70dp"
         android:layout_height="70dp"
         app:layout_constraintStart_toEndOf="@+id/imageView4"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/master" />
 
     <ImageView
@@ -31,7 +19,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/visa" />
 
     <ImageView
@@ -39,7 +27,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/amex" />
 
     <ImageView
@@ -47,7 +35,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/discover" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -60,55 +48,33 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView4">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:fontFamily="sans-serif-thin"
             android:layout_width="400dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/roundededittext"
+            android:fontFamily="sans-serif-thin"
             android:hint="Please Enter Card Number"
             android:inputType="text"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/exp_date_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-thin"
-        android:text="Please Enter Payment Method Expiration Date"
-        android:textSize="20sp"
-        android:textColor="#891699"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardNumber" />
-
-    <TextView
-        android:id="@+id/cvc_enter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-thin"
-        android:text="Please Enter CVC Code Written on the Back of Your Card"
-        android:textSize="20sp"
-        android:textColor="#891699"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/exp_month" />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/exp_month"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/exp_date_text">
+        app:layout_constraintTop_toBottomOf="@+id/cardNumber">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:fontFamily="sans-serif-thin"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/roundededittext"
+            android:fontFamily="sans-serif-thin"
             android:gravity="center"
             android:hint="MM"
             android:inputType="text"
@@ -118,18 +84,20 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/enter_cvc"
-        android:layout_width="110dp"
-        android:layout_height="wrap_content"
+        android:layout_width="116dp"
+        android:layout_height="69dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cvc_enter">
+        app:layout_constraintTop_toBottomOf="@+id/exp_month">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:background="@drawable/roundededittext"
+            android:fontFamily="sans-serif-thin"
             android:gravity="center_horizontal"
             android:hint="CVC"
-            android:fontFamily="sans-serif-thin"
             android:inputType="text"
             android:maxLines="1"
             android:textColorHint="#FFFFFF" />
@@ -139,16 +107,16 @@
         android:id="@+id/exp_year"
         android:layout_width="110dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toEndOf="@+id/exp_month"
-        app:layout_constraintTop_toBottomOf="@+id/exp_date_text">
+        app:layout_constraintTop_toBottomOf="@+id/cardNumber">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:fontFamily="sans-serif-thin"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:background="@drawable/roundededittext"
+            android:fontFamily="sans-serif-thin"
             android:gravity="center"
             android:hint="YYYY"
             android:inputType="text"
@@ -160,13 +128,42 @@
         android:id="@+id/addPaymentMethodButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:backgroundTint="#E3E3E3"
         android:fontFamily="sans-serif-thin"
         android:text="Submit"
         android:textColor="#F46B00"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enter_cvc"
-        android:layout_marginRight="16dp" />
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/amountTextView" />
 
+    <EditText
+        android:id="@+id/editTextNumber"
+        android:layout_width="236dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/roundededittext"
+        android:backgroundTint="@android:color/transparent"
+        android:ems="10"
+        android:gravity="center"
+        android:hapticFeedbackEnabled="true"
+        android:hint="How Much Will You Add?"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/enter_cvc" />
+
+    <TextView
+        android:id="@+id/amountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="$0.00"
+        android:textSize="50sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextNumber" />
 </androidx.constraintlayout.widget.ConstraintLayout>

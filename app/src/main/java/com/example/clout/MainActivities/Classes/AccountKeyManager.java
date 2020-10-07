@@ -5,7 +5,7 @@ import com.example.clout.MainActivities.objects.UserObject;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class AccountKeyGenerator {
+public class AccountKeyManager {
 
     // This class will create an &AccountKey for each user which enters the app
     // It will be used in-tandum with the user object which has not been created yet
@@ -14,6 +14,7 @@ public class AccountKeyGenerator {
     // Write a message to the database
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("Users");
+    private Object AccountKeyManager;
 
     public String createAccountKey(String emailToPass){
         StringBuilder emailBreak = new StringBuilder(emailToPass);
@@ -27,5 +28,10 @@ public class AccountKeyGenerator {
             user.getAccountKey();
         }
         return emailAdd;
+    }
+
+    public String reversAccountKeyFromRecyclerViewAdapter(String accountKeyToPass){
+        String reversedAccountKey = accountKeyToPass.split(" : ")[0];
+        return reversedAccountKey;
     }
 }

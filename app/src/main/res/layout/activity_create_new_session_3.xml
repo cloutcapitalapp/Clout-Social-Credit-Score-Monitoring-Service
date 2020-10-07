@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    tools:context=".MainActivities.CreateNewSession_3">
+    tools:context=".MainActivities.activities.CreateNewSession_3">
+
 
     <TextView
         android:id="@+id/whoTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="228dp"
+        android:layout_marginTop="116dp"
         android:fontFamily="sans-serif-thin"
         android:gravity="center"
         android:text="@string/what_date_must_the_funds_be_returned"
@@ -21,7 +22,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <ImageButton
         android:id="@+id/continueArrow"
@@ -41,29 +41,15 @@
         android:id="@+id/backArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="32dp"
         android:background="#FFFFFF"
         android:rotation="-90"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.268"
+        app:layout_constraintHorizontal_bias="0.265"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_baseline_arrow_back_72"
         tools:ignore="MissingConstraints,VectorDrawableCompat" />
-
-    <Button
-        android:id="@+id/chooseDateButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:background="@android:color/transparent"
-        android:text="@string/choose_date"
-        android:textColor="#00BCD4"
-        app:backgroundTint="#FFFFFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateTextView" />
 
     <Button
         android:id="@+id/noReturnButton"
@@ -76,16 +62,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chooseDateButton" />
+        app:layout_constraintTop_toBottomOf="@+id/calendarView" />
 
     <TextView
         android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:text="Date Selected"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/whoTextView" />
+
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="344dp"
+        android:layout_height="309dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateTextView" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

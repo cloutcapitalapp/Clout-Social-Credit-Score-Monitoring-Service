@@ -1,4 +1,4 @@
-package com.example.clout.MainActivities;
+package com.example.clout.MainActivities.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.clout.MainActivities.Classes.AccountKeyGenerator;
+import com.example.clout.MainActivities.Classes.AccountKeyManager;
 import com.example.clout.MainActivities.objects.UserObject;
 import com.example.clout.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,8 +31,6 @@ import com.stripe.model.Customer;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.KeyGenerator;
-
 
 // The login activity must be attractive as it will be the introduction of the user to the app
 public class AuthActivity extends AppCompatActivity {
@@ -48,7 +46,7 @@ public class AuthActivity extends AppCompatActivity {
     private FirebaseUser mCurrentUser;
     private Button loginButton;
     private TabLayout logAndSignTab;
-    private AccountKeyGenerator keyGenerator;
+    private AccountKeyManager keyGenerator;
     private UserObject userObject;
 
     // onCreate method should be confound to Vars and method calls
@@ -104,7 +102,7 @@ public class AuthActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             //Log.d("success", "createUserWithEmail:success");
                             FirebaseUser fireUser = mAuth.getCurrentUser();
-                            keyGenerator = new AccountKeyGenerator();
+                            keyGenerator = new AccountKeyManager();
                             userObject = new UserObject();
                             String accKey = keyGenerator.createAccountKey(email);
                             Log.d("New Pass", "" + accKey);
@@ -114,9 +112,10 @@ public class AuthActivity extends AppCompatActivity {
                             //
                             mRefUsers.child(accKey);
                             mRefUsers.child(accKey).child("Email").setValue(fireUser.getEmail());
-                            mRefUsers.child(accKey).child("Score").setValue("200.00");
-                            mRefUsers.child(accKey).child("Cash").setValue("0.00");
-                            mRefUsers.child(accKey).child("isCardOnFile").setValue("No");
+
+                            mRefUsers.child(accKey).child("Score").setValue("CS200.00");
+                            mRefUsers.child(accKey).child("Cash").setValue("$0.00");
+                            mRefUsers.child(accKey).child("isCardOnFile").setValue("NO");
                             mRefUsers.child(accKey).child("isFirstTimeUserIntro").setValue("yes");
                             mRefUsers.child(accKey).child("isFirstTimeUserScore").setValue("yes");
                             mRefUsers.child(accKey).child("isFirstTimeUserCash").setValue("yes");
@@ -282,7 +281,7 @@ public class AuthActivity extends AppCompatActivity {
 
     /* This method doesn't need to be used as it is not delivered Asynchronously */
     /* Create stripe customer */
-    /*public void createStripeCustomer(){
+    public void createStripeCustomer(){
         com.stripe.Stripe.apiKey = "sk_live_PRhe9eFUANmDRa7KlIqQF2mj00LBHktQVS";
         String mapUsernameString = username.getEditText().getText().toString().replace(" ", "");
         Map <String, Object> mapCustomer = new HashMap<String, Object>();
@@ -291,10 +290,10 @@ public class AuthActivity extends AppCompatActivity {
             Customer newCustomer = Customer.create(mapCustomer);
             String custID = newCustomer.getId();
             Log.d("CustomerID", custID);
-            mRef.child(mapUsernameString.replace(".", ""));
-            mRef.child(mapUsernameString.replace(".", "")).child("customerID").setValue(custID);
+            mRefUsers.child(mapUsernameString.replace(".", ""));
+            mRefUsers.child(mapUsernameString.replace(".", "")).child("customerID").setValue(custID);
         } catch (StripeException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 }

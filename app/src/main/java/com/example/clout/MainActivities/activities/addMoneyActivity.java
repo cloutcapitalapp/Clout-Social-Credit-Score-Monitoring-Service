@@ -1,4 +1,4 @@
-package com.example.clout.MainActivities;
+package com.example.clout.MainActivities.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;

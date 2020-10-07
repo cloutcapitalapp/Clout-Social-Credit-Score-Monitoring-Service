@@ -3,24 +3,51 @@
     package="com.example.clout">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".MainActivities.Classes.notificationHandler"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivities.userprfileactivity"/>
-        <activity android:name=".MainActivities.addMoneyActivity" />
-        <activity android:name=".MainActivities.CreateNewSessionStart" />
-        <activity android:name=".MainActivities.CreateNewSession_3" />
-        <activity android:name=".MainActivities.CreateNewSession_2" />
-        <activity android:name=".MainActivities.AddPaymentMethodActivity" />
-        <activity android:name=".MainActivities.CreateNewSession" />
+        <activity android:name=".MainActivities.NotificationActivity"></activity>
+
+        <service
+            android:name=".MainActivities.activities.dateReached"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity
-            android:name=".MainActivities.AuthActivity"
+            android:name=".MainActivities.activities.AuthActivity"
+            android:configChanges="locale" />
+        <activity
+            android:name=".MainActivities.activities.userprfileactivity"
+            android:configChanges="locale"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivities.activities.addMoneyActivity"
+            android:configChanges="locale" />
+        <activity
+            android:name=".MainActivities.activities.CreateNewSessionStart"
+            android:configChanges="locale" />
+        <activity
+            android:name=".MainActivities.activities.CreateNewSession_3"
+            android:configChanges="locale" />
+        <activity
+            android:name=".MainActivities.activities.CreateNewSession_2"
+            android:configChanges="locale" />
+        <activity
+            android:name=".MainActivities.activities.LoadCashActivity"
+            android:configChanges="locale" />
+        <activity
+            android:name=".MainActivities.activities.CreateNewSession"
+            android:configChanges="locale" />
+        <activity
+            android:name=".MainActivities.activities.LauncherActivity"
+            android:configChanges="locale"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +56,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivities.MainActivity"
+            android:name=".MainActivities.activities.MainActivity"
+            android:configChanges="locale"
             android:screenOrientation="portrait" />
     </application>
 
