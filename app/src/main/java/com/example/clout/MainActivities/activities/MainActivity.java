@@ -283,6 +283,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 addFriend.AddFriend(usersName);
                 confirm.dismiss();
+                String ripUsersName = usersName.substring(usersName.indexOf(" : ") + 1);
+                Log.d("ripUNCheck", ripUsersName);
                 Toast.makeText(MainActivity.this, usersName + " has been added to your friends list", Toast.LENGTH_SHORT).show();
             }
         });
@@ -720,7 +722,13 @@ public class MainActivity extends AppCompatActivity {
             /* Get the rate from the selected viewHolder */ String rate,
             /* Get the description from the selected viewHolder */ String description,
             /*get usersnames from transacting users*/ String TransactingUsers){
-        String testLog = accKey.reversAccountKeyFromRecyclerViewAdapter(TransactingUsers);
+
+        // The below string is a test that grabs the users and isolates the to-Users
+        // String FinalRipTUsers = TransactingUsers.substring(TransactingUsers.indexOf(" : ") + 1)
+           //     .replace(": ", "");
+        //Log.d("CheckUsers", FinalRipTUsers);
+
+        String transUserString = accKey.reversAccountKeyFromRecyclerViewAdapter(TransactingUsers);
         MaterialAlertDialogBuilder transactionDetialsAlert = new MaterialAlertDialogBuilder(this);
         SpannableString ss = new SpannableString(rate);
         BackgroundColorSpan fcsGreen = new BackgroundColorSpan(Color.RED);
@@ -730,18 +738,18 @@ public class MainActivity extends AppCompatActivity {
         transactionDetialsAlert.setMessage("Users : " + TransactingUsers.replace(" : ", " and ") +
                 "\n\nThis loan is in the amount of : " + ss +
                 "\n\nTo be repaid on " + ": " + date
-                + "\n\nWould you like to add : " + testLog + " as a friend?" + "\n");
+                + "\n\nWould you like to add : " + transUserString + " as a friend?" + "\n");
         transactionDetialsAlert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.d("reversedLog", testLog);
-                mVal.child(testLog).addValueEventListener(new ValueEventListener() {
+                Log.d("reversedLog", transUserString);
+                mVal.child(transUserString).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String email = snapshot.child("Email").getValue(String.class);
                         String Score = snapshot.child("Score").getValue(String.class);
                         Log.d("checkForEmail", "" + email);
-                        confirmationAlert(testLog, Score, email);
+                        confirmationAlert(transUserString, Score, email);
                     }
 
                     @Override

@@ -14,6 +14,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Locale;
+
 // This class needs to take in a score entry and add to the standing score or decrease the standing score.
 public class ScoreHandler extends CreateNewSession {
     FirebaseDatabase mDatabaseRef = FirebaseDatabase.getInstance();
@@ -36,8 +38,9 @@ public class ScoreHandler extends CreateNewSession {
 
                 String value = dataSnapshot.getValue(String.class);
 
+                assert value != null;
                 double valueToString = Double.parseDouble(value.replace("CS", "")) + valuePlus;
-                @SuppressLint("DefaultLocale") String convertValueToSTringDec = String.format("%.02f", valueToString);
+                String convertValueToSTringDec = String.format(Locale.ENGLISH,"%.02f", valueToString);
                 String valueSetToString = String.valueOf("CS"+convertValueToSTringDec);
                 mRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("Score").setValue(valueSetToString);
                 }

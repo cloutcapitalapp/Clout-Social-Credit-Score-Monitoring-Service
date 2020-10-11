@@ -4,14 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,7 +28,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.clout.MainActivities.Classes.AccountKeyManager;
 import com.example.clout.MainActivities.Classes.AddFriendHandler;
-import com.example.clout.MainActivities.NotificationActivity;
 import com.example.clout.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -56,9 +49,6 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static com.example.clout.MainActivities.Classes.notificationHandler.CHANNEL_1_ID;
-import static com.example.clout.MainActivities.Classes.notificationHandler.CHANNEL_2_ID;
 
 public class userprfileactivity extends AppCompatActivity {
 
@@ -103,7 +93,6 @@ public class userprfileactivity extends AppCompatActivity {
 
         progress.setVisibility(View.INVISIBLE);
         //updateUserName();
-        populateListView();
         addFriendsHandler();
         usernameRec();
         toFetchImage();
@@ -112,17 +101,14 @@ public class userprfileactivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
         onStartGrabImage();
+
+        populateListView();
     }
 
     //onClick set on button XML
     public void notificationsButtonOnClick(View v){
-        notificationsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToNotifActivity = new Intent(userprfileactivity.this, NotificationActivity.class);
-                startActivity(goToNotifActivity);
-            }
-        });
+        Intent goToNotifActivity = new Intent(userprfileactivity.this, NotificationActivity.class);
+        startActivity(goToNotifActivity);
     }
 
     public void populateListView(){
@@ -168,12 +154,12 @@ public class userprfileactivity extends AppCompatActivity {
      * 2 - Once the user has been found, create db table for users and their friends
      * 3 - funnel the friends list users to the current users friend list Recycler View ***/
     private void addFriendsHandler(){
-        /*addedButton.setOnClickListener(new View.OnClickListener() {
+        addedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addFriendsHandlerAlert();
             }
-        });*/
+        });
     }
     public void addFriendsHandlerAlert(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(userprfileactivity.this).create();

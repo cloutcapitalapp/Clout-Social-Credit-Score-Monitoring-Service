@@ -15,6 +15,7 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.icu.util.LocaleData;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.clout.MainActivities.Classes.AccountKeyManager;
 import com.example.clout.MainActivities.Classes.ScoreHandler;
@@ -51,8 +53,6 @@ public class CreateNewSession_3 extends AppCompatActivity {
     private NotificationManagerCompat notificationManagerCompat;
     String receiver;
     TextView date;
-    Calendar calender;
-    private SimpleDateFormat dateFormat;
     CalendarView calendarView;
     SessionActivityID sessionActivityID;
     Button fundsReturnedNoneRequired;
@@ -63,8 +63,9 @@ public class CreateNewSession_3 extends AppCompatActivity {
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseDatabase mDataBase = FirebaseDatabase.getInstance();
     FirebaseUser mCurrentUser = mAuth.getCurrentUser();
+    DatabaseReference usersRef = mDataBase.getReference("Users");
     DatabaseReference transactionRef = mDataBase.getReference("User_Transactions");
-    private Handler thisHandler;
+    DatabaseReference notificationsRef = mDataBase.getReference("Users_Notifications");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,12 +86,10 @@ public class CreateNewSession_3 extends AppCompatActivity {
         openAnimations();
         continueButton();
     }
-
     protected void onStart(){
         super.onStart();
         getExtras();
     }
-
     private void getExtras(){
         Bundle intentExtras = getIntent().getExtras();
         assert intentExtras != null;
@@ -122,9 +121,26 @@ public class CreateNewSession_3 extends AppCompatActivity {
                 // Then user should see an increase in their CS
                 //
 
-                Intent returnToMainActivity1 = new Intent(CreateNewSession_3.this, MainActivity.class);
-                startActivity(returnToMainActivity1);
                 scrHandle.sessionStartScoreIncrease(.50);
+                LocalDate currentDate = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    currentDate = LocalDate.now(ZoneId.systemDefault());
+                }
+
+
+                //send notification of score increase to firebasde
+                LocalDate finalCurrentDate = currentDate;
+                notificationsRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        notificationsRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).push().child("Notify").setValue(finalCurrentDate + " : \n" + "Score Increased by .50! Great Job!");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
                 Notification notification = new NotificationCompat.Builder(CreateNewSession_3.this, CHANNEL_1_ID)
                         .setSmallIcon(R.drawable.ic_baseline_emoji_emotions_24)
@@ -134,6 +150,9 @@ public class CreateNewSession_3 extends AppCompatActivity {
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                         .build();
                 notificationManagerCompat.notify(1, notification);
+
+                Intent returnToMainActivity1 = new Intent(CreateNewSession_3.this, MainActivity.class);
+                startActivity(returnToMainActivity1);
             }
         });
 
@@ -182,15 +201,28 @@ public class CreateNewSession_3 extends AppCompatActivity {
     }
     public void continueButton(){
         continueButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 stage3Transaction();
                 if(!date.getText().toString().equals("Date Selected")){
-                    scrHandle.sessionStartScoreIncrease(.25);
 
-                    Intent returnToMainActivity1 = new Intent(CreateNewSession_3.this, MainActivity.class);
-                    startActivity(returnToMainActivity1);
-                    scrHandle.sessionStartScoreIncrease(.50);
+                    scrHandle.sessionStartScoreIncrease(.25);
+                    LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
+
+                    //send notification of score increase to firebasde
+                    notificationsRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            notificationsRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).push().child("Notify").setValue(currentDate+ " : \n" + "Score Increased by .25! Great Job!");
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
 
                     Notification notification = new NotificationCompat.Builder(CreateNewSession_3.this, CHANNEL_1_ID)
                             .setSmallIcon(R.drawable.ic_baseline_emoji_emotions_24)
@@ -203,7 +235,8 @@ public class CreateNewSession_3 extends AppCompatActivity {
                     Intent returnToMain = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(returnToMain);
                 }else{
-                    //Do nothing
+                    //if no date is selected display the following Toast!
+                    Toast.makeText(CreateNewSession_3.this, "Please selected a date", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivities.NotificationActivity"></activity>
+        <activity android:name=".MainActivities.activities.NotificationActivity"></activity>
 
         <service
             android:name=".MainActivities.activities.dateReached"
@@ -59,6 +59,10 @@
             android:name=".MainActivities.activities.MainActivity"
             android:configChanges="locale"
             android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
