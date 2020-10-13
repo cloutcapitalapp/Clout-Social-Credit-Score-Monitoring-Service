@@ -13,7 +13,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivities.activities.NotificationActivity"></activity>
+        <receiver android:name=".MainActivities.activities.scoreWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/score_widget_info" />
+        </receiver>
+
+        <activity android:name=".MainActivities.activities.NotificationActivity" />
 
         <service
             android:name=".MainActivities.activities.dateReached"
@@ -24,7 +34,7 @@
             android:name=".MainActivities.activities.AuthActivity"
             android:configChanges="locale" />
         <activity
-            android:name=".MainActivities.activities.userprfileactivity"
+            android:name=".MainActivities.activities.UserProfileActivity"
             android:configChanges="locale"
             android:screenOrientation="portrait" />
         <activity
@@ -64,5 +74,4 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
     </application>
-
 </manifest>

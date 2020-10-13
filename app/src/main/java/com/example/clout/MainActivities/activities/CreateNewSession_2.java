@@ -83,6 +83,7 @@ public class CreateNewSession_2 extends AppCompatActivity {
 
     private void getExtras(){
         Bundle intentExtras = getIntent().getExtras();
+        assert intentExtras != null;
         receiver = intentExtras.getString("receiver");
         Log.d("recieverTest", "extras : " + receiver);
     }
@@ -92,11 +93,16 @@ public class CreateNewSession_2 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stage2Transaction();
-                Bundle extras = new Bundle();
+                Bundle toUserBundle = new Bundle();
+                Bundle amountBundle = new Bundle();
+
                 Intent toStage2 = new Intent(CreateNewSession_2.this, CreateNewSession_3.class);
-                String getReceiver = receiver;
-                extras.putString("receiver", "" + getReceiver.toString());
-                toStage2.putExtras(extras);
+                String getToUser = receiver;
+                String getAmount = amountEditText.getText().toString();
+                toUserBundle.putString("toUser", "" + getToUser);
+                amountBundle.putString("amount", "" + getAmount);
+                toStage2.putExtras(toUserBundle);
+                toStage2.putExtras(amountBundle);
                 startActivity(toStage2);
             }
         });

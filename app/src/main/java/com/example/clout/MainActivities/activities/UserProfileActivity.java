@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.ObjectAnimator;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,35 +52,49 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class userprfileactivity extends AppCompatActivity {
+public class UserProfileActivity extends AppCompatActivity {
 
-    Button notificationsButton;
+    //Declare general vars START
+    private StorageReference mStorageRefProfilePic;
+    Button addedButton, update, notificationsButton;
     ListView listView;
-    ArrayAdapter adapter;
+    ArrayAdapter<String> adapter;
     ArrayList<String> arrayList;
     AddFriendHandler addFriend;
-    private StorageReference mStorageRefPfofPic;
     ProgressBar progress;
-    TextView accountKey;
+    TextView accountKey, addedTV;
     CircleImageView profilePic;
-    Button addedButton, update;
     AccountKeyManager accKey;
+    //END...
+
+    //Declare firebase vars START
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference usersFrieldKListRef = database.getReference("Users_Friends_List");
-    DatabaseReference usersRef = database.getReference("Users");
+    DatabaseReference userFriendsList, usersRef;
     FirebaseUser mCurrentUser = mAuth.getCurrentUser();
+    //END...
+
+    //prepare image for selection and placement vars START
     Uri mImageUri; /* Image URI is for Firebase Image Storage */
     private StorageReference mStorageRef;
     public static final int PICK_IMAGE = 1;
+    private Handler myHandler;
+    //END...
 
+    /** onCreate should house initialized variables as well as methods, but no direct code
+     * However - There is a single line of code as follows
+     *         progress.setVisibility(View.INVISIBLE);
+     * I don't see value in placing this one line of code into its' own method*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprfileactivity);
 
+        userFriendsList = database.getReference("User_Friends_List");
+        usersRef = database.getReference("Users");
+        addedTV = findViewById(R.id.addedTextView);
         notificationsButton = findViewById(R.id.notifButton);
-        addFriend = new AddFriendHandler(userprfileactivity.this);
+        addFriend = new AddFriendHandler(UserProfileActivity.this);
         arrayList = new ArrayList<String>();
         progress = findViewById(R.id.progressBar);
         mStorageRef = FirebaseStorage.getInstance().getReference("user/");
@@ -92,29 +108,50 @@ public class userprfileactivity extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         progress.setVisibility(View.INVISIBLE);
+
         //updateUserName();
         addFriendsHandler();
         usernameRec();
         toFetchImage();
+        populateListView();
     }
+
+    /**onStart will populate the listView withe the 'Users_Friend_List' data from frirebase
+     * */
     @Override
     protected void onStart(){
         super.onStart();
         onStartGrabImage();
-
-        populateListView();
     }
 
-    //onClick set on button XML
+    /**When the notifications button is tapped
+     * An Intent will be created and the user will be sent to the NotificationActivity*/
     public void notificationsButtonOnClick(View v){
-        Intent goToNotifActivity = new Intent(userprfileactivity.this, NotificationActivity.class);
+        Intent goToNotifActivity = new Intent(UserProfileActivity.this, NotificationActivity.class);
         startActivity(goToNotifActivity);
     }
 
+    /**This method will populate the listView with data from the firebase 'User_Friends_List object'
+     * */
     public void populateListView(){
-        usersFrieldKListRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addChildEventListener(new ChildEventListener() {
+        Log.d("forLoopEnd", "End");
+        if(!arrayList.contains(null)){
+            myHandler = new Handler();
+            addedTV.setText("Friends List");
+
+            myHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    addedTV.setVisibility(View.INVISIBLE);
+                    ObjectAnimator tTextViewAnimation = ObjectAnimator.ofFloat(listView, "translationY", -70f);
+                    tTextViewAnimation.setDuration(1000);
+                    tTextViewAnimation.start();
+                }
+            }, 3000);
+        }
+        userFriendsList.child(accKey.createAccountKey(mCurrentUser.getEmail())).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d("forLoopStart", "Start");
                 Log.d("forLoopStart", "start" + " : " + snapshot);
 
@@ -124,22 +161,6 @@ public class userprfileactivity extends AppCompatActivity {
                     arrayList.add(value);
                     adapter.notifyDataSetChanged();
                 }
-                Log.d("forLoopEnd", "End");
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
             }
 
             @Override
@@ -148,8 +169,21 @@ public class userprfileactivity extends AppCompatActivity {
             }
         });
     }
+    
+    /**This mthod will allow the listView onClick functionality
+     * When an item is clicked it will deliver some information about the user.
+     * profile picture, username and score
+     * @param // TODO: 10/13/20 is up next for completion */
+    public void listViewItemSelect(){
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                
+            }
+        });
+    }
 
-    /*** The below method will add friends to the users account
+    /*** The below methods will add friends to the users account
      * 1 - Select a user by typing the account key/name
      * 2 - Once the user has been found, create db table for users and their friends
      * 3 - funnel the friends list users to the current users friend list Recycler View ***/
@@ -162,7 +196,7 @@ public class userprfileactivity extends AppCompatActivity {
         });
     }
     public void addFriendsHandlerAlert(){
-        final AlertDialog confirm = new MaterialAlertDialogBuilder(userprfileactivity.this).create();
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         confirm.setView(layout);
@@ -185,12 +219,12 @@ public class userprfileactivity extends AppCompatActivity {
         confirm.setMessage("Please type a users account name to add that user to your friends list. " +
                 "Also Please make sure to add the \"&\" symbol before the account name.");
 
-        EditText friendsName = new EditText(userprfileactivity.this);
+        EditText friendsName = new EditText(UserProfileActivity.this);
         friendsName.setGravity(Gravity.CENTER);
         friendsName.setHint("&AccountName");
         friendsName.setBackground(getDrawable(R.drawable.roundededittext));
-        MaterialButton submit = new MaterialButton(userprfileactivity.this);
-        MaterialButton cancel = new MaterialButton(userprfileactivity.this);
+        MaterialButton submit = new MaterialButton(UserProfileActivity.this);
+        MaterialButton cancel = new MaterialButton(UserProfileActivity.this);
         submit.setText(R.string.submit);
         submit.setBackgroundResource(R.color.colorPrimary);
         cancel.setText(R.string.cancel);
@@ -267,7 +301,7 @@ public class userprfileactivity extends AppCompatActivity {
                 }else{
                     /*if the entered friendsName does NOT contain the "&" symbol it is not passed to be
                     * searched*/
-                    Toast.makeText(userprfileactivity.this, "Please make sure " +
+                    Toast.makeText(UserProfileActivity.this, "Please make sure " +
                             "you've entered the \"&\" symbol before the users account name", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -280,14 +314,15 @@ public class userprfileactivity extends AppCompatActivity {
         });
         confirm.show();
     } /*TODO*/
+    /**END*/
 
-    /*** We will now create an confrimation dialoge that asks the currentUser if the user the've found
+    /*** We will now create an confirmation dialog that asks the currentUser if the user the've found
      * is the user they were looking for and a prompt will be displayed for them to add the user to their
      * friends list ... ***/
     public void confirmationAlert(/*Searched users account name*/String usersName,
             /*Searched users account name*/String usersCloutScore, String usersEmail){
 
-        final AlertDialog confirm = new MaterialAlertDialogBuilder(userprfileactivity.this).create();
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         confirm.setView(layout);
@@ -311,10 +346,10 @@ public class userprfileactivity extends AppCompatActivity {
         /*** We'll need to add in a function that grabs the searched usersprofile image, but
          * if there isn't one then we'll just use the profile image drawable. ***/
 
-        MaterialButton submit = new MaterialButton(userprfileactivity.this);
-        MaterialButton cancel = new MaterialButton(userprfileactivity.this);
-        TextView usersNameTV = new MaterialButton(userprfileactivity.this);
-        CircleImageView circleImageView = new CircleImageView(userprfileactivity.this);
+        MaterialButton submit = new MaterialButton(UserProfileActivity.this);
+        MaterialButton cancel = new MaterialButton(UserProfileActivity.this);
+        TextView usersNameTV = new MaterialButton(UserProfileActivity.this);
+        CircleImageView circleImageView = new CircleImageView(UserProfileActivity.this);
         circleImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_person_24));
         /*** Image Grab START ***/
         StorageReference mStorageRefPfofPic = FirebaseStorage.getInstance().getReference("user/user/" + usersEmail + "profilepicture" + "." + "jpg");
@@ -324,7 +359,7 @@ public class userprfileactivity extends AppCompatActivity {
                 public void onSuccess(Uri uri) {
 
                     String uriString = uri.toString();
-                    Glide.with(userprfileactivity.this).load(uriString).into(circleImageView);
+                    Glide.with(UserProfileActivity.this).load(uriString).into(circleImageView);
                     //Log.d("load image", "" + uriString);
 
                 }
@@ -342,11 +377,11 @@ public class userprfileactivity extends AppCompatActivity {
             //"\n " +
             //"\n");
 
-            Glide.with(userprfileactivity.this).load(circleImageView).into(circleImageView);
+            Glide.with(UserProfileActivity.this).load(circleImageView).into(circleImageView);
             //Log.d("load image", "" + mStorageRefPfofPic.toString());
         }
         /*** Image Grab END ***/
-        TextView usersCloutScoreTV = new MaterialButton(userprfileactivity.this);
+        TextView usersCloutScoreTV = new MaterialButton(UserProfileActivity.this);
         usersNameTV.setText(usersName);
         usersCloutScoreTV.setText(usersCloutScore);
         submit.setText(R.string.yes);
@@ -368,7 +403,7 @@ public class userprfileactivity extends AppCompatActivity {
                  * been added */
                 addFriend.AddFriend(usersName);
                 confirm.dismiss();
-                Toast.makeText(userprfileactivity.this, usersName + " has been added to your friends list", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UserProfileActivity.this, usersName + " has been added to your friends list", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -382,8 +417,10 @@ public class userprfileactivity extends AppCompatActivity {
         confirm.show();
     }
 
+    /**This method will retrieve the users accountKey/Username [which is a Key node from 'Users']
+     * from firebase('Users') and will
+     * replace the top-most textView with the retrieved string*/
     public void usernameRec (){
-
         usersRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -398,6 +435,10 @@ public class userprfileactivity extends AppCompatActivity {
         });
 
     }
+
+    /**This method changes the current users username
+     * Changing the username may cause unwanted side effects at the moment so for-now it will
+     * be removed until further notice*/
     /*public void updateUserName(){
         update.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -428,7 +469,10 @@ public class userprfileactivity extends AppCompatActivity {
             }
         });
     }*/
+    /**END*/
 
+    /**The following blocks of code will allow the user to select an image from their gallery
+     * and will place the image inside a circle imageView with the Glide library START*/
     /* When an image is selected from the gallery return result */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -442,14 +486,12 @@ public class userprfileactivity extends AppCompatActivity {
 
         }
     }
-
     /* When image file is selected master the extension of the file for sending to DB */
     private String getFileExtention (Uri uri){
         ContentResolver cR = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
     }
-
     /* When image is selected and extension is grabbed, send to storage */
     private void uploadFile(){
         if (mImageUri != null) {
@@ -469,8 +511,8 @@ public class userprfileactivity extends AppCompatActivity {
 
                             progress.setVisibility(View.INVISIBLE);
 
-                            Toast.makeText(userprfileactivity.this, "Upload Success", Toast.LENGTH_SHORT).show();
-                            Intent reload = new Intent(userprfileactivity.this, userprfileactivity.class);
+                            Toast.makeText(UserProfileActivity.this, "Upload Success", Toast.LENGTH_SHORT).show();
+                            Intent reload = new Intent(UserProfileActivity.this, UserProfileActivity.class);
                             startActivity(reload);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -495,8 +537,7 @@ public class userprfileactivity extends AppCompatActivity {
 
         }
     }
-
-    // ported to errands Check Done*
+    // Ported to Clouts Check Done*
     /* When C.ImgView is tapped, take user to users photo Gallery */
     private void toFetchImage(){
         profilePic.setOnClickListener(new View.OnClickListener() {
@@ -509,18 +550,17 @@ public class userprfileactivity extends AppCompatActivity {
             }
         });
     }
-
     /* When onStart 'LifeCycle' begins check if there is a user profile image, if so place in C.ImgView */
     private void onStartGrabImage(){
-        mStorageRefPfofPic = FirebaseStorage.getInstance().getReference("user/user/" + mCurrentUser.getEmail() + "profilepicture" + "." + "jpg");
+        mStorageRefProfilePic = FirebaseStorage.getInstance().getReference("user/user/" + mCurrentUser.getEmail() + "profilepicture" + "." + "jpg");
 
-        if(mStorageRefPfofPic != null){
-            mStorageRefPfofPic.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        if(mStorageRefProfilePic != null){
+            mStorageRefProfilePic.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
 
                     String uriString = uri.toString();
-                    Glide.with(userprfileactivity.this).load(uriString).into(profilePic);
+                    Glide.with(UserProfileActivity.this).load(uriString).into(profilePic);
                     //Log.d("load image", "" + uriString);
 
                 }
@@ -538,8 +578,9 @@ public class userprfileactivity extends AppCompatActivity {
             //"\n " +
             //"\n");
 
-            Glide.with(userprfileactivity.this).load(profilePic).into(profilePic);
+            Glide.with(UserProfileActivity.this).load(profilePic).into(profilePic);
             //Log.d("load image", "" + mStorageRefPfofPic.toString());
         }
     }
+    /**END*/
 }

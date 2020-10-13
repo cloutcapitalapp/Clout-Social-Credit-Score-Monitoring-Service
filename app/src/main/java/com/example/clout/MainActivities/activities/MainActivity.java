@@ -53,7 +53,12 @@ import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /*** This activity will house the main-hub. From here you'll have access to the other app activities
- * and you'll be able to see the full transaction history of the entire app. ***/
+ * and you'll be able to see the full transaction history of the entire app.
+ * @param // TODO: 10/12/20 There is a bug that causes the app to return to CreateNewSession2 after
+ * @param // TODO: 10/12/20 CreateNewSession2 has been passed, and seems to be recreated when the
+ * @param // TODO: 10/12/20 the user tries to return to the main method after passing CreateNewSession2
+ * @param // TODO: 10/12/20 Strangely, it affects all devices when any device returns to main
+ * @see // FIXME: 10/12/20 Above!***/
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseDatabase mDatabaseRef;
     DatabaseReference mVal, mCardInfo, mGetCash, getAccountKeyRef;
 
+    /** onCreate should house initialized variables as well as methods, but no direct code*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +120,11 @@ public class MainActivity extends AppCompatActivity {
         cashButtonHandle();
         //listViewListener();
     }
-    // OnStart Check what the users clout score is.
+    /***/
+
+    /**OnStart should pull the users clout score and init RecyclerView
+     * The current code should be refactored such that it is more organized and should only house
+     * methods that perform the code needed --- */
     @Override
     protected void onStart(){
         super.onStart();
@@ -204,9 +214,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    /***/
 
-    public void confirmationAlert(/*Searched users account name*/String usersName,
-            /*Searched users account name*/String usersCloutScore, String usersEmail){
+    /** onPause should start the dateReached service
+     * dateReach service should be refactored to handle notifications,
+     * but should also be changed to launch onDestroy()*/
+    @Override
+    protected void onPause(){
+        super.onPause();
+        startService(new Intent(this, dateReached.class));
+    }
+    /***/
+
+    /**Currently onDestroy() does not create service
+     * this must be changed*/
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        startService(new Intent(this, dateReached.class));
+    }
+    /***/
+
+    /**When the user taps on a RecyclerView item they will be prompted with that users information
+     * And a follow option will be granted apon accaptance. This may be removed as this may be
+     * more information than general users should have access to.*/
+    public void confirmationAlert(/*Selected users account name*/String usersName,
+            /*Selected users clout score*/String usersCloutScore, /*Selected users account email*/String usersEmail){
 
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
@@ -236,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
         TextView usersNameTV = new MaterialButton(MainActivity.this);
         CircleImageView circleImageView = new CircleImageView(MainActivity.this);
         circleImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_person_24));
+
         /*** Image Grab START ***/
         StorageReference mStorageRefPfofPic = FirebaseStorage.getInstance().getReference("user/user/" + usersEmail + "profilepicture" + "." + "jpg");
         if(mStorageRefPfofPic != null){
@@ -253,17 +287,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }else{
-            //Log.d("ReportImageTarget", "\n " +
-            //"\n " +
-            //"\n " +
-            //"onStart: NOTHING " +
-            //"\n " +
-            //"\n");
-
             Glide.with(MainActivity.this).load(circleImageView).into(circleImageView);
             //Log.d("load image", "" + mStorageRefPfofPic.toString());
         }
         /*** Image Grab END ***/
+
         TextView usersCloutScoreTV = new MaterialButton(MainActivity.this);
         usersNameTV.setText(usersName);
         usersCloutScoreTV.setText(usersCloutScore);
@@ -298,7 +326,9 @@ public class MainActivity extends AppCompatActivity {
         confirm.create();
         confirm.show();
     }
+    /***/
 
+    /** When the app starts, firebase should be called and the users cash amount should be retrieved*/
     private void onStartGetCash(){
         mGetCash.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("Cash").addValueEventListener(new ValueEventListener() {
             @Override
@@ -313,8 +343,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }/* This method needs to call the cash value stored at the user level */
+    }
+    /***/
 
+    /**This view holder is for the Main RecyclerView*/
     public static class tasksViewHolder extends RecyclerView.ViewHolder{
 
         TextView getTransacting_Users, getDate, getCurrent_date, getLocation, getAmount;
@@ -329,9 +361,12 @@ public class MainActivity extends AppCompatActivity {
             getAmount       = itemView.findViewById(R.id.amount);
         }
     }
+    /***/
+
+    /**onStart the usersScore should be checked
+     * if there is a score score grab will be called
+     * if there is no score a score will be created*/
     public void initScoreHandling(){
-        FirebaseUser user = mAuth.getCurrentUser();
-        AccountKeyManager accKey = new AccountKeyManager();
         if(mRefUsers.child("Score") != null){
             scoreGrab();
             // Nothing should happen if the value of the score is 200 already
@@ -341,15 +376,11 @@ public class MainActivity extends AppCompatActivity {
             scoreGrab();
         }
     }
+
+    /**onStart the users score should be grabed*/
     //init user score
     public void scoreGrab(){
-        mAuth = FirebaseAuth.getInstance();
-        mCurrentUser = mAuth.getCurrentUser();
-        db = FirebaseDatabase.getInstance();
         final MaterialButton cloutScore1 = findViewById(R.id.CloutScore);
-        FirebaseUser user = mAuth.getCurrentUser();
-        AccountKeyManager accKey = new AccountKeyManager();
-
         // Read from the database to get the users score
         mRefUsers.child("Score").addValueEventListener(new ValueEventListener() {
             @Override
@@ -357,8 +388,10 @@ public class MainActivity extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 String value = dataSnapshot.getValue(String.class);
-                Log.d("db_ref_success", "Value is: " + value + " " + mRefUsers);
-                cloutScore1.setText(String.format(String.valueOf(value)));
+
+                //Log.d("db_ref_success", "Value is: " + value + " " + mRefUsers);
+
+                cloutScore1.setText(String.valueOf(value));
             }
 
             @Override
@@ -369,7 +402,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-    //When the ScoreHolder button is clicked go to the CreateNewSession Activity
+    /***/
+
+    /**When the scorehandler/cloutScore button is tapped go CreateNewSessionStart activity*/
     public void onClickGoToCreateNewSessionActivity(){
         cloutScore.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -380,6 +415,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    /***/
+
+    /**When the cash/money button is tapped the user should be taken to the LoadCash activity
+     * The users system should check to see if the user has added banking information,
+     * if they have not, the user should be able to use a card*/
     public void cashButtonHandle(){
         // Read from the database
         money.setOnClickListener(new View.OnClickListener() {
@@ -475,6 +515,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    /***/
+
+    /**This method listens for updates to the user objects cash amount item in firebase*/
     private void adjustCashVal(){
         mVal.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("Cash").addValueEventListener(new ValueEventListener() {
             @Override
@@ -494,6 +537,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    /***/
+
+    /**This method was implements a listView
+     * it has since been changed to a recyclerView
+     * so the below method has no use
+     * it will be removed before release*/
     /*private void listViewListener(){
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -524,6 +573,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }*/
+    /***/
+
+    /**When the app starts the firebase User Objects' username item should be retrieved and displayed
+     * on the Title TextView*/
     private void getUsernameOnStart(){
         // Read from the database
         getAccountKeyRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addValueEventListener(new ValueEventListener() {
@@ -534,7 +587,7 @@ public class MainActivity extends AppCompatActivity {
                 String value = dataSnapshot.getValue(String.class);
                 String key = dataSnapshot.getKey();
                 usernameTextView.setText(key);
-                Log.d("getUNameOnStartTest: ", "Value is: " + value + " : " + getAccountKeyRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).getKey());
+                //Log.d("getUNameOnStartTest: ", "Value is: " + value + " : " + getAccountKeyRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).getKey());
             }
 
             @Override
@@ -544,15 +597,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    /***/
+
+    /**When the imageView at the top right corner is tapped, the user should be taken to their personal
+     * profile*/
     private void imageViewButtonToProfile(){
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goToProfile = new Intent(MainActivity.this, userprfileactivity.class);
+                Intent goToProfile = new Intent(MainActivity.this, UserProfileActivity.class);
                 startActivity(goToProfile);
             }
         });
     }
+    /***/
+
+    /**The following three alerts work together to introduce the user to the app
+     * Each user object in firebase has an 'isFirstTimeUserIntro' item with a boolean val(TRUE or FALSE)
+     * which simply keeps track of weather or not the user has been introduced to the app with the alerts yet*/
     public void firstReturnAlertBlock1(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
@@ -671,6 +733,10 @@ public class MainActivity extends AppCompatActivity {
         });
         confirm.show();
     }
+    /***/
+
+    /**This method houses 3 animations one for the profileImage, money button and recyclerView
+     * These are standard animations meant to attract the user*/
     public void openAnimations(){
 
         ObjectAnimator animProfileImage = ObjectAnimator.ofFloat(profileImage, "translationX", 30f);
@@ -686,7 +752,9 @@ public class MainActivity extends AppCompatActivity {
         animListView.start();
 
     }
-    /* When onStart 'LifeCycle' begins check if there is a user profile image, if so place in C.ImgView */
+    /***/
+
+    /** When onStart 'LifeCycle' begins check if there is a user profile image, if so place in C.ImgView */
     private void onStartGrabImage(){
         StorageReference mStorageRefPfofPic = FirebaseStorage.getInstance().getReference("user/user/" + mCurrentUser.getEmail() + "profilepicture" + "." + "jpg");
 
@@ -718,6 +786,9 @@ public class MainActivity extends AppCompatActivity {
             //Log.d("load image", "" + mStorageRefPfofPic.toString());
         }
     }
+    /***/
+
+    /**This alert will report to the user what the details of an recylerView list item are when tapped*/
     public void transactionDetialsAlert(/* Get the date from the selected viewHolder */ String date,
             /* Get the rate from the selected viewHolder */ String rate,
             /* Get the description from the selected viewHolder */ String description,
@@ -766,4 +837,5 @@ public class MainActivity extends AppCompatActivity {
         });
         transactionDetialsAlert.show();
     }
+    /***/
 }

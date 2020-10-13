@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.clout.MainActivities.Classes.AccountKeyManager;
+import com.example.clout.MainActivities.Classes.CashHandler;
 import com.example.clout.MainActivities.Classes.ScoreHandler;
 import com.example.clout.MainActivities.Classes.SessionActivityID;
 import com.example.clout.R;
@@ -51,7 +52,11 @@ import static com.example.clout.MainActivities.Classes.notificationHandler.CHANN
 public class CreateNewSession_3 extends AppCompatActivity {
 
     private NotificationManagerCompat notificationManagerCompat;
+    //Extras - Start
     String receiver;
+    String getAmount;
+    //Extras - End
+    CashHandler cashHandler = new CashHandler();
     TextView date;
     CalendarView calendarView;
     SessionActivityID sessionActivityID;
@@ -93,8 +98,9 @@ public class CreateNewSession_3 extends AppCompatActivity {
     private void getExtras(){
         Bundle intentExtras = getIntent().getExtras();
         assert intentExtras != null;
-        receiver = intentExtras.getString("receiver");
-        Log.d("recieverTest", "extras : " + receiver);
+        receiver = intentExtras.getString("toUser");
+        getAmount = intentExtras.getString("amount");
+        Log.d("recieverTest", "extras : " + receiver + ", " + getAmount);
     }
 
     private void FundsNotRequiredForReturnMethod(){
@@ -214,7 +220,7 @@ public class CreateNewSession_3 extends AppCompatActivity {
                     notificationsRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-
+                            cashHandler.sendCash(receiver, Double.valueOf(getAmount));
                             notificationsRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).push().child("Notify").setValue(currentDate+ " : \n" + "Score Increased by .25! Great Job!");
                         }
 

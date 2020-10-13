@@ -1,5 +1,7 @@
 package com.example.clout.MainActivities.activities;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import com.example.clout.MainActivities.Classes.AccountKeyManager;
 import com.example.clout.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,6 +45,8 @@ public class NotificationActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     AccountKeyManager accKey;
 
+    /**This activity will show the users notifications
+     * over a listView*/
     //Standard ListView will be used
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,26 +54,27 @@ public class NotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification);
 
 
+        //Call AccountKeyManager
         accKey = new AccountKeyManager();
-        //setup firebase
-        // declare firebase vars
+
+        //setup firebase START
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Users_Notifications");
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        //END...
 
-        // We'll need to create the ListView and create entries in a ListView node in firebase
+        //Init listView
         notifListView = findViewById(R.id.notificationsListView);
+
         listViewPopulate();
         callListViewData();
     }
 
-    protected void onStart(){
-        super.onStart();
-    }
-
+    /**Finds Users_Notificiations object and locates mCurrentUser
+     * Once the current users object is found in firebase iterate over that users children which will be the
+     * users notifications and will be passed into the listView*/
     public void callListViewData(){
-        // Read from the database
         myRef.child(accKey.createAccountKey(currentUser.getEmail())).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

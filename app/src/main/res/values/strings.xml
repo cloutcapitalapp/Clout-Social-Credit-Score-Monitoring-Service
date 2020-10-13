@@ -31,5 +31,7 @@
     <string name="withdrawnow">WITHDRAW FUNDS NOW</string>
     <string name="yes">YES</string>
     <string name="add_friend">ADD FRIEND</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 </resources>

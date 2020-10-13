@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivities.activities.userprfileactivity">
+    tools:context=".MainActivities.activities.UserProfileActivity">
 
     <TextView
         android:id="@+id/accountKeyTitle"
@@ -24,7 +24,7 @@
         app:civ_border_color="#FF000000"
         app:civ_border_width="0.3dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.891"
+        app:layout_constraintHorizontal_bias="0.478"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/accountKeyTitle" />
 
@@ -43,13 +43,16 @@
         android:id="@+id/addedButton"
         android:layout_width="wrap_content"
         android:layout_height="33dp"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="2dp"
         android:fontFamily="sans-serif-light"
         android:text="Add Friend"
         android:textSize="10sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.905"
+        app:layout_constraintEnd_toStartOf="@+id/notifButton"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/notifButton" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_image" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -79,19 +82,23 @@
         android:layout_width="wrap_content"
         android:layout_height="33dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:fontFamily="sans-serif-light"
         android:text="WITHDRAW FUNDS"
         android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/addedTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.893"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_image" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_image"
+        app:layout_constraintVertical_bias="1.0" />
 
     <ListView
         android:id="@+id/listView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginLeft="30dp"
         android:layout_marginTop="1dp"
+        android:layout_marginRight="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,13 +108,18 @@
         android:id="@+id/notifButton"
         android:layout_width="wrap_content"
         android:layout_height="33dp"
+        android:layout_marginStart="132dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="8dp"
         android:fontFamily="sans-serif-light"
         android:onClick="notificationsButtonOnClick"
         android:text="Notifications"
         android:textSize="10sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.899"
+        app:layout_constraintBottom_toTopOf="@+id/addedTextView"
+        app:layout_constraintEnd_toStartOf="@+id/withDrawButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/withDrawButton" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_image"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
