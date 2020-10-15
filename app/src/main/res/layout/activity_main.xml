@@ -32,9 +32,10 @@
         android:background="#E74C3C"
         android:fontFamily="sans-serif-light"
         android:gravity="center"
-        android:text="0.00"
+        android:text="@string/zero_value"
         android:textColor="#00CC8F"
         android:textSize="40dp"
+        android:visibility="gone"
         app:backgroundTint="#378A00"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -84,10 +85,9 @@
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        app:stackFromEnd="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/money" />
+        app:layout_constraintTop_toBottomOf="@+id/CloutScore"
+        app:stackFromEnd="true" />
 </androidx.constraintlayout.widget.ConstraintLayout>

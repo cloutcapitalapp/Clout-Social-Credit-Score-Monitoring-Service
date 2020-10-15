@@ -56,7 +56,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     //Declare general vars START
     private StorageReference mStorageRefProfilePic;
-    Button addedButton, update, notificationsButton;
+    Button addedButton, update, notificationsButton, withdrawButton;
     ListView listView;
     ArrayAdapter<String> adapter;
     ArrayList<String> arrayList;
@@ -90,6 +90,7 @@ public class UserProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprfileactivity);
 
+        withdrawButton = findViewById(R.id.withDrawButton);
         userFriendsList = database.getReference("User_Friends_List");
         usersRef = database.getReference("Users");
         addedTV = findViewById(R.id.addedTextView);
@@ -107,13 +108,17 @@ public class UserProfileActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<String>(this,R.layout.listview, R.id.listviewitem, arrayList);
         listView.setAdapter(adapter);
 
+        //progressbar setVisibility to invisible.
+        //this is of course changed when the user uploads an image.
         progress.setVisibility(View.INVISIBLE);
 
         //updateUserName();
+        //listViewItemSelect();
         addFriendsHandler();
         usernameRec();
         toFetchImage();
         populateListView();
+        withdrawOnClick();
     }
 
     /**onStart will populate the listView withe the 'Users_Friend_List' data from frirebase
@@ -178,7 +183,7 @@ public class UserProfileActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                
+                String userName = String.valueOf(listView.getItemAtPosition(position));
             }
         });
     }
@@ -315,6 +320,49 @@ public class UserProfileActivity extends AppCompatActivity {
         confirm.show();
     } /*TODO*/
     /**END*/
+
+    /**Widthdraw Button is tapped*/
+    public void withdrawOnClick(){
+        withdrawButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                paymentsNotReadyAlert();
+            }
+        });
+    }
+
+    /**This method will alert the user that payments are not yet ready*/
+    private void paymentsNotReadyAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_mood_bad_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("NOT YET!");
+        confirm.setMessage("Payments are not ready yet. Stick around, they'll be ready soon.");
+
+        MaterialButton confirmButton = new MaterialButton(UserProfileActivity.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
+    }
 
     /*** We will now create an confirmation dialog that asks the currentUser if the user the've found
      * is the user they were looking for and a prompt will be displayed for them to add the user to their

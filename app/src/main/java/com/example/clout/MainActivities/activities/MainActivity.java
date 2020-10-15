@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,7 +23,6 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.example.clout.MainActivities.Classes.AccountKeyManager;
 import com.example.clout.MainActivities.Classes.AddFriendHandler;
@@ -46,10 +44,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
 import java.text.MessageFormat;
 import java.util.Locale;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /*** This activity will house the main-hub. From here you'll have access to the other app activities
@@ -115,6 +111,8 @@ public class MainActivity extends AppCompatActivity {
         scrHandle = new ScoreHandler();
         usernameTextView = findViewById(R.id.usernameTextView);
         profileImage = findViewById(R.id.profile_image);
+
+        /**Method | Functionality*/
         openAnimations();
         imageViewButtonToProfile();
         cashButtonHandle();
@@ -410,8 +408,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //transAlert();
-                Intent toCreateNewSession = new Intent(MainActivity.this, CreateNewSessionStart.class);
-                startActivity(toCreateNewSession);
+                createTransactionAlert();
             }
         });
     }
@@ -735,10 +732,107 @@ public class MainActivity extends AppCompatActivity {
     }
     /***/
 
+    /**The following alert will ask the user if the user would like to create a transaction.
+     * If the user would like to create a transaction they will have 2 options.
+     * O 1 - Event|Trust Transaction
+     * O 2 - Money Transaction*/
+    private void createTransactionAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("Create A Transaction?");
+        confirm.setMessage("What kind of transaction would you like to create?");
+
+        MaterialButton eventTransButton = new MaterialButton(MainActivity.this);
+        MaterialButton moneyTransButton = new MaterialButton(MainActivity.this);
+        MaterialButton cancelButton = new MaterialButton(MainActivity.this);
+
+        eventTransButton.setText(R.string.eventTransaction);
+        moneyTransButton.setText(R.string.money_transaction);
+        cancelButton.setText(R.string.cancel);
+
+        eventTransButton.setBackgroundResource(R.color.colorPrimary);
+        moneyTransButton.setBackgroundResource(R.color.colorPrimary);
+        cancelButton.setBackgroundResource(R.color.colorPrimary);
+
+        layout.addView(eventTransButton);
+        layout.addView(moneyTransButton);
+        layout.addView(cancelButton);
+
+        eventTransButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO - Create EventTransactionActivity
+                Intent passToEventTransaction = new Intent(MainActivity.this, EventTransactionActivity.class);
+                startActivity(passToEventTransaction);
+            }
+        });
+
+        moneyTransButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //T.O.D.O
+                // An alert that informs the user that the payments system is not yet ready.
+                // DONE!
+                paymentsNotReadyAlert();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
+    }
+    private void paymentsNotReadyAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_mood_bad_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("NOT YET!");
+        confirm.setMessage("Payments are not ready yet. Stick around, they'll be ready soon.");
+
+        MaterialButton confirmButton = new MaterialButton(MainActivity.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
+    }
+
     /**This method houses 3 animations one for the profileImage, money button and recyclerView
      * These are standard animations meant to attract the user*/
     public void openAnimations(){
-
         ObjectAnimator animProfileImage = ObjectAnimator.ofFloat(profileImage, "translationX", 30f);
         animProfileImage.setDuration(500);
         animProfileImage.start();
@@ -747,10 +841,9 @@ public class MainActivity extends AppCompatActivity {
         animCashButton.setDuration(500);
         animCashButton.start();
 
-        ObjectAnimator animListView = ObjectAnimator.ofFloat(recyclerView, "translationY", -90f);
+        /*ObjectAnimator animListView = ObjectAnimator.ofFloat(recyclerView, "translationY", -90f);
         animListView.setDuration(500);
-        animListView.start();
-
+        animListView.start();*/
     }
     /***/
 

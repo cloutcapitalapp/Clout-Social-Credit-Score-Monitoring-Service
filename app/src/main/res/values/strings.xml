@@ -33,5 +33,18 @@
     <string name="add_friend">ADD FRIEND</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="eventTransaction">Event Transaction</string>
+    <string name="money_transaction">Money Transaction</string>
+    <string name="zero_value">0.00</string>
+    <string name="trans_description">Description of transaction</string>
+    <string name="whoTextViewMain">Who will you send this transaction to?</string>
+    <string name="accountname"><![CDATA[&Accountname]]></string>
 
+    <string-array name="event_types">
+        <item>Choose Event Type</item>
+        <item>Meeting</item>
+        <item>Date</item>
+        <item>Party</item>
+        <item>other</item>
+    </string-array>
 </resources>
