@@ -2,9 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.clout">
 
+    <!-- Include required permissions for Google Mobile Ads to run. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MainActivities.Classes.notificationHandler"
@@ -14,18 +15,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivities.activities.EventTransactionActivity"></activity>
-
-        <receiver android:name=".MainActivities.activities.scoreWidget">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/score_widget_info" />
-        </receiver>
-
+        <!-- Include the AdActivity configChanges and theme. -->
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
+        <activity android:name=".MainActivities.activities.EventTransactionActivity" />
         <activity android:name=".MainActivities.activities.NotificationActivity" />
 
         <service
@@ -35,7 +30,8 @@
 
         <activity
             android:name=".MainActivities.activities.AuthActivity"
-            android:configChanges="locale" />
+            android:configChanges="locale"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivities.activities.UserProfileActivity"
             android:configChanges="locale"

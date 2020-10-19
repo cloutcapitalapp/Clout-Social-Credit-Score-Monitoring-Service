@@ -46,7 +46,7 @@ public class CheckAccountName extends Activity {
 
         //Change editTextVal to string
         String editTextToString = editTextVal.getText().toString().toLowerCase().trim();
-        
+
         if(editTextToString.contains("&")){
             // Read from the database
             mVal.addValueEventListener(new ValueEventListener() {

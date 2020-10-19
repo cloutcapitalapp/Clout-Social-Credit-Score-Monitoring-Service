@@ -1,23 +1,35 @@
 package com.example.clout.MainActivities.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.example.clout.MainActivities.Classes.AccountKeyManager;
 import com.example.clout.MainActivities.objects.UserObject;
 import com.example.clout.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
@@ -30,11 +42,13 @@ import com.stripe.model.Customer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-
-// The login activity must be attractive as it will be the introduction of the user to the app
+/**The login activity must be attractive as it will be the introduction of the user to the app
+ * @param // FIXME: 10/18/20 refactor notes on this activity*/
 public class AuthActivity extends AppCompatActivity {
     /* Init Vars */
+    VideoView videoView;
     private TextInputLayout username;
     private TextInputLayout password;
     private TextView confirmAssistText;
@@ -56,6 +70,7 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         /* Assign Vars */
+        videoView = (VideoView) findViewById(R.id.videoView);
         confirmAssistText = findViewById(R.id.confirmAssistText);
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
@@ -72,16 +87,56 @@ public class AuthActivity extends AppCompatActivity {
 
         // App functionality
         loginButton.setVisibility(View.INVISIBLE);
+        openingAnimation();
         tabLayoutManager();
         loginButtonOnClick();
         submitButtonOnClick();
     }
 
-    // Check if user is signed in (non-null) and update UI accordingly.
+    /**When the back button was being pressed, the user would be taken back to the launch screen
+     * with no animation and the intent was killed so the user wasn't being returned to the */
+    @Override
+    public void onBackPressed() {
+        //...do nothing
+    }
+
+    /**onStart the ad video should play
+     * when the add video plays, because its so loud the system volume should be changed to 6*/
+    public void onStartPlayIntroVideo(){
+
+        Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.cloutad);
+
+        AudioManager audioManager =
+                (AudioManager)getSystemService(AuthActivity.AUDIO_SERVICE);
+
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 6, 1);
+
+        videoView.setVideoURI(uri);
+        videoView.start();
+    }
+
+    /**These are animations
+     * openingAnimation will run onCreate
+     * reverseAnimation will run on return to sign up tab*/
+    public void openingAnimation(){
+        ObjectAnimator animCashButton = ObjectAnimator.ofFloat(submit, "translationY", -90f);
+        animCashButton.setDuration(500);
+        animCashButton.start();
+    }
+    public void reverseAnimation(){
+        ObjectAnimator animCashButton = ObjectAnimator.ofFloat(submit, "translationY", 90f);
+        animCashButton.setDuration(500);
+        animCashButton.start();
+    }
+
+    /**Check if user is signed in (non-null) and update UI accordingly.
+     * If there is a user cached then go to MainActivity,
+     * if not then stay on AuthActivity to sign up or log in*/
     @Override
     public void onStart() {
         super.onStart();
 
+        onStartPlayIntroVideo();
         if (mCurrentUser != null){
             Intent toProfileActivity = new Intent(AuthActivity.this, MainActivity.class);
             startActivity(toProfileActivity);
@@ -90,105 +145,190 @@ public class AuthActivity extends AppCompatActivity {
         }
     } /* If there is no user, user will be prompted to create an account. */
 
-    // Firebase method: if email is properly formated and passwords match firebase user will be created and cashed.
+    /**Firebase method: if email is properly formatted and passwords match firebase user will be created and cached.
+     * The following methods will be for creating an account or signing into one.
+     * */
     public void createAccount(final String email, String password){
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    private Object AsyncStripeTask;
+        if(!email.isEmpty()){
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        private Object AsyncStripeTask;
 
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            //Log.d("success", "createUserWithEmail:success");
-                            FirebaseUser fireUser = mAuth.getCurrentUser();
-                            keyGenerator = new AccountKeyManager();
-                            userObject = new UserObject();
-                            String accKey = keyGenerator.createAccountKey(email);
-                            Log.d("New Pass", "" + accKey);
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            //If the sign in is successful
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                //Log.d("success", "createUserWithEmail:success");
+                                FirebaseUser fireUser = mAuth.getCurrentUser();
+                                keyGenerator = new AccountKeyManager();
 
-                            // Send a userObject to firebase RTDB
-                            //
-                            //
-                            mRefUsers.child(accKey);
-                            mRefUsers.child(accKey).child("Email").setValue(fireUser.getEmail());
+                                /**userObject = new UserObject does not appear to be used
+                                 *@// FIXME: 10/17/20 will fix soon */
+                                userObject = new UserObject();
 
-                            mRefUsers.child(accKey).child("Score").setValue("CS200.00");
-                            mRefUsers.child(accKey).child("Cash").setValue("$0.00");
-                            mRefUsers.child(accKey).child("isCardOnFile").setValue("NO");
-                            mRefUsers.child(accKey).child("isFirstTimeUserIntro").setValue("yes");
-                            mRefUsers.child(accKey).child("isFirstTimeUserScore").setValue("yes");
-                            mRefUsers.child(accKey).child("isFirstTimeUserCash").setValue("yes");
-                            mRefUsers.child(accKey).child("TransactionList").setValue("Null");
-                            new AsyncStripeTask().execute(AsyncStripeTask);
+                                String accKey = keyGenerator.createAccountKey(email);
 
-                            //
-                            //
-                            // DONE
+                                //Log.d("New Pass", "" + accKey);
 
-                            Intent toMain = new Intent(AuthActivity.this, MainActivity.class);
-                            startActivity(toMain);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            //Log.w("Failed", "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(AuthActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                                // Send a userObject to firebase RTDB
+                                //
+                                //
+
+                                mRefUsers.child(accKey);
+                                assert fireUser != null;
+                                mRefUsers.child(accKey).child("Email").setValue(fireUser.getEmail());
+
+                                mRefUsers.child(accKey).child("FirstName").setValue("CS200.00");
+                                mRefUsers.child(accKey).child("LastName").setValue("CS200.00");
+                                mRefUsers.child(accKey).child("Score").setValue("CS200.00");
+                                mRefUsers.child(accKey).child("Cash").setValue("$0.00");
+                                mRefUsers.child(accKey).child("isCardOnFile").setValue("NO");
+                                mRefUsers.child(accKey).child("isFirstTimeUserIntro").setValue("yes");
+                                mRefUsers.child(accKey).child("isFirstTimeUserScore").setValue("yes");
+                                mRefUsers.child(accKey).child("isFirstTimeUserCash").setValue("yes");
+                                //For now creating a TransactionList inside the user element won't be used
+                                //mRefUsers.child(accKey).child("TransactionList").setValue("Null");
+                                new AsyncStripeTask().execute(AsyncStripeTask);
+
+                                //
+                                //
+                                // DONE
+
+                                Intent toMain = new Intent(AuthActivity.this, MainActivity.class);
+                                startActivity(toMain);
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                //Log.w("Failed", "createUserWithEmail:failure", task.getException());
+                                Toast.makeText(AuthActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+
+                                checkEmailAlert();
+                            }
+                            // ...
                         }
-                        // ...
-                    }
-                });
-    }
+                    });
+        }else{
+            Toast.makeText(this, "We need an email", Toast.LENGTH_SHORT).show();
+        }
 
-    // This method will be used to handle the user sign in.
-    // TODO: The login button will not be shown unless the login tab is active.
+    }
     public void signInUser(final String email, final String password){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        Log.d("firetest", email + " " + password);
+                        //Log.d("firebase_test", email + " " + password);
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d("isLoggedIn", "signInWithEmail:success");
+                            //Log.d("isLoggedIn", "signInWithEmail:success");
                             Intent passToMain = new Intent(AuthActivity.this, MainActivity.class);
                             startActivity(passToMain);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("isLoggedIn", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(AuthActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            //Log.w("isLoggedIn", "signInWithEmail:failure", task.getException());
+                            //Toast.makeText(AuthActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            loginAlert();
                         }
                         // ...
                     }
                 });
     }
+    /**End block*/
 
     /* BUTTON FUNCTIONS */
     /*  */
     /*  */
 
-    // When submit button is clicked, check if passwords match
+    /**When submit button is clicked, check if passwords match and check email*/
     public void submitButtonOnClick(){
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /* Email to store for creation of users account */ String email          = username.getEditText().getText().toString();
+                /* Email to store for creation of users account */ String email          = Objects.requireNonNull(username.getEditText()).getText().toString();
 
                 /* Passwords will be used by if conditional | if passwords match account will be created (assuming email is formated correctly). */
-                /* initial password for comparision */             String passwordMain   = password.getEditText().getText().toString();
-                /* secondary password for comparison */            String passwordRetype = retype.getEditText().getText().toString();
+                /* initial password for comparision */             String passwordMain   = Objects.requireNonNull(password.getEditText()).getText().toString();
+                /* secondary password for comparison */            String passwordRetype = Objects.requireNonNull(retype.getEditText()).getText().toString();
 
-                if(passwordMain.equals(passwordRetype)){
+                /**Password requirements should be set
+                 * rule 1 - should match - satisfied
+                 * rule 2 - should be at least 10 characters @todo check*/
+                if(/*Passwords match*/ passwordMain.equals(passwordRetype)
+                        && (/*can NOT be less than 10 characters*/(passwordMain.length() >= 10))){
                     createAccount(email.replace(" ", ""), passwordMain);
                 }else{
-                    Log.d("SOMETHING: ", "Password check does not match:" + " " + passwordMain + " " + passwordRetype);
+                    //Log.d("SOMETHING: ", "Password check does not match:" + " " + passwordMain + " " + passwordRetype);
+                    passwordLengthAlert();
                 }
             }
         });
     }
+    public void passwordLengthAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
 
-    // Below will be the method used to log the user into his/her account
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("WAIT!");
+        confirm.setMessage("Your password isn't long enough or doesn't match. Please check it and try again. " +
+                "It just helps keep your account secure.");
+
+        MaterialButton button = new MaterialButton(AuthActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
+    }
+    public void checkEmailAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("WAIT!");
+        confirm.setMessage("Please make sure your email is correct and try again!");
+
+        MaterialButton button = new MaterialButton(AuthActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
+    }
+
+    /**Below will be the method used to log the user into his/her account*/
     public void loginButtonOnClick(){
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,10 +338,43 @@ public class AuthActivity extends AppCompatActivity {
                 /* Passwords will be used by if conditional | if passwords match account will be created (assuming email is formated correctly). */
                 /* initial password for comparision */             String passwordMain   = password.getEditText().getText().toString();
 
-                signInUser(email, passwordMain);
-                Log.d("test login cred", email + " " + passwordMain);
+                signInUser(email.trim(), passwordMain);
+                //Log.d("test login cred", email + " " + passwordMain);
             }
         });
+    }
+    public void loginAlert(){
+        /**User needs to be warned to check email and password and try again*/
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("WAIT!");
+        confirm.setMessage("Looks like your user name or password was incorrect. Please check, " +
+                "and try again.");
+
+        MaterialButton button = new MaterialButton(AuthActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
     }
 
     /* APP FUNCTIONALITY */
@@ -233,6 +406,8 @@ public class AuthActivity extends AppCompatActivity {
                     confirmAssistText.setVisibility(View.INVISIBLE);
                     submit.setVisibility(View.GONE);
                     loginButton.setVisibility(View.VISIBLE);
+                    openingAnimation();
+                    reverseAnimation();
                 }else /* if else, then index 0 is active | index 0 is the sign up tab, and all elements will be available when index 0 is active */{
                     //Log.d("isindex0", "onTabSelected: " + false); {test is complete | index1 is false and shows}
 
@@ -241,6 +416,7 @@ public class AuthActivity extends AppCompatActivity {
                     submit.setVisibility(View.VISIBLE);
                     loginButton.setVisibility(View.INVISIBLE);
                     submit.setVisibility(View.VISIBLE);
+                    openingAnimation();
                 }
             }
 
@@ -279,6 +455,10 @@ public class AuthActivity extends AppCompatActivity {
         }
     }
 
+    /**@// TODO: 10/17/20 this method is fixed by the above method which is an async
+     * connection to stripe that creates a customer. They may be both taken out, but
+     * for now the below method @fixme createStripeCustomer()
+     * will be taken out before ship*/
     /* This method doesn't need to be used as it is not delivered Asynchronously */
     /* Create stripe customer */
     public void createStripeCustomer(){

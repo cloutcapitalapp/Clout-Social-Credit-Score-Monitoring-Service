@@ -52,8 +52,9 @@ public class AddFriendHandler {
                 //Log.d("chedkAddFriend", "Were good Outer");
                 //String username = snapshot1.child(endingUser).getKey();
                 String value = snapshot.getKey();
-                Log.d("checkValue", "" + value);
+                //Log.d("checkValue", "" + value);
                 usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child(endingUser).setValue("Added");
+
             }
 
             @Override

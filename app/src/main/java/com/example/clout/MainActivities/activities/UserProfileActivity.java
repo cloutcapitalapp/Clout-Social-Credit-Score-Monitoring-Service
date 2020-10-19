@@ -113,7 +113,7 @@ public class UserProfileActivity extends AppCompatActivity {
         progress.setVisibility(View.INVISIBLE);
 
         //updateUserName();
-        //listViewItemSelect();
+        listViewItemSelect();
         addFriendsHandler();
         usernameRec();
         toFetchImage();
@@ -157,12 +157,12 @@ public class UserProfileActivity extends AppCompatActivity {
         userFriendsList.child(accKey.createAccountKey(mCurrentUser.getEmail())).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("forLoopStart", "Start");
-                Log.d("forLoopStart", "start" + " : " + snapshot);
+                //Log.d("forLoopStart", "Start");
+                //Log.d("forLoopStart", "start" + " : " + snapshot);
 
                 for (DataSnapshot snapshot1 : snapshot.getChildren()){
                     String value = snapshot1.getKey();
-                    Log.d("logValue", "" + value);
+                    //Log.d("logValue", "" + value);
                     arrayList.add(value);
                     adapter.notifyDataSetChanged();
                 }
@@ -180,12 +180,132 @@ public class UserProfileActivity extends AppCompatActivity {
      * profile picture, username and score
      * @param // TODO: 10/13/20 is up next for completion */
     public void listViewItemSelect(){
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            String userName = String.valueOf(listView.getItemAtPosition(position));
+            listViewOnClickItemAlert(userName);
+        });
+    }
+    /**This alert should confirm the user selected will be sent a transaction request
+     * @// TODO: 10/18/20 This method takes code from addFriend, it must be changed to suit its new purpose
+     * @// TODO: 10/18/20 Its' new purpose will be to submit a transaction request */
+    public void listViewOnClickItemAlert(String userName){
+        Toast.makeText(this, "" + userName, Toast.LENGTH_SHORT).show();
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        editTextParams.setMargins(130, 0, 130, 30);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("Start Transaction Request?");
+        confirm.setMessage("Make sure this is the correct username.");
+
+        EditText friendsName = new EditText(UserProfileActivity.this);
+        friendsName.setGravity(Gravity.CENTER);
+        friendsName.setText(userName);
+        friendsName.setHint("&AccountName");
+        friendsName.setBackground(getDrawable(R.drawable.roundededittext));
+        MaterialButton submit = new MaterialButton(UserProfileActivity.this);
+        MaterialButton cancel = new MaterialButton(UserProfileActivity.this);
+        submit.setText(R.string.submit);
+        submit.setBackgroundResource(R.color.colorPrimary);
+        cancel.setText(R.string.cancel);
+        cancel.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(friendsName, editTextParams);
+        layout.addView(submit, editTextParams);
+        layout.addView(cancel);
+        submit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String userName = String.valueOf(listView.getItemAtPosition(position));
+            public void onClick(View v) {
+
+                /* When the users touches the submit button the firebase needs to be checked for
+                 * said user in the users list, then a dialog needs to pop up showing the user in question
+                 * and confirming the user is the correct user that needs to be added. A small amount of the
+                 * users information will be displayed - Profile image, clout score, -- bio when they are added in --, and user name
+                 *
+                 * The data will display as follows
+                 * 1 - Account Key/Name
+                 * 2 - Profile image
+                 * 3 - Clout Score
+                 * 4 - Bio -- When added*/
+
+                /*** the friendsName var will be checked against all users to ensure the user is present in the
+                 * system. if the user is present they will be added. In the second version of the app, this will change
+                 * to a notification system - where the users will verify that they wish to be added. Instead, the user
+                 * will be notified when they are added.
+                 *
+                 * I find this acceptable for now because the users will have to give out there user names in order to
+                 * be added because there is no search bar for names.
+                 *
+                 * I believe this is secure enough for the moment to avoid hacks or manipulations of any kind
+                 *
+                 * We will start with an if conditional which makes sure the username is entered
+                 * correctly, then, if-so the system will procede with the check.
+                 * ***/
+                if(friendsName.getText().toString().contains("&")){
+                    /*if the entered friendsName contains the "&" symbol it is passed to be searched*/
+                    usersRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            for(DataSnapshot snapshot1 : snapshot.getChildren()){
+                                String usersName = snapshot1.getKey();
+                                String usersCloutScore = snapshot1.child("Score").getValue(String.class);
+                                String usersEmail = snapshot1.child("Email").getValue(String.class);
+                                // this log checks which usernames are being snapshot -- Log.d("userNameCheck", "" + usersName);
+
+                                /* This if conditional will now check the username entered against the usernames in the firebase DB
+                                 *
+                                 *  */
+                                if(friendsName.getText().toString().equals(usersName)){
+                                    /* Log.d("userNameCompareCheck", "Got a match from the database" + " : " + usersName);
+                                     *
+                                     * This above log will let us know we found a match*/
+
+                                    /* Now that we know the username can be indexed
+                                     * we can report to the currentUser and confirm that they have
+                                     * found the user they were looking for
+                                     *  */
+
+                                    // TODO BELOW
+                                    // The confirmation alert will go here ...
+                                    confirmationAlert(usersName, usersCloutScore, usersEmail);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }else{
+                    /*if the entered friendsName does NOT contain the "&" symbol it is not passed to be
+                     * searched*/
+                    Toast.makeText(UserProfileActivity.this, "Please make sure " +
+                            "you've entered the \"&\" symbol before the users account name", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
     }
 
     /*** The below methods will add friends to the users account
@@ -292,8 +412,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
                                     // TODO BELOW
                                     // The confirmation alert will go here ...
-                                    confirmationAlert(usersName, usersCloutScore, usersEmail);
-
+                                    confirmationFriendAlert(usersName, usersCloutScore, usersEmail);
                                 }
                             }
                         }
@@ -367,6 +486,98 @@ public class UserProfileActivity extends AppCompatActivity {
     /*** We will now create an confirmation dialog that asks the currentUser if the user the've found
      * is the user they were looking for and a prompt will be displayed for them to add the user to their
      * friends list ... ***/
+    public void confirmationFriendAlert(/*Searched users account name*/String usersName,
+            /*Searched users account name*/String usersCloutScore, String usersEmail){
+
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        editTextParams.setMargins(130, 0, 130, 30);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("Is this who you're looking for?");
+
+        /*** We'll need to add in a function that grabs the searched usersprofile image, but
+         * if there isn't one then we'll just use the profile image drawable. ***/
+
+        MaterialButton submit = new MaterialButton(UserProfileActivity.this);
+        MaterialButton cancel = new MaterialButton(UserProfileActivity.this);
+        TextView usersNameTV = new MaterialButton(UserProfileActivity.this);
+        CircleImageView circleImageView = new CircleImageView(UserProfileActivity.this);
+        circleImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_person_24));
+        /*** Image Grab START ***/
+        StorageReference mStorageRefPfofPic = FirebaseStorage.getInstance().getReference("user/user/" + usersEmail + "profilepicture" + "." + "jpg");
+        if(mStorageRefPfofPic != null){
+            mStorageRefPfofPic.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+
+                    String uriString = uri.toString();
+                    Glide.with(UserProfileActivity.this).load(uriString).into(circleImageView);
+                    //Log.d("load image", "" + uriString);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+        }else{
+            //Log.d("ReportImageTarget", "\n " +
+            //"\n " +
+            //"\n " +
+            //"onStart: NOTHING " +
+            //"\n " +
+            //"\n");
+
+            Glide.with(UserProfileActivity.this).load(circleImageView).into(circleImageView);
+            //Log.d("load image", "" + mStorageRefPfofPic.toString());
+        }
+        /*** Image Grab END ***/
+        TextView usersCloutScoreTV = new MaterialButton(UserProfileActivity.this);
+        usersNameTV.setText(usersName);
+        usersCloutScoreTV.setText(usersCloutScore);
+        submit.setText(R.string.yes);
+        submit.setBackgroundResource(R.color.colorPrimary);
+        cancel.setText(R.string.cancel);
+        cancel.setBackgroundResource(R.color.colorPrimary);
+
+        layout.addView(circleImageView, editTextParams);
+        layout.addView(usersNameTV);
+        layout.addView(usersCloutScoreTV);
+        layout.addView(submit, editTextParams);
+        layout.addView(cancel);
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addFriend.AddFriend(usersName);
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.create();
+        confirm.show();
+    }
     public void confirmationAlert(/*Searched users account name*/String usersName,
             /*Searched users account name*/String usersCloutScore, String usersEmail){
 
@@ -446,12 +657,11 @@ public class UserProfileActivity extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                /** A check will need to be built out to make sure the users hasn't alrady
-                 * been added */
-                addFriend.AddFriend(usersName);
-                confirm.dismiss();
-                Toast.makeText(UserProfileActivity.this, usersName + " has been added to your friends list", Toast.LENGTH_SHORT).show();
+                // The current user must be sent to the transaction activity with the username set in the
+                // username field to the to-users' username.
+                Intent toTransactionActiviy = new Intent(UserProfileActivity.this, EventTransactionActivity.class);
+                toTransactionActiviy.putExtra("username", usersNameTV.getText().toString());
+                startActivity(toTransactionActiviy);
             }
         });
 

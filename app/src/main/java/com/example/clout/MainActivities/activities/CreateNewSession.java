@@ -27,7 +27,6 @@ import com.google.firebase.database.ValueEventListener;
 
 /* A session will mean a new activity where a clout evaluation will exist */
 /* A Clout evaluation will mean an event where a debt will be evaluated between two clout users */
-
 public class CreateNewSession extends AppCompatActivity {
 
     /* Init Vars */

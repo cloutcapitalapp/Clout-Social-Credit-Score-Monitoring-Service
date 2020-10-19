@@ -20,7 +20,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
@@ -35,6 +38,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -45,6 +49,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -58,6 +63,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
 
+    TabLayout tabLayout;
     AddFriendHandler addFriend = new AddFriendHandler(MainActivity.this);
     TextView money, usernameTextView;
     ScoreHandler scrHandle;
@@ -70,13 +76,26 @@ public class MainActivity extends AppCompatActivity {
     MaterialButton cloutScore;
     AccountKeyManager accKey = new AccountKeyManager();
     FirebaseDatabase mDatabaseRef;
-    DatabaseReference mVal, mCardInfo, mGetCash, getAccountKeyRef;
+    DatabaseReference mVal, mCardInfo, mGetCash, getAccountKeyRef, mEventTransactionsList;
+    //ListView
+    ListView listView;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> arrayList;
+
 
     /** onCreate should house initialized variables as well as methods, but no direct code*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tabLayout = findViewById(R.id.transactionTabs);
+
+        //ListView
+        arrayList = new ArrayList<String>();
+        listView = (ListView) findViewById(R.id.eventTransactionsListView);
+        adapter = new ArrayAdapter<String>(this,R.layout.listview, R.id.listviewitem, arrayList);
+        listView.setAdapter(adapter);
 
         ScoreHandler scoreHandler = new ScoreHandler();
         scoreHandler.sessionStartScoreIncrease(.01);
@@ -111,14 +130,84 @@ public class MainActivity extends AppCompatActivity {
         scrHandle = new ScoreHandler();
         usernameTextView = findViewById(R.id.usernameTextView);
         profileImage = findViewById(R.id.profile_image);
+        mEventTransactionsList = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
 
         /**Method | Functionality*/
         openAnimations();
         imageViewButtonToProfile();
         cashButtonHandle();
+        firstTimeCloutScoreOnClick();
         //listViewListener();
+        eventTrasnactionsListView();
+        tabLayoutManager();
     }
     /***/
+
+    /**When the back button was being pressed, the user would be taken back to the launch screen
+     * with no animation and the intent was killed so the user wasn't being returned to the */
+    @Override
+    public void onBackPressed() {
+        //...do nothing
+    }
+
+    public void tabLayoutManager(){
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                // called when tab selected
+                int position = tab.getPosition();
+                // Log.d("tabPosition: ", "" + position); /* Log.d test is shown to work index is shown correctly */
+
+                //TODO: if signup tab { index 0 } is selected, all elements should be visible
+                //TODO: if login tab { index 1 } is selected, only username and password should be visible
+
+                if(position == /* check for index 1 which is the login tab */ 1){
+                    listView.setVisibility(View.INVISIBLE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }else /* if else, then index 0 is active | index 0 is the sign up tab, and all elements will be available when index 0 is active */{
+                    listView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // called when tab unselected
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                // called when a tab is reselected
+            }
+        });
+
+    }
+
+    public void eventTrasnactionsListView(){
+        mEventTransactionsList.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("forLoopStart", "Start");
+                Log.d("forLoopStart", "start" + " : " + snapshot);
+
+                for (DataSnapshot snapshot1 : snapshot.getChildren()){
+                    String desc = snapshot1.child("description").getValue(String.class);
+                    String enddate = snapshot1.child("enddate").getValue(String.class);
+                    String email = snapshot1.child("username").getValue(String.class);
+                    String allData = desc + "\n" + enddate + "\n" + email;
+
+                    Log.d("logValue", "" + allData);
+                    arrayList.add(allData);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 
     /**OnStart should pull the users clout score and init RecyclerView
      * The current code should be refactored such that it is more organized and should only house
@@ -220,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        startService(new Intent(this, dateReached.class));
+        //startService(new Intent(this, dateReached.class));
     }
     /***/
 
@@ -229,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        startService(new Intent(this, dateReached.class));
+        //startService(new Intent(this, dateReached.class));
     }
     /***/
 
@@ -931,4 +1020,189 @@ public class MainActivity extends AppCompatActivity {
         transactionDetialsAlert.show();
     }
     /***/
+
+    /**This method will provide a first time alert for the CloutScoreButton
+     * What needs to happen?
+     * Alert will introducse the user to what transactions are*/
+
+    /**First time user cloutscore Alert blocks*/
+    public void firstTimeCloutScoreOnClick(){
+        cloutScore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference firstTimeCheckIntro = mDatabaseRef.getReference("Users")
+                        .child(accKey.createAccountKey(mCurrentUser.getEmail()))
+                        .child("isFirstTimeUserScore");
+
+                firstTimeCheckIntro.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        String value = snapshot.getValue(String.class);
+                        Log.d("value", "" + value);
+                        if(value.equals("yes")){
+                            firstimeCloutScoreOnClickAlert1();
+                        }else{
+                            // do nothing
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
+    }
+    public void firstimeCloutScoreOnClickAlert1(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("HELLO!");
+        confirm.setMessage("I see you've found the Clout Score button!");
+
+        MaterialButton button = new MaterialButton(MainActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+                firstimeCloutScoreOnClickAlert2();
+            }
+        });
+        confirm.show();
+    }
+    public void firstimeCloutScoreOnClickAlert2(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("HELLO!");
+        confirm.setMessage("We will keep track of your Clout Score here.");
+
+        MaterialButton button = new MaterialButton(MainActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+                firstimeCloutScoreOnClickAlert3();
+            }
+        });
+        confirm.show();
+    }
+    public void firstimeCloutScoreOnClickAlert3(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("HELLO!");
+        confirm.setMessage("You'll be able to create transactions here also. Transactions are submissions " +
+                "to other users that increase your score and gives the other user the ability to increase theirs. " +
+                "So have fun building your score.");
+
+        MaterialButton button = new MaterialButton(MainActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+                firstimeCloutScoreOnClickAlert4();
+            }
+        });
+        confirm.show();
+    }
+    public void firstimeCloutScoreOnClickAlert4(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_mood_bad_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("Warning!");
+        confirm.setMessage("Just remember, return debts and keep your word and your score will increase, " +
+                "but if you don't, it will decrease.");
+
+        MaterialButton button = new MaterialButton(MainActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference firstTimeScoreCheck = mDatabaseRef.getReference("Users")
+                        .child(accKey.createAccountKey(mCurrentUser.getEmail()))
+                        .child("isFirstTimeUserScore");
+
+                firstTimeScoreCheck.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        String value = snapshot.getValue(String.class);
+                        Log.d("value", "" + value);
+                        if(value.equals("yes")){
+                            firstTimeScoreCheck.setValue("no");
+                        }else{
+                            // do nothing
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
+        confirm.show();
+    }
+    /**END*/
 }

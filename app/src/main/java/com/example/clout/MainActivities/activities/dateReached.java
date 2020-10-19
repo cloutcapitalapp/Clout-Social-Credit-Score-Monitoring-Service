@@ -1,5 +1,6 @@
 package com.example.clout.MainActivities.activities;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;

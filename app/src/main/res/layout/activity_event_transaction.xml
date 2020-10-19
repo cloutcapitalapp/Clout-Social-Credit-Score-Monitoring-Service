@@ -23,12 +23,10 @@
         android:id="@+id/barSeperator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="19dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginTop="48dp"
         android:background="#FF7400"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName" />
 
     <EditText
         android:id="@+id/editTextTextPersonName"
@@ -47,18 +45,19 @@
         app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <Spinner
-        android:id="@+id/eventTypeSpinner"
+        android:id="@+id/eventTypeSpinner9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="8dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/roundededittext"
         android:entries="@array/event_types"
         android:rotationY="0"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.473"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName" />
+        app:layout_constraintTop_toBottomOf="@+id/barSeperator" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/descEditText"
@@ -69,7 +68,7 @@
         android:layout_marginRight="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventTypeSpinner">
+        app:layout_constraintTop_toBottomOf="@+id/eventTypeSpinner9">
 
         <com.google.android.material.textfield.TextInputEditText
             android:maxLines="3"
@@ -84,8 +83,8 @@
         android:id="@+id/dateCalView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/roundededittext"
         app:layout_constraintEnd_toEndOf="parent"
@@ -114,5 +113,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/descEditText" />
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="65dp"
+        android:background="@android:color/transparent"
+        android:text="Cancel"
+        android:onClick="backToMain"
+        android:textColor="#C0392B"
+        app:layout_constraintEnd_toStartOf="@+id/submitEventTransactionButton"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateCalView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
