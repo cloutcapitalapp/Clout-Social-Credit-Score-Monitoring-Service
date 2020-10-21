@@ -29,6 +29,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -169,9 +170,11 @@ public class NotificationActivity extends AppCompatActivity {
 
     /**CallPendingData listView item listener*/
     public void callPendingDataItemListener(){
+
         pendingDeedListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 String item = pendingAdapter.getItem(position);
                 String findUsername = item.substring(item.indexOf("\n&")+1);
                 Toast.makeText(NotificationActivity.this, "" + findUsername, Toast.LENGTH_SHORT).show();
@@ -216,6 +219,25 @@ public class NotificationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mEventReceivedTransactionList = database.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_received").push();
                 mEventReceivedTransactionList.child("accepted_event").setValue(itemText);
+
+                Query applesQuery = pendingRef.orderByChild("sentFrom").equalTo(fromUser);
+                Log.d("querycheck", "" + applesQuery);
+
+                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                            appleSnapshot.getRef().removeValue();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("failed", "onCancelled", databaseError.toException());
+                    }
+                });
+
+                pendingAdapter.notifyDataSetChanged();
                 pendingAlert.dismiss();
             }
         });
