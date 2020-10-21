@@ -34,8 +34,10 @@ import com.example.clout.MainActivities.Classes.ScoreHandler;
 import com.example.clout.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
@@ -46,6 +48,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.text.MessageFormat;
@@ -63,25 +66,40 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
 
+    //TabLayout
     TabLayout tabLayout;
+
+    //Classes
     AddFriendHandler addFriend = new AddFriendHandler(MainActivity.this);
-    TextView money, usernameTextView;
+    AccountKeyManager accKey = new AccountKeyManager();
     ScoreHandler scrHandle;
+
+
+    //TextView
+    TextView money, usernameTextView;
+
+    //CircleImageView and ImageView
     CircleImageView profileImage;
+
+    //RecyclerView
     RecyclerView recyclerView;
-    FirebaseDatabase db;
-    DatabaseReference mCrawlUsers, mRefUsers;
+
+    //Firebase init
     FirebaseAuth mAuth;
     FirebaseUser mCurrentUser;
-    MaterialButton cloutScore;
-    AccountKeyManager accKey = new AccountKeyManager();
-    FirebaseDatabase mDatabaseRef;
-    DatabaseReference mVal, mCardInfo, mGetCash, getAccountKeyRef, mEventTransactionsList;
-    //ListView
-    ListView listView;
-    ArrayAdapter<String> adapter;
-    ArrayList<String> arrayList;
+    FirebaseDatabase mDatabaseRef, db;
+    DatabaseReference mCrawlUsers, mRefUsers, mVal, mCardInfo, mGetCash, getAccountKeyRef, mEventTransactionsList, mEventReceivedTransactionList;
 
+    //MaterialButton
+    MaterialButton cloutScore;
+
+    //ListView
+    ListView listView, receivedListView;
+
+    //ArrayAdapter
+    ArrayAdapter<String> adapter, adapterReceived;
+    //ArrayList
+    ArrayList<String> arrayList, arrayListReceived;
 
     /** onCreate should house initialized variables as well as methods, but no direct code*/
     @Override
@@ -96,6 +114,12 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.eventTransactionsListView);
         adapter = new ArrayAdapter<String>(this,R.layout.listview, R.id.listviewitem, arrayList);
         listView.setAdapter(adapter);
+
+        //receivedListView
+        arrayListReceived = new ArrayList<String>();
+        receivedListView = (ListView) findViewById(R.id.receivedListView);
+        adapterReceived = new ArrayAdapter<String>(this,R.layout.listview, R.id.listviewitem, arrayListReceived);
+        receivedListView.setAdapter(adapterReceived);
 
         ScoreHandler scoreHandler = new ScoreHandler();
         scoreHandler.sessionStartScoreIncrease(.01);
@@ -131,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         usernameTextView = findViewById(R.id.usernameTextView);
         profileImage = findViewById(R.id.profile_image);
         mEventTransactionsList = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+        mEventReceivedTransactionList = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_received");
 
         /**Method | Functionality*/
         openAnimations();
@@ -138,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         cashButtonHandle();
         firstTimeCloutScoreOnClick();
         //listViewListener();
+        eventTransactionsReceivedListView();
         eventTrasnactionsListView();
         tabLayoutManager();
     }
@@ -163,10 +189,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if(position == /* check for index 1 which is the login tab */ 1){
                     listView.setVisibility(View.INVISIBLE);
-                    recyclerView.setVisibility(View.VISIBLE);
+                    receivedListView.setVisibility(View.VISIBLE);
                 }else /* if else, then index 0 is active | index 0 is the sign up tab, and all elements will be available when index 0 is active */{
                     listView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.INVISIBLE);
+                    receivedListView.setVisibility(View.INVISIBLE);
                 }
             }
 
@@ -180,7 +206,28 @@ public class MainActivity extends AppCompatActivity {
                 // called when a tab is reselected
             }
         });
+    }
 
+    /**Setting up for background notifications*/
+    public void firebaseGetInstance(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("Success", "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log and toast
+                        String msg = getString(R.string.msg_token_fmt, token);
+                        Log.d("message", msg);
+                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void eventTrasnactionsListView(){
@@ -192,13 +239,33 @@ public class MainActivity extends AppCompatActivity {
 
                 for (DataSnapshot snapshot1 : snapshot.getChildren()){
                     String desc = snapshot1.child("description").getValue(String.class);
-                    String enddate = snapshot1.child("enddate").getValue(String.class);
-                    String email = snapshot1.child("username").getValue(String.class);
+                    String enddate = snapshot1.child("end_date").getValue(String.class);
+                    String email = snapshot1.child("sent_to").getValue(String.class);
                     String allData = desc + "\n" + enddate + "\n" + email;
 
                     Log.d("logValue", "" + allData);
                     arrayList.add(allData);
                     adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+    public void eventTransactionsReceivedListView(){
+        mEventReceivedTransactionList.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("forLoopStart", "Start");
+                Log.d("forLoopStart", "start" + " : " + snapshot);
+
+                for (DataSnapshot snapshot1 : snapshot.getChildren()){
+                    Log.d("logValue", "" + snapshot1.child("accepted_event").getValue(String.class));
+                    arrayListReceived.add(snapshot1.child("accepted_event").getValue(String.class));
+                    adapterReceived.notifyDataSetChanged();
                 }
             }
 
@@ -845,36 +912,43 @@ public class MainActivity extends AppCompatActivity {
         confirm.setMessage("What kind of transaction would you like to create?");
 
         MaterialButton eventTransButton = new MaterialButton(MainActivity.this);
-        MaterialButton moneyTransButton = new MaterialButton(MainActivity.this);
+        MaterialButton fundedMoneyTransaction = new MaterialButton(MainActivity.this);
+        MaterialButton nonFundedMoneyTransaction = new MaterialButton(MainActivity.this);
+
         MaterialButton cancelButton = new MaterialButton(MainActivity.this);
 
         eventTransButton.setText(R.string.eventTransaction);
-        moneyTransButton.setText(R.string.money_transaction);
+        nonFundedMoneyTransaction.setText(R.string.nonFunded);
+        fundedMoneyTransaction.setText(R.string.funded);
         cancelButton.setText(R.string.cancel);
 
         eventTransButton.setBackgroundResource(R.color.colorPrimary);
-        moneyTransButton.setBackgroundResource(R.color.colorPrimary);
+        nonFundedMoneyTransaction.setBackgroundResource(R.color.colorPrimary);
+        fundedMoneyTransaction.setBackgroundResource(R.color.colorPrimary);
         cancelButton.setBackgroundResource(R.color.colorPrimary);
 
         layout.addView(eventTransButton);
-        layout.addView(moneyTransButton);
+        layout.addView(nonFundedMoneyTransaction);
+        layout.addView(fundedMoneyTransaction);
         layout.addView(cancelButton);
 
         eventTransButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO - Create EventTransactionActivity
+                confirm.dismiss();
                 Intent passToEventTransaction = new Intent(MainActivity.this, EventTransactionActivity.class);
                 startActivity(passToEventTransaction);
             }
         });
 
-        moneyTransButton.setOnClickListener(new View.OnClickListener() {
+        fundedMoneyTransaction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //T.O.D.O
                 // An alert that informs the user that the payments system is not yet ready.
                 // DONE!
+                confirm.dismiss();
                 paymentsNotReadyAlert();
             }
         });

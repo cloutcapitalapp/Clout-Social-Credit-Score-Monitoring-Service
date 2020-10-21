@@ -50,14 +50,14 @@
     <string name="title_activity_ads">MainActivity</string>
     <string name="action_settings">Settings</string>
 
+    <string name="msg_token_fmt">message</string>
 
-    <string name="interstitial_ad_sample">Interstitial Ad Sample</string>
-    <string name="start_level">Level 1</string>
-    <string name="next_level">Next Level</string>
     <!-- -
         This is an ad unit ID for an interstitial test ad. Replace with your own interstitial ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
     <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
     <string name="listview_item_pretext">listViewItem</string>
+    <string name="funded">Funded Money Transactions</string>
+    <string name="nonFunded">Non Funded Money Transaction</string>
 </resources>

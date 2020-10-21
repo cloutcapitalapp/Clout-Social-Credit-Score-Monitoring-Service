@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -53,6 +54,9 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserProfileActivity extends AppCompatActivity {
+
+    //ImageButton
+    ImageButton signoutButton;
 
     //Declare general vars START
     private StorageReference mStorageRefProfilePic;
@@ -90,6 +94,7 @@ public class UserProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprfileactivity);
 
+        signoutButton = findViewById(R.id.signoutButton);
         withdrawButton = findViewById(R.id.withDrawButton);
         userFriendsList = database.getReference("User_Friends_List");
         usersRef = database.getReference("Users");
@@ -119,6 +124,7 @@ public class UserProfileActivity extends AppCompatActivity {
         toFetchImage();
         populateListView();
         withdrawOnClick();
+        signout();
     }
 
     /**onStart will populate the listView withe the 'Users_Friend_List' data from frirebase
@@ -127,6 +133,68 @@ public class UserProfileActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
         onStartGrabImage();
+    }
+
+    /**Signout method will house an onClick listener that will prompt the signoutAlert to display.*/
+    public void signout(){
+        signoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signoutAlert();
+            }
+        });
+    }
+    /**signoutAlert will ask the user if they want to signout. Assuming 'yes' the users firebase instance
+     * will be signed out and the user will be returned to the AuthActivity*/
+    public void signoutAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_warning_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("SignOut?");
+        confirm.setMessage("Are you ready to signout?");
+
+        MaterialButton button = new MaterialButton(UserProfileActivity.this);
+        MaterialButton cancel = new MaterialButton(UserProfileActivity.this);
+
+        cancel.setText(R.string.cancel);
+        button.setText(R.string.confirm);
+
+        cancel.setBackgroundResource(R.color.colorPrimary);
+        button.setBackgroundResource(R.color.colorPrimary);
+
+        layout.addView(button);
+        layout.addView(cancel);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+
+                FirebaseAuth.getInstance().signOut();
+                Intent toAuth = new Intent(UserProfileActivity.this, AuthActivity.class);
+                startActivity(toAuth);
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
     }
 
     /**When the notifications button is tapped
@@ -801,10 +869,7 @@ public class UserProfileActivity extends AppCompatActivity {
         profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+                imageSelectAlert();
             }
         });
     }
@@ -839,6 +904,52 @@ public class UserProfileActivity extends AppCompatActivity {
             Glide.with(UserProfileActivity.this).load(profilePic).into(profilePic);
             //Log.d("load image", "" + mStorageRefPfofPic.toString());
         }
+    }
+    /**Alerts the user that proceding will take them to select a profile image*/
+    public void imageSelectAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("Profile Photo");
+        confirm.setMessage("Would you like to choose a profile image?");
+
+        MaterialButton button = new MaterialButton(UserProfileActivity.this);
+        MaterialButton cancelButton = new MaterialButton(UserProfileActivity.this);
+
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+
+        confirm.show();
     }
     /**END*/
 }

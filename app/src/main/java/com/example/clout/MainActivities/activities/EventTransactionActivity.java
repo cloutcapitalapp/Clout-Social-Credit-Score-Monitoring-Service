@@ -57,11 +57,10 @@ public class EventTransactionActivity extends AppCompatActivity {
     String datePicked, newString;
 
     //Firebase declare
-    private DatabaseReference mEventSubmitted;
     private FirebaseUser mCurrentUser;
     private FirebaseAuth mAuth;
     FirebaseDatabase mDatabaseRef;
-    DatabaseReference mVal, mEventTransactionFirebase;
+    DatabaseReference mVal, mEventTransactionFirebaseReceived, notifications, mEventTransactionFirebaseSubmitted, usersNotify;
 
     //Classes
     AccountKeyManager accKey = new AccountKeyManager();
@@ -106,11 +105,14 @@ public class EventTransactionActivity extends AppCompatActivity {
         eventSpinner = (Spinner) findViewById(R.id.eventTypeSpinner9);
 
         //firebase
+        mDatabaseRef = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
-        mDatabaseRef = FirebaseDatabase.getInstance();
-        mEventTransactionFirebase = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions").push();
-        mEventSubmitted = mDatabaseRef.getReference(editTextTextPersonName.getText().toString() + "_" + "event_submitted").push();
+        assert mCurrentUser != null;
+        mEventTransactionFirebaseSubmitted = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()).trim() + "_" + "event_transactions").push();
+
+        //TODO this line may no longer be needed.
+        //mEventSubmitted = mDatabaseRef.getReference(editTextTextPersonName.getText().toString() + "_" + "event_submitted").push();
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -224,20 +226,45 @@ public class EventTransactionActivity extends AppCompatActivity {
                 //Toast.makeText(this, "Pass", Toast.LENGTH_SHORT).show();
                 date = Calendar.getInstance().getTime();
                 assert mCurrentUser != null;
-                /**This sequence will generate a firebase realtime database node that will house
-                 * the 'Recieved' children in the database
-                 * @// TODO: 10/19/20 This sequences needs to be changed to push a submitted node
-                 * But should leave the request node to be sent to the receiver.*/
-                mEventSubmitted.child("sentto").setValue(editTextTextPersonName.getText().toString());
-                mEventSubmitted.child("enddate").setValue(whenTextView.getText().toString());
 
-                mEventTransactionFirebase.child("username").setValue(editTextTextPersonName.getText().toString());
-                mEventTransactionFirebase.child("description").setValue(description.getEditText().getText().toString());
-                mEventTransactionFirebase.child("enddate").setValue(whenTextView.getText().toString());
+                notifications = mDatabaseRef.getReference(editTextTextPersonName.getText().toString().trim() + "_" + "Pending_Notifications").push();
+                usersNotify = mDatabaseRef.getReference("Users_Notifications").child(accKey.createAccountKey(mCurrentUser.getEmail())).push();
+
+                mEventTransactionFirebaseReceived = mDatabaseRef.getReference(String.valueOf(editTextTextPersonName.getText()).trim() + "_" + "event_received").push();
+
+                /**This sequence will generate a firebase realtime database node that will house
+                 * the 'Submitted' children in the database
+                 * @// TODO: 10/19/20 This sequence needs to be changed to push a submitted node
+                 * But should leave the request node to be sent to the receiver.*/
+                mEventTransactionFirebaseSubmitted.child("sent_to").setValue(String.valueOf(editTextTextPersonName.getText()));
+                mEventTransactionFirebaseSubmitted.child("description").setValue(Objects.requireNonNull(description.getEditText()).getText().toString());
+                mEventTransactionFirebaseSubmitted.child("end_date").setValue(whenTextView.getText().toString());
                 scoreHandler.sessionStartScoreIncrease(.25);
+
+                /**Send user notification of score increase*/
+                usersNotify.child("notify").setValue("Great job! You're score increased by .25 points!");
+
+                /**This sequence will generate a firebase realtime database node that will house
+                 * the 'Received' children in the database, it will be sent to the pending notifications
+                 * view for approval from the requested user*/
+                notifications.child("description").setValue(description.getEditText().getText().toString());
+                notifications.child("sentFrom").setValue(accKey.createAccountKey(mCurrentUser.getEmail()));
+                notifications.child("enddate").setValue(whenTextView.getText().toString());
+                notifications.child("read_status").setValue("Unread");
+
+                /**The score will be increase after both submitted and received nodes are sent to firebase*/
+                scoreHandler.sessionStartScoreIncrease(.25);
+
+                /**Next we need to dismiss the Alert and return the user to the MainActivity
+                 * returning the user also has the added benefit not allowing the user to be able
+                 * to create multiple transactions from the same instance.  */
                 noMatchAlert.dismiss();
                 Intent toMain = new Intent(EventTransactionActivity.this, MainActivity.class);
                 startService(new Intent(EventTransactionActivity.this, dateReached.class));
+
+                /**Add the notification to the notifications node
+                 * @// FIXME: 10/19/20 @todo !!*/
+
                 startActivity(toMain);
             }
         });
@@ -261,7 +288,7 @@ public class EventTransactionActivity extends AppCompatActivity {
                             checkFirebaseUsername(editTextTextPersonName);
                             //Toast.makeText(EventTransactionActivity.this, "Checking2", Toast.LENGTH_SHORT).show();
                         }
-                    }, 500);
+                    }, 100);
                 }
             }
         });
@@ -281,19 +308,21 @@ public class EventTransactionActivity extends AppCompatActivity {
 
         if(editTextToString.contains("&")){
             // Read from the database
-
             mVal.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-
                     //This for-loop needs to check the entered value against the users in the database for accountkeys
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                         String snappedEmail = (String) snapshot.child("Email").getValue();
                         String accKeySanpped = accKey.createAccountKey(snappedEmail);
 
-                        if(editTextToString.equals(accKeySanpped)){
-                            Log.d("Match", "Match Found");
-                            Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
+                        //Check to make sure the user isn't making a transaction with themselves
+                        if(editTextToString.trim().equals(accKey.createAccountKey(mCurrentUser.getEmail()))){
+                            //Alert the user that they can't send transactions to themselves.
+                            checkForSelfAlert();
+                        }else if(editTextToString.trim().equals(accKeySanpped)){
+                            //Log.d("Match", "Match Found");
+                            //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
                             matchingUserAlert();
                             submitTransactionsButton.setEnabled(true);
                             break;
@@ -315,6 +344,42 @@ public class EventTransactionActivity extends AppCompatActivity {
             //Log.d("containsFail", "Fail");
         }
     }
+
+    /**Searched for self alert
+     *
+     */
+    public void checkForSelfAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
+
+        LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        noMatchAlert.setView(layout);
+
+        noMatchAlert.setCancelable(false);
+
+        noMatchAlert.setIcon(R.drawable.ic_baseline_warning_24);
+
+        Window window = noMatchAlert.getWindow();
+        window.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        noMatchAlert.setTitle("Hmmm?");
+        noMatchAlert.setMessage("You can not make a deed transaction with yourself.");
+
+        MaterialButton confirmButton = new MaterialButton(EventTransactionActivity.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noMatchAlert.dismiss();
+            }
+        });
+        noMatchAlert.show();
+    }
+
     /**Alert for check user check*/
     public void noMatchingUserAlert(){
         final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
@@ -359,7 +424,7 @@ public class EventTransactionActivity extends AppCompatActivity {
         noMatchAlert.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
 
         Window window = noMatchAlert.getWindow();
-        window.setGravity(Gravity.BOTTOM);
+        window.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
