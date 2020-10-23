@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -166,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         eventTransactionsReceivedListView();
         eventTrasnactionsListView();
         tabLayoutManager();
+        receivedListViewOnClick();
     }
     /***/
 
@@ -206,6 +208,172 @@ public class MainActivity extends AppCompatActivity {
                 // called when a tab is reselected
             }
         });
+    }
+
+    /**The receivedListViewOnClick method should hold an onClick listener for the pendingAlertsListView
+     * the  listener should listen for click that will display an alert to the user that asks if the
+     * transaction was complete.*/
+    public void receivedListViewOnClick(){
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String userName = (String) listView.getItemAtPosition(position);
+                String userNamePull = userName.substring(userName.indexOf("\n&")+1);
+                receivedListViewOnClickAlert(userNamePull);
+                Toast.makeText(MainActivity.this, "" + userNamePull, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public void receivedListViewOnClickAlert(String userName){
+        final AlertDialog endTransactionAlert= new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        endTransactionAlert.setView(layout);
+
+        endTransactionAlert.setCancelable(false);
+        endTransactionAlert.setCanceledOnTouchOutside(false);
+
+        endTransactionAlert.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = endTransactionAlert.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        endTransactionAlert.setTitle("DONE?");
+        endTransactionAlert.setMessage("Let us know how " + userName.trim() + " did." + " was " + userName.trim() +
+                " on-time, positive, and over-all pleasant? If so, let them know!");
+
+        MaterialButton greatCompletion = new MaterialButton(MainActivity.this);
+        MaterialButton okCompletion = new MaterialButton(MainActivity.this);
+        MaterialButton badCompletion = new MaterialButton(MainActivity.this);
+        MaterialButton terribleCompletion = new MaterialButton(MainActivity.this);
+        MaterialButton cancelButton = new MaterialButton(MainActivity.this);
+
+        greatCompletion.setText(String.format("%s", getString(R.string.great_score_increase)));
+        okCompletion.setText(R.string.okay);
+        badCompletion.setText(R.string.bad);
+        terribleCompletion.setText(R.string.terrible);
+        cancelButton.setText(R.string.cancel);
+
+        greatCompletion.setBackgroundResource(R.color.colorPrimary);
+        okCompletion.setBackgroundResource(R.color.colorPrimary);
+        badCompletion.setBackgroundResource(R.color.colorPrimary);
+        terribleCompletion.setBackgroundResource(R.color.colorPrimary);
+        terribleCompletion.setBackgroundResource(R.color.colorPrimary);
+
+        layout.addView(greatCompletion);
+        layout.addView(okCompletion);
+        layout.addView(badCompletion);
+        layout.addView(terribleCompletion);
+        layout.addView(cancelButton);
+
+        greatCompletion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scrHandle.increaseEndUserScore(userName.trim(), 1);
+                endTransactionAlert.dismiss();
+                positiveAlert();
+            }
+        });
+        okCompletion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scrHandle.increaseEndUserScore(userName.trim(), .50);
+                endTransactionAlert.dismiss();
+                positiveAlert();
+            }
+        });
+        badCompletion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scrHandle.decreaseEndUserScore(userName, .50);
+                endTransactionAlert.dismiss();
+                negativeAlert();
+            }
+        });
+        terribleCompletion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scrHandle.decreaseEndUserScore(userName.trim(), 2);
+                endTransactionAlert.dismiss();
+                negativeAlert();
+            }
+        });
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endTransactionAlert.dismiss();
+            }
+        });
+        endTransactionAlert.show();
+    }
+
+    /**This method displays a thank you to the user for their support in using the app*/
+    public void positiveAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("THANKS!");
+        confirm.setMessage("Clout is still young. Your support really helps us grow.");
+
+        MaterialButton button = new MaterialButton(MainActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
+    }
+
+    /**This method displays a thank you to the user for their support in using the app*/
+    public void negativeAlert(){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_mood_bad_24);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        confirm.setTitle("THANKS!");
+        confirm.setMessage("Sorry it went so poorly for you. We'll be sure to decrease the users score. " +
+                "So others will know to watch out.");
+
+        MaterialButton button = new MaterialButton(MainActivity.this);
+        button.setText(R.string.confirm);
+        button.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.show();
     }
 
     /**Setting up for background notifications*/
@@ -939,6 +1107,15 @@ public class MainActivity extends AppCompatActivity {
                 confirm.dismiss();
                 Intent passToEventTransaction = new Intent(MainActivity.this, EventTransactionActivity.class);
                 startActivity(passToEventTransaction);
+            }
+        });
+
+        nonFundedMoneyTransaction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+                Intent passToNonFundedMoneyTransactionActivity = new Intent(MainActivity.this, NonFundedMoneyTransaction.class);
+                startActivity(passToNonFundedMoneyTransactionActivity);
             }
         });
 

@@ -41,7 +41,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
-/**This method is ready for MVP*/
 public class EventTransactionActivity extends AppCompatActivity {
 
     //boolean
@@ -482,8 +481,9 @@ public class EventTransactionActivity extends AppCompatActivity {
      * rule 1 - Must be over 50 characters in length
      * @return*/
     public boolean descriptionCheck(String descriptionString){
-        if(descriptionString.length() <= 50){
-            Toast.makeText(this, "Description must be at least 50 characters", Toast.LENGTH_SHORT).show();
+        if(descriptionString.length() <= 10
+                && (descriptionString.length() >= 20)){
+            Toast.makeText(this, "Description must be at least 10 characters", Toast.LENGTH_SHORT).show();
         }else {
             //Toast.makeText(this, "Description pass", Toast.LENGTH_SHORT).show();
             descPass = true;

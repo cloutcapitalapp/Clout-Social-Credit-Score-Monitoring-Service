@@ -170,11 +170,9 @@ public class NotificationActivity extends AppCompatActivity {
 
     /**CallPendingData listView item listener*/
     public void callPendingDataItemListener(){
-
         pendingDeedListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 String item = pendingAdapter.getItem(position);
                 String findUsername = item.substring(item.indexOf("\n&")+1);
                 Toast.makeText(NotificationActivity.this, "" + findUsername, Toast.LENGTH_SHORT).show();

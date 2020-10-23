@@ -23,10 +23,10 @@ public class ScoreHandler extends CreateNewSession {
     FirebaseUser mCurrentUser = mAuth.getCurrentUser();
     DatabaseReference mRef = mDatabaseRef.getReference("Users");
     AccountKeyManager accKey;
-    TextView textView3;
 
     // T.O.D.O: there is an issue with this code. It keeps making a nonstop connection loop to the data base
     // The above issue has been rectified.
+    /**This method will connect to firebase realtime db and increase the current users score*/
     public void sessionStartScoreIncrease(final double valuePlus){
         accKey = new AccountKeyManager();
         Log.d("testNow", "" + "Test");
@@ -34,7 +34,7 @@ public class ScoreHandler extends CreateNewSession {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                Log.d("valueFound", "Found" + " : " + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
+                Log.d("valueFound", "Found" + ": " + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
 
                 String value = dataSnapshot.getValue(String.class);
 
@@ -47,6 +47,52 @@ public class ScoreHandler extends CreateNewSession {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                //Todo Consider an alert that tells the user to try again later
+            }
+        });
+    }
+
+    public void increaseEndUserScore(final String endUser, final double valuePlus){
+        accKey = new AccountKeyManager();
+        //Log.d("testNow", "" + "Test");
+        mRef.child(endUser).child("Score").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("valueFound", "Found" + ": " + endUser + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
+
+                String value = dataSnapshot.getValue(String.class);
+
+                double valueToString = Double.parseDouble(value.replace("CS", "")) + valuePlus;
+                String convertValueToSTringDec = String.format(Locale.ENGLISH,"%.02f", valueToString);
+                String valueSetToString = String.valueOf("CS"+convertValueToSTringDec);
+                mRef.child(endUser).child("Score").setValue(valueSetToString);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                //Todo Consider an alert that tells the user to try again later
+            }
+        });
+    }
+    public void decreaseEndUserScore(final String endUser, final double valuePlus){
+        accKey = new AccountKeyManager();
+        //Log.d("testNow", "" + "Test");
+        mRef.child(endUser.trim()).child("Score").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("valueFound", "Found" + ": " + endUser + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
+
+                String value = dataSnapshot.getValue(String.class);
+
+                double valueToString = Double.parseDouble(value.replace("CS", "")) - valuePlus;
+                String convertValueToSTringDec = String.format(Locale.ENGLISH,"%.02f", valueToString);
+                String valueSetToString = String.valueOf("CS"+convertValueToSTringDec);
+                mRef.child(endUser).child("Score").setValue(valueSetToString);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                //Todo Consider an alert that tells the user to try again later
             }
         });
     }

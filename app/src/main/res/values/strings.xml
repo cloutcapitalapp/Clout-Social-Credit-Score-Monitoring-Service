@@ -60,4 +60,8 @@
     <string name="listview_item_pretext">listViewItem</string>
     <string name="funded">Funded Money Transactions</string>
     <string name="nonFunded">Non Funded Money Transaction</string>
+    <string name="great_score_increase">\"GREAT: +1 Point Increase"</string>
+    <string name="terrible">TERRIBLE: -2 Point Decrease</string>
+    <string name="bad">BAD: -.50 Point Decrease</string>
+    <string name="okay">Ok: +.50 Point Increase</string>
 </resources>

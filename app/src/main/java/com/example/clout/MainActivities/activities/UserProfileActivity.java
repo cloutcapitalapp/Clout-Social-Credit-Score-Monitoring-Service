@@ -55,8 +55,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserProfileActivity extends AppCompatActivity {
 
+    TextView emptyTextView;
     //ImageButton
-    ImageButton signoutButton;
+    ImageButton signoutButton, returnToMain;
 
     //Declare general vars START
     private StorageReference mStorageRefProfilePic;
@@ -94,6 +95,8 @@ public class UserProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprfileactivity);
 
+        emptyTextView = findViewById(R.id.empty);
+        returnToMain = findViewById(R.id.returnToMain);
         signoutButton = findViewById(R.id.signoutButton);
         withdrawButton = findViewById(R.id.withDrawButton);
         userFriendsList = database.getReference("User_Friends_List");
@@ -117,6 +120,7 @@ public class UserProfileActivity extends AppCompatActivity {
         //this is of course changed when the user uploads an image.
         progress.setVisibility(View.INVISIBLE);
 
+        listView.setEmptyView(emptyTextView);
         //updateUserName();
         listViewItemSelect();
         addFriendsHandler();
@@ -124,7 +128,26 @@ public class UserProfileActivity extends AppCompatActivity {
         toFetchImage();
         populateListView();
         withdrawOnClick();
+        returnToMainOnclick();
         signout();
+    }
+
+    public void returnToMainOnclick(){
+        returnToMain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toMain = new Intent(UserProfileActivity.this, MainActivity.class);
+                startActivity(toMain);
+            }
+        });
+    }
+
+    /**When the user presses the back button, the user should be taken to the MainActivity.
+     * pressing the back button without this will result in a refresh of the activity if the user
+     * has added a new profile picture.*/
+    public void onBackPressed() {
+        Intent toMain = new Intent(UserProfileActivity.this, MainActivity.class);
+        startActivity(toMain);
     }
 
     /**onStart will populate the listView withe the 'Users_Friend_List' data from frirebase
@@ -216,7 +239,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     addedTV.setVisibility(View.INVISIBLE);
-                    ObjectAnimator tTextViewAnimation = ObjectAnimator.ofFloat(listView, "translationY", -70f);
+                    ObjectAnimator tTextViewAnimation = ObjectAnimator.ofFloat(listView, "translationY", -40f);
                     tTextViewAnimation.setDuration(1000);
                     tTextViewAnimation.start();
                 }
@@ -849,11 +872,9 @@ public class UserProfileActivity extends AppCompatActivity {
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-
                     Double progressVal = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
                     progress.setVisibility(View.VISIBLE);
                     progress.setProgress(progressVal.intValue());
-
                 }
             });
 
@@ -905,7 +926,7 @@ public class UserProfileActivity extends AppCompatActivity {
             //Log.d("load image", "" + mStorageRefPfofPic.toString());
         }
     }
-    /**Alerts the user that proceding will take them to select a profile image*/
+    /**Alerts the user that proceeding will take them to select a profile image*/
     public void imageSelectAlert(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
@@ -929,8 +950,10 @@ public class UserProfileActivity extends AppCompatActivity {
         MaterialButton cancelButton = new MaterialButton(UserProfileActivity.this);
 
         button.setText(R.string.confirm);
+        cancelButton.setText(R.string.cancel);
         button.setBackgroundResource(R.color.colorPrimary);
         layout.addView(button);
+        layout.addView(cancelButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
