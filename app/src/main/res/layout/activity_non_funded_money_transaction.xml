@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="190dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/roundededittext"
@@ -82,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="-140dp"
-            android:layout_marginTop="-170dp"
+            android:layout_marginTop="-260dp"
             android:background="@android:color/transparent"
             android:text="Cancel"
             android:textColor="@android:color/holo_red_light" />

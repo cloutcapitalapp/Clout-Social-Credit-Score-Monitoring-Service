@@ -14,9 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivities.activities.NonFundedMoneyTransaction"></activity>
+        <activity android:name=".MainActivities.activities.NonFundedMoneyTransaction"/>
         <!-- Include the AdActivity configChanges and theme. -->
-        <activity android:name=".MainActivities.activities.EventTransactionActivity" />
+        <activity android:name=".MainActivities.activities.EventTransactionActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".MainActivities.activities.NotificationActivity" />
 
         <service

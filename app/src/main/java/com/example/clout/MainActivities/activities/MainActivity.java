@@ -48,12 +48,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mailjet.client.Main;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -75,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
     AccountKeyManager accKey = new AccountKeyManager();
     ScoreHandler scrHandle;
 
-
     //TextView
     TextView money, usernameTextView;
 
@@ -89,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mCurrentUser;
     FirebaseDatabase mDatabaseRef, db;
-    DatabaseReference mCrawlUsers, mRefUsers, mVal, mCardInfo, mGetCash, getAccountKeyRef, mEventTransactionsList, mEventReceivedTransactionList;
+    DatabaseReference mCrawlUsers, mRefUsers, mVal, mCardInfo, mGetCash, getAccountKeyRef, mEventTransactionsList, mEventReceivedTransactionList, pendingRef;
 
     //MaterialButton
     MaterialButton cloutScore;
@@ -272,6 +275,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 scrHandle.increaseEndUserScore(userName.trim(), 1);
+                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+
+                Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
+                Log.d("querycheck", "" + applesQuery);
+
+                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                            appleSnapshot.getRef().removeValue();
+                            adapter.notifyDataSetChanged();
+                            listView.invalidateViews();
+
+                            completedTransactionAlert();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("failed", "onCancelled", databaseError.toException());
+                    }
+                });
+
                 endTransactionAlert.dismiss();
                 positiveAlert();
             }
@@ -399,6 +425,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void eventTrasnactionsListView(){
+        Collections.reverse(arrayList);
+
         mEventTransactionsList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -429,6 +457,8 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d("forLoopStart", "Start");
                 Log.d("forLoopStart", "start" + " : " + snapshot);
+
+                Collections.reverse(arrayListReceived);
 
                 for (DataSnapshot snapshot1 : snapshot.getChildren()){
                     Log.d("logValue", "" + snapshot1.child("accepted_event").getValue(String.class));
@@ -1456,4 +1486,39 @@ public class MainActivity extends AppCompatActivity {
         confirm.show();
     }
     /**END*/
+
+    /**This alert will let the user know the transaction was completed*/
+    public void completedTransactionAlert(){
+        final AlertDialog whoAlert = new MaterialAlertDialogBuilder(MainActivity.this).create();
+
+        LinearLayout layout = new LinearLayout(MainActivity.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        whoAlert.setView(layout);
+
+        whoAlert.setCancelable(false);
+
+        whoAlert.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = whoAlert.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        whoAlert.setTitle("Completed!");
+        whoAlert.setMessage("This transaction was marked as completed. Thank you!");
+
+        MaterialButton confirmButton = new MaterialButton(MainActivity.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                whoAlert.dismiss();
+                finish();
+                startActivity(getIntent());
+            }
+        });
+        whoAlert.show();
+    }
 }

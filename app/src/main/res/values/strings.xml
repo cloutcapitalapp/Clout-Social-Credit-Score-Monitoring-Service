@@ -64,4 +64,5 @@
     <string name="terrible">TERRIBLE: -2 Point Decrease</string>
     <string name="bad">BAD: -.50 Point Decrease</string>
     <string name="okay">Ok: +.50 Point Increase</string>
+    <string name="unfollow">Unfollow</string>
 </resources>

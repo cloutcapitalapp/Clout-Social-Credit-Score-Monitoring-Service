@@ -43,6 +43,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -75,7 +76,7 @@ public class UserProfileActivity extends AppCompatActivity {
     //Declare firebase vars START
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference userFriendsList, usersRef;
+    DatabaseReference userFriendsList, usersRef, friendRef;
     FirebaseUser mCurrentUser = mAuth.getCurrentUser();
     //END...
 
@@ -101,6 +102,7 @@ public class UserProfileActivity extends AppCompatActivity {
         withdrawButton = findViewById(R.id.withDrawButton);
         userFriendsList = database.getReference("User_Friends_List");
         usersRef = database.getReference("Users");
+        friendRef = database.getReference("User_Friends_List");
         addedTV = findViewById(R.id.addedTextView);
         notificationsButton = findViewById(R.id.notifButton);
         addFriend = new AddFriendHandler(UserProfileActivity.this);
@@ -273,7 +275,30 @@ public class UserProfileActivity extends AppCompatActivity {
     public void listViewItemSelect(){
         listView.setOnItemClickListener((parent, view, position, id) -> {
             String userName = String.valueOf(listView.getItemAtPosition(position));
-            listViewOnClickItemAlert(userName);
+            /**If the user has a follow target that is equal to mCurrentUser, then the user should
+             * be blocked from following - as it's pointless for the users to add themselves to their
+             * follow list.*/
+            if(userName.trim().equals(accKey.createAccountKey(mCurrentUser.getEmail()))){
+                //Alert the user that they can't send transactions to themselves.
+                //Toast.makeText(NonFundedMoneyTransaction.this, "Test 1", Toast.LENGTH_SHORT).show();
+                checkForSelfAlert();
+            }else{
+                //
+                usersRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        String usersCloutScore = snapshot.child(userName).child("Score").getValue(String.class);
+                        String usersEmail = snapshot.child(userName).child("Email").getValue(String.class);
+                        //listViewOnClickItemAlert(userName);
+                        checkUserInfoAlert(userName, usersCloutScore, usersEmail);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
         });
     }
     /**This alert should confirm the user selected will be sent a transaction request
@@ -372,7 +397,8 @@ public class UserProfileActivity extends AppCompatActivity {
 
                                     // TODO BELOW
                                     // The confirmation alert will go here ...
-                                    confirmationAlert(usersName, usersCloutScore, usersEmail);
+                                    //confirmationAlert(usersName, usersCloutScore, usersEmail);
+                                    addFriendsHandlerAlert();
                                 }
                             }
                         }
@@ -411,6 +437,150 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         });
     }
+    public void checkUserInfoAlert(/*Searched users account name*/String usersName,
+            /*Searched users account name*/String usersCloutScore, String usersEmail){
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        confirm.setView(layout);
+
+        confirm.setCancelable(false);
+        confirm.setCanceledOnTouchOutside(false);
+
+        confirm.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        editTextParams.setMargins(130, 0, 130, 30);
+
+        Window window = confirm.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        /*** We'll need to add in a function that grabs the searched usersprofile image, but
+         * if there isn't one then we'll just use the profile image drawable. ***/
+
+        MaterialButton submit = new MaterialButton(UserProfileActivity.this);
+        MaterialButton unfollow = new MaterialButton(UserProfileActivity.this);
+        MaterialButton cancel = new MaterialButton(UserProfileActivity.this);
+        TextView usersNameTV = new MaterialButton(UserProfileActivity.this);
+        CircleImageView circleImageView = new CircleImageView(UserProfileActivity.this);
+        circleImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_person_24));
+        /*** Image Grab START ***/
+        StorageReference mStorageRefPfofPic = FirebaseStorage.getInstance().getReference("user/user/" + usersEmail + "profilepicture" + "." + "jpg");
+        if(mStorageRefPfofPic != null){
+            mStorageRefPfofPic.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+
+                    String uriString = uri.toString();
+                    Glide.with(UserProfileActivity.this).load(uriString).into(circleImageView);
+                    //Log.d("load image", "" + uriString);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+        }else{
+            //Log.d("ReportImageTarget", "\n " +
+            //"\n " +
+            //"\n " +
+            //"onStart: NOTHING " +
+            //"\n " +
+            //"\n");
+
+            Glide.with(UserProfileActivity.this).load(circleImageView).into(circleImageView);
+            //Log.d("load image", "" + mStorageRefPfofPic.toString());
+        }
+        /*** Image Grab END ***/
+        TextView usersCloutScoreTV = new MaterialButton(UserProfileActivity.this);
+        usersNameTV.setText(usersName);
+        usersCloutScoreTV.setText(usersCloutScore);
+        unfollow.setText(R.string.unfollow);
+        submit.setText(R.string.yes);
+        submit.setBackgroundResource(R.color.colorPrimary);
+        cancel.setText(R.string.cancel);
+        cancel.setBackgroundResource(R.color.colorPrimary);
+
+        layout.addView(circleImageView, editTextParams);
+        layout.addView(usersNameTV);
+        layout.addView(usersCloutScoreTV);
+        layout.addView(unfollow, editTextParams);
+        layout.addView(cancel);
+
+        unfollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Query unfollowQuerry = friendRef.orderByChild(accKey.createAccountKey(mCurrentUser.getEmail())).equalTo(usersName);
+                Log.d("unfollow_Query_Check", "" + unfollowQuerry);
+
+                /**When the unfollow button is tapped the follow target shoudld be removed from the users
+                 * friends list.*/
+                unfollowQuerry.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot friend: dataSnapshot.getChildren()) {
+                            friend.getRef().removeValue();
+                            Intent intent = getIntent();
+                            finish();
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("failed", "onCancelled", databaseError.toException());
+                    }
+                });
+                confirm.dismiss();
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.create();
+        confirm.show();
+    }
+    /**Users should not be able to add themselves as friehds.*/
+    public void checkForSelfAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
+
+        LinearLayout layout = new LinearLayout(UserProfileActivity.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        noMatchAlert.setView(layout);
+
+        noMatchAlert.setCancelable(false);
+
+        noMatchAlert.setIcon(R.drawable.ic_baseline_warning_24);
+
+        Window window = noMatchAlert.getWindow();
+        window.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        noMatchAlert.setTitle("Hmmm?");
+        noMatchAlert.setMessage("You can not make a deed transaction with yourself.");
+
+        MaterialButton confirmButton = new MaterialButton(UserProfileActivity.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noMatchAlert.dismiss();
+            }
+        });
+        noMatchAlert.show();
+    }
     public void addFriendsHandlerAlert(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(UserProfileActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
@@ -431,9 +601,9 @@ public class UserProfileActivity extends AppCompatActivity {
 
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        confirm.setTitle("Add A Friend!");
-        confirm.setMessage("Please type a users account name to add that user to your friends list. " +
-                "Also Please make sure to add the \"&\" symbol before the account name.");
+        confirm.setTitle("Follow A User!");
+        confirm.setMessage("Please type a users account name to add that user to your follow list. " +
+                "Also please make sure to add the \"&\" symbol before the account name.");
 
         EditText friendsName = new EditText(UserProfileActivity.this);
         friendsName.setGravity(Gravity.CENTER);
@@ -504,6 +674,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                     // TODO BELOW
                                     // The confirmation alert will go here ...
                                     confirmationFriendAlert(usersName, usersCloutScore, usersEmail);
+                                    confirm.dismiss();
                                 }
                             }
                         }
@@ -657,6 +828,7 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addFriend.AddFriend(usersName);
+                confirm.dismiss();
             }
         });
 
@@ -753,6 +925,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 Intent toTransactionActiviy = new Intent(UserProfileActivity.this, EventTransactionActivity.class);
                 toTransactionActiviy.putExtra("username", usersNameTV.getText().toString());
                 startActivity(toTransactionActiviy);
+                confirm.dismiss();
             }
         });
 

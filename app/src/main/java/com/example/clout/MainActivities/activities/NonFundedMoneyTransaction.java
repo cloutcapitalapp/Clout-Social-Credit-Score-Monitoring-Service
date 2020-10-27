@@ -33,6 +33,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.mailjet.client.ClientOptions;
 import com.mailjet.client.errors.MailjetException;
@@ -225,6 +226,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         //Connect to firebase
         mDatabaseRef = FirebaseDatabase.getInstance();
         mVal = mDatabaseRef.getReference("Users");
+        DatabaseReference mQueryTransactions = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
 
         //Change editTextVal to string
         String editTextToString = Objects.requireNonNull(editTextVal.getEditText()).getText().toString().toLowerCase().trim();
@@ -233,12 +235,12 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
             // Read from the database
             mVal.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    //This for-loop needs to check the entered value against the users in the database for accountkeys
 
-                    String snappedEmail = String.valueOf(dataSnapshot.child("Email").getValue());
-                    //Log.d("Check Email ", "" + snappedEmail);
-                    String accKeySanpped = accKey.createAccountKey(snappedEmail);
-
+                    String snappedEmail = (String) dataSnapshot.child("Email").getValue();
+                    //String accKeySanpped = accKey.createAccountKey(snappedEmail);
+                    //Check to make sure the user isn't making a transaction with themselves
                     if(editTextToString.trim().equals(accKey.createAccountKey(mCurrentUser.getEmail()))){
                         //Alert the user that they can't send transactions to themselves.
                         //Toast.makeText(NonFundedMoneyTransaction.this, "Test 1", Toast.LENGTH_SHORT).show();
@@ -250,13 +252,63 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                         //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
                         //alert user there is no matching user
                         noMatchingUserAlert();
+                    }else if(!editTextToString.equals(Objects.requireNonNull(dataSnapshot.getKey()))){
+                        //Toast.makeText(EventTransactionActivity.this, "Were good " + editTextToString + " " + dataSnapshot, Toast.LENGTH_SHORT).show();
+                        //matchingUserAlert();
+                        DatabaseReference mSubmitted = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail())+"_event_transactions");
+                        ValueEventListener mSubmitedCheck = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshotMain) {
+                                if(descriptionCheck(Objects.requireNonNull(description.getEditText()).getText().toString())
+                                        && (!whenTextView.getText().toString().equals("When should this be done?"))
+                                        && (eventSpinner.getSelectedItemPosition() != 0)){
+                                    if(!snapshotMain.exists()){
+                                        calViewAlert();
+                                    }else{
+                                        Query mSubmitterQuery = mSubmitted.orderByChild("sent_to");
+                                        mSubmitterQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                for(DataSnapshot query : snapshot.getChildren()) {
+                                                    String value = (String) query.child("sent_to").getValue();
+                                                    System.out.println("Val query check " + value);
+                                                    assert value != null;
+                                                    if(value.equals(editTextTextPersonName.getText().toString())){
+                                                        /**If snapshot is not null we will check
+                                                         * to make sure the entered value is not a current
+                                                         * sent_to value*/
+                                                        noRepeatAlert();
+                                                        System.out.println("Query 1: " + query.child("sent_to").getValue());
+                                                    }else if(!value.equals(editTextTextPersonName.getText().toString())){
+                                                        noRepeatAlert();
+                                                        //goodDeedAlert();
+                                                    }
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+                                    }
+                                }else{
+                                    Toast.makeText(EventTransactionActivity.this, "Please make sure all fields are entered", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        };
+                        mSubmitted.addListenerForSingleValueEvent(mSubmitedCheck);
                     }
-                    //This for-loop needs to check the entered value against the users in the database for accountkeys
+
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+
                         String snappedEmailLoop = String.valueOf(snapshot.child("Email").getValue());
                         //Log.d("Check Email ", "" + snappedEmailLoop);
                         String accKeySanppedLoop = accKey.createAccountKey(snappedEmailLoop);
-
                         //Check to make sure the user isn't making a transaction with themselves
                         if(editTextToString.trim().equals(accKeySanppedLoop)
                                 && !editTextToString.trim().equals(accKey.createAccountKey(mCurrentUser.getEmail()))){
@@ -265,7 +317,27 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                             //Toast.makeText(NonFundedMoneyTransaction.this, "Test 2", Toast.LENGTH_SHORT).show();
 
                             //We will report the deed transaction to firebase
-                            calViewAlert();
+                            Toast.makeText(NonFundedMoneyTransaction.this, "User Found", Toast.LENGTH_SHORT).show();
+
+                            Query applesQuery = mQueryTransactions.orderByChild("sent_to").equalTo(editTextToString);
+                            Log.d("querycheck", "" + applesQuery);
+
+                            applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                        Toast.makeText(NonFundedMoneyTransaction.this, "You can not create a transaction with someone " +
+                                                "who already has a transaction with you.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.e("failed", "onCancelled", databaseError.toException());
+                                    Toast.makeText(NonFundedMoneyTransaction.this, "Query failed", Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
                             break;
                         }
                     }
@@ -280,6 +352,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
             //Log.d("containsFail", "Fail");
         }
     }
+
     public void checkForSelfAlert(){
         final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(NonFundedMoneyTransaction.this).create();
 

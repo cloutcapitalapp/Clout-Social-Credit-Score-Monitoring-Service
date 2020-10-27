@@ -35,16 +35,21 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
 public class EventTransactionActivity extends AppCompatActivity {
 
+    String snapshotString;
+
     //boolean
     boolean descPass = false;
+    boolean didPass;
 
     //View
     View barSeperator;
@@ -151,11 +156,54 @@ public class EventTransactionActivity extends AppCompatActivity {
         //Methods
         submitTransactionButtonOnClick();
     }
+    @Override
+    public void onStart(){
+        super.onStart();
+        onStartAlert();
+    }
+
+    /**At start, the user should be shown an Alert that displays the purpose of thise Deed Transaction.*/
+    public void onStartAlert(){
+        final AlertDialog whoAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
+
+        LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        whoAlert.setView(layout);
+
+        whoAlert.setCancelable(false);
+
+        whoAlert.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = whoAlert.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        whoAlert.setTitle("Event Transactions");
+        whoAlert.setMessage("This Deed Transaction type is for Events. " +
+                "If you'd like to report a Date, Meeting, Party etc. You'll report that in this " +
+                "transaction. Don't forget, use the users &AccountName to report on them. For example, " +
+                "your &AccountName is" + "\n" + accKey.createAccountKey(mCurrentUser.getEmail()));
+
+        MaterialButton confirmButton = new MaterialButton(EventTransactionActivity.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                whoAlert.dismiss();
+            }
+        });
+        whoAlert.show();
+    }
 
     /**This onClick handler should take the
      * @param // TODO: 10/15/20 onClickCheckTransactionsInfo() method*/
     /**START*/
-    private void submitTransactionButtonOnClick(){
+    private void submitTransactionButtonOnClick()
+
+    {
         //Check date
         dateSelected();
         submitTransactionsButton.setOnClickListener(new View.OnClickListener() {
@@ -177,13 +225,88 @@ public class EventTransactionActivity extends AppCompatActivity {
      * and CalView needs to be checked for an entered date that isn't before the current date
      * */
     private void onClickCheckTransactionsInfo(){
-        if(descriptionCheck(Objects.requireNonNull(description.getEditText()).getText().toString())
-        && (!whenTextView.getText().toString().equals("When should this be done?"))
-        && (eventSpinner.getSelectedItemPosition() != 0)){
-            goodDeedAlert();
-        }else{
-            Toast.makeText(this, "Did not pass", Toast.LENGTH_SHORT).show();
-        }
+        //matchingUserAlert();
+        DatabaseReference mSubmitted = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail())+"_event_transactions");
+        ValueEventListener mSubmitedCheck = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshotMain) {
+                if(descriptionCheck(Objects.requireNonNull(description.getEditText()).getText().toString())
+                        && (!whenTextView.getText().toString().equals("When should this be done?"))
+                        && (eventSpinner.getSelectedItemPosition() != 0)){
+                    if(!snapshotMain.exists()){
+                        goodDeedAlert();
+                    }else{
+                        Query mSubmitterQuery = mSubmitted.orderByChild("sent_to");
+                        mSubmitterQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for(DataSnapshot query : snapshot.getChildren()) {
+                                    String value = (String) query.child("sent_to").getValue();
+                                    System.out.println("Val query check " + value);
+                                    assert value != null;
+                                    if(value.equals(editTextTextPersonName.getText().toString())){
+                                        /**If snapshot is not null we will check
+                                         * to make sure the entered value is not a current
+                                         * sent_to value*/
+                                        noRepeatAlert();
+                                        System.out.println("Query 1: " + query.child("sent_to").getValue());
+                                    }else if(!value.equals(editTextTextPersonName.getText().toString())){
+                                        noRepeatAlert();
+                                        //goodDeedAlert();
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }else{
+                    Toast.makeText(EventTransactionActivity.this, "Please make sure all fields are entered", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        mSubmitted.addListenerForSingleValueEvent(mSubmitedCheck);
+    }
+
+    public void noRepeatAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
+
+        LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        noMatchAlert.setView(layout);
+
+        noMatchAlert.setCancelable(false);
+
+        noMatchAlert.setIcon(R.drawable.ic_baseline_warning_24);
+
+        Window window = noMatchAlert.getWindow();
+        window.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        noMatchAlert.setTitle("Hmmm?");
+        noMatchAlert.setMessage("For now, you can only submit one transaction at a time. Complete the one you have and you can create a new one.");
+
+        MaterialButton confirmButton = new MaterialButton(EventTransactionActivity.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                startActivity(getIntent());
+                noMatchAlert.dismiss();
+            }
+        });
+        noMatchAlert.show();
     }
 
     /**When the back button was being pressed, the user would be taken back to the launch screen
@@ -283,65 +406,44 @@ public class EventTransactionActivity extends AppCompatActivity {
                     myHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            //Check &Accountname
-                            checkFirebaseUsername(editTextTextPersonName);
-                            //Toast.makeText(EventTransactionActivity.this, "Checking2", Toast.LENGTH_SHORT).show();
+                            /**Check for user in Us*/
+                            DatabaseReference mTransactionReference = mDatabaseRef.getReference("Users").child(editTextTextPersonName.getText().toString());
+                            ValueEventListener eventListener = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if(!dataSnapshot.exists()) {
+                                        //create new user
+                                        //Toast.makeText(EventTransactionActivity.this, "didn't find it", Toast.LENGTH_SHORT).show();
+                                        //noMatchingUserAlert();
+                                    }else{
+                                        //Toast.makeText(EventTransactionActivity.this, "Found a matching user", Toast.LENGTH_SHORT).show();
+                                        /**Once we find a user, we have to check to make sure the user isn't searching for themselves*/
+                                        /**We will compare the entered value to the snapshot to know if this is the case*/
+                                        if(String.valueOf(dataSnapshot).equals(editTextTextPersonName.getText().toString().trim())){
+                                            //Toast.makeText(EventTransactionActivity.this, "found self", Toast.LENGTH_SHORT).show();
+                                            checkForSelfAlert();
+                                        }else{
+                                            /**We've found a user and that user isn't self
+                                             * We must now check to make sure the user don't
+                                             * already have a transaction submitted*/
+                                            matchingUserAlert();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.d("failed", databaseError.getMessage()); //Don't ignore errors!
+                                }
+                            };
+                            mTransactionReference.addListenerForSingleValueEvent(eventListener);
                         }
                     }, 100);
+                }else{
+                    Toast.makeText(EventTransactionActivity.this, "Please make sure to use the & symbol before the username", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-    }
-
-    /**This method will run a check against all users in the firebase Users database
-     * returns true if User is found
-     * @return*/
-    public void
-    checkFirebaseUsername(EditText editTextVal){
-        //Connect to firebase
-        mDatabaseRef = FirebaseDatabase.getInstance();
-        mVal = mDatabaseRef.getReference("Users");
-
-        //Change editTextVal to string
-        String editTextToString = editTextVal.getText().toString().toLowerCase().trim();
-
-        if(editTextToString.contains("&")){
-            // Read from the database
-            mVal.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    //This for-loop needs to check the entered value against the users in the database for accountkeys
-                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        String snappedEmail = (String) snapshot.child("Email").getValue();
-                        String accKeySanpped = accKey.createAccountKey(snappedEmail);
-
-                        //Check to make sure the user isn't making a transaction with themselves
-                        if(editTextToString.trim().equals(accKey.createAccountKey(mCurrentUser.getEmail()))){
-                            //Alert the user that they can't send transactions to themselves.
-                            checkForSelfAlert();
-                        }else if(editTextToString.trim().equals(accKeySanpped)){
-                            //Log.d("Match", "Match Found");
-                            //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
-                            matchingUserAlert();
-                            submitTransactionsButton.setEnabled(true);
-                            break;
-                        }else{
-                            //Log.d("Match", "Match Not Found");
-                            //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
-                            //alert user there is no matching user
-                            //noMatchingUserAlert();
-                        }
-                    }
-                }
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    // Failed to read value
-                    //Log.w("UserCheck", "Failed to read value.", error.toException());
-                }
-            });
-        }else{
-            //Log.d("containsFail", "Fail");
-        }
     }
 
     /**Searched for self alert
@@ -437,6 +539,7 @@ public class EventTransactionActivity extends AppCompatActivity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                submitTransactionsButton.setEnabled(true);
                 noMatchAlert.dismiss();
             }
         });
@@ -483,7 +586,8 @@ public class EventTransactionActivity extends AppCompatActivity {
     public boolean descriptionCheck(String descriptionString){
         if(descriptionString.length() <= 10
                 && (descriptionString.length() >= 20)){
-            Toast.makeText(this, "Description must be at least 10 characters", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Description must be at least 10 characters, " +
+                    "but not more than 20", Toast.LENGTH_SHORT).show();
         }else {
             //Toast.makeText(this, "Description pass", Toast.LENGTH_SHORT).show();
             descPass = true;
