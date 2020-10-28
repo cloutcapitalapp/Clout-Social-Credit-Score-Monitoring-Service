@@ -432,6 +432,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 confirm.dismiss();
+                finish();
+                startActivity(getIntent());
             }
         });
         confirm.show();
@@ -466,6 +468,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 confirm.dismiss();
+                finish();
+                startActivity(getIntent());
             }
         });
         confirm.show();
@@ -1562,8 +1566,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 whoAlert.dismiss();
-                finish();
-                startActivity(getIntent());
             }
         });
         whoAlert.show();

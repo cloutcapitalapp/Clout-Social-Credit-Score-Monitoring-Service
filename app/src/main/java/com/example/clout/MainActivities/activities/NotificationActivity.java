@@ -201,15 +201,20 @@ public class NotificationActivity extends AppCompatActivity {
         pendingAlert.setMessage("Will you accept this deed transactions from " + fromUser + "?");
 
         MaterialButton confirmButton = new MaterialButton(NotificationActivity.this);
+        MaterialButton rejectButton = new MaterialButton(NotificationActivity.this);
         MaterialButton cancelButton = new MaterialButton(NotificationActivity.this);
-
-        cancelButton.setText(R.string.cancel);
-        cancelButton.setBackgroundResource(R.color.colorPrimary);
 
         confirmButton.setText(R.string.confirm);
         confirmButton.setBackgroundResource(R.color.colorPrimary);
 
+        rejectButton.setText("Reject Transaction");
+        rejectButton.setBackgroundResource(R.color.colorPrimary);
+
+        cancelButton.setText(R.string.cancel);
+        cancelButton.setBackgroundResource(R.color.colorPrimary);
+
         layout.addView(confirmButton);
+        layout.addView(rejectButton);
         layout.addView(cancelButton);
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
@@ -237,6 +242,13 @@ public class NotificationActivity extends AppCompatActivity {
 
                 pendingAdapter.notifyDataSetChanged();
                 pendingAlert.dismiss();
+            }
+        });
+
+        rejectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
 
