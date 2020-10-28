@@ -306,6 +306,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 scrHandle.increaseEndUserScore(userName.trim(), .50);
+                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+
+                Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
+                Log.d("querycheck", "" + applesQuery);
+
+                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                            appleSnapshot.getRef().removeValue();
+                            adapter.notifyDataSetChanged();
+                            listView.invalidateViews();
+
+                            completedTransactionAlert();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("failed", "onCancelled", databaseError.toException());
+                    }
+                });
+
                 endTransactionAlert.dismiss();
                 positiveAlert();
             }
@@ -313,7 +336,30 @@ public class MainActivity extends AppCompatActivity {
         badCompletion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                scrHandle.decreaseEndUserScore(userName, .50);
+                scrHandle.increaseEndUserScore(userName.trim(), -.50);
+                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+
+                Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
+                Log.d("querycheck", "" + applesQuery);
+
+                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                            appleSnapshot.getRef().removeValue();
+                            adapter.notifyDataSetChanged();
+                            listView.invalidateViews();
+
+                            completedTransactionAlert();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("failed", "onCancelled", databaseError.toException());
+                    }
+                });
+
                 endTransactionAlert.dismiss();
                 negativeAlert();
             }
@@ -321,7 +367,30 @@ public class MainActivity extends AppCompatActivity {
         terribleCompletion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                scrHandle.decreaseEndUserScore(userName.trim(), 2);
+                scrHandle.increaseEndUserScore(userName.trim(), -1);
+                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+
+                Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
+                Log.d("querycheck", "" + applesQuery);
+
+                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                            appleSnapshot.getRef().removeValue();
+                            adapter.notifyDataSetChanged();
+                            listView.invalidateViews();
+
+                            completedTransactionAlert();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("failed", "onCancelled", databaseError.toException());
+                    }
+                });
+
                 endTransactionAlert.dismiss();
                 negativeAlert();
             }
@@ -400,28 +469,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         confirm.show();
-    }
-
-    /**Setting up for background notifications*/
-    public void firebaseGetInstance(){
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w("Success", "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-
-                        // Log and toast
-                        String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d("message", msg);
-                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
     public void eventTrasnactionsListView(){
