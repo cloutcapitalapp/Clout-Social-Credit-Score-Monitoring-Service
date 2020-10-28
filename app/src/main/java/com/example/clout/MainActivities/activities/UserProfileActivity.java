@@ -515,28 +515,17 @@ public class UserProfileActivity extends AppCompatActivity {
         unfollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Query unfollowQuerry = friendRef.orderByChild(accKey.createAccountKey(mCurrentUser.getEmail())).equalTo(usersName);
+                Query unfollowQuerry = friendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child(usersName);
                 Log.d("unfollow_Query_Check", "" + unfollowQuerry);
 
                 /**When the unfollow button is tapped the follow target shoudld be removed from the users
                  * friends list.*/
-                unfollowQuerry.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot friend: dataSnapshot.getChildren()) {
-                            friend.getRef().removeValue();
-                            Intent intent = getIntent();
-                            finish();
-                            startActivity(intent);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e("failed", "onCancelled", databaseError.toException());
-                    }
-                });
+                friendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child(usersName).removeValue();
+                Toast.makeText(UserProfileActivity.this, friendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child(usersName).getKey() + " has been removed from your follow list", Toast.LENGTH_SHORT).show();
                 confirm.dismiss();
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
             }
         });
 
@@ -646,7 +635,7 @@ public class UserProfileActivity extends AppCompatActivity {
                  * We will start with an if conditional which makes sure the username is entered
                  * correctly, then, if-so the system will procede with the check.
                  * ***/
-                if(friendsName.getText().toString().contains("&")){
+                if(friendsName.getText().toString().trim().contains("&")){
                     /*if the entered friendsName contains the "&" symbol it is passed to be searched*/
                     usersRef.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -661,7 +650,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                 /* This if conditional will now check the username entered against the usernames in the firebase DB
                                 *
                                 *  */
-                                if(friendsName.getText().toString().equals(usersName)){
+                                if(friendsName.getText().toString().trim().equals(usersName)){
                                     /* Log.d("userNameCompareCheck", "Got a match from the database" + " : " + usersName);
                                     *
                                     * This above log will let us know we found a match*/
@@ -673,7 +662,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
                                     // TODO BELOW
                                     // The confirmation alert will go here ...
-                                    confirmationFriendAlert(usersName, usersCloutScore, usersEmail);
+                                    confirmationFriendAlert(usersName.trim(), usersCloutScore, usersEmail);
                                     confirm.dismiss();
                                 }
                             }
@@ -827,8 +816,15 @@ public class UserProfileActivity extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addFriend.AddFriend(usersName);
-                confirm.dismiss();
+                if(!usersName.equals(accKey.createAccountKey(mCurrentUser.getEmail()))){
+                    addFriend.AddFriend(usersName);
+                    confirm.dismiss();
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(UserProfileActivity.this, "You can not follow yourself", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

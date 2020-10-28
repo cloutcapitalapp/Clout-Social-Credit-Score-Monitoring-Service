@@ -259,9 +259,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                         ValueEventListener mSubmitedCheck = new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshotMain) {
-                                if(descriptionCheck(Objects.requireNonNull(description.getEditText()).getText().toString())
-                                        && (!whenTextView.getText().toString().equals("When should this be done?"))
-                                        && (eventSpinner.getSelectedItemPosition() != 0)){
+                                if((!cashAmountTextView.getText().toString().equals("When should this be done?"))){
                                     if(!snapshotMain.exists()){
                                         calViewAlert();
                                     }else{
@@ -273,13 +271,13 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                                                     String value = (String) query.child("sent_to").getValue();
                                                     System.out.println("Val query check " + value);
                                                     assert value != null;
-                                                    if(value.equals(editTextTextPersonName.getText().toString())){
+                                                    if(value.equals(whoEditText.getEditText().getText().toString())){
                                                         /**If snapshot is not null we will check
                                                          * to make sure the entered value is not a current
                                                          * sent_to value*/
                                                         noRepeatAlert();
                                                         System.out.println("Query 1: " + query.child("sent_to").getValue());
-                                                    }else if(!value.equals(editTextTextPersonName.getText().toString())){
+                                                    }else if(!value.equals(whoEditText.getEditText().getText().toString())){
                                                         noRepeatAlert();
                                                         //goodDeedAlert();
                                                     }
@@ -292,7 +290,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                                         });
                                     }
                                 }else{
-                                    Toast.makeText(EventTransactionActivity.this, "Please make sure all fields are entered", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(NonFundedMoneyTransaction.this, "Please make sure all fields are entered", Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -351,6 +349,40 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         }else{
             //Log.d("containsFail", "Fail");
         }
+    }
+
+    public void noRepeatAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(NonFundedMoneyTransaction.this).create();
+
+        LinearLayout layout = new LinearLayout(NonFundedMoneyTransaction.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        noMatchAlert.setView(layout);
+
+        noMatchAlert.setCancelable(false);
+
+        noMatchAlert.setIcon(R.drawable.ic_baseline_warning_24);
+
+        Window window = noMatchAlert.getWindow();
+        window.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        noMatchAlert.setTitle("Hmmm?");
+        noMatchAlert.setMessage("For now, you can only submit one transaction at a time. Complete the one you have and you can create a new one.");
+
+        MaterialButton confirmButton = new MaterialButton(NonFundedMoneyTransaction.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                startActivity(getIntent());
+                noMatchAlert.dismiss();
+            }
+        });
+        noMatchAlert.show();
     }
 
     public void checkForSelfAlert(){
