@@ -44,7 +44,7 @@ import com.google.android.material.button.MaterialButton;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.MailjetResponse;
-import org.jetbrains.annotations.NotNull;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,16 +52,14 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Objects;
 
-//TODO Firebase Database paths must not contain '.', '#', '$', '[', or ']
+public class PreFundedMoneyTransaction extends AppCompatActivity {
 
-public class NonFundedMoneyTransaction extends AppCompatActivity {
-
-    TextInputLayout whoEditText;
-    EditText cashAmountEditText;
-    TextView cashAmountTextView;
-    MaterialButton cancelButton;
-    Button submitButton;
-    ScoreHandler scoreHandler = new ScoreHandler();
+    private TextInputLayout whoEditText;
+    private EditText cashAmountEditText;
+    private TextView cashAmountTextView;
+    private MaterialButton cancelButton;
+    private Button submitButton;
+    private ScoreHandler scoreHandler = new ScoreHandler();
 
     //Firebase declare
     private FirebaseUser mCurrentUser;
@@ -75,7 +73,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_non_funded_money_transaction);
+        setContentView(R.layout.activity_pre_funded_money_transaction);
 
         mDatabaseRef = FirebaseDatabase.getInstance();
 
@@ -102,21 +100,21 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         //...do nothing
     }
     /**cancelbutton onclick listener*/
-    public void cancelButtonOnClick(){
+    private void cancelButtonOnClick(){
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent toMain = new Intent(NonFundedMoneyTransaction.this, MainActivity.class);
+                Intent toMain = new Intent(PreFundedMoneyTransaction.this, MainActivity.class);
                 startActivity(toMain);
             }
         });
     }
     /**Submit Button onClick*/
-    public void submitButtonOnClick(){
+    private void submitButtonOnClick(){
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(NonFundedMoneyTransaction.this, "test: " + whoEditText.getEditText().getText().toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(PreFundedMoneyTransaction.this, "test: " + whoEditText.getEditText().getText().toString().trim(), Toast.LENGTH_SHORT).show();
                 checkFirebaseUsername(whoEditText);
             }
         });
@@ -144,7 +142,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                                         .put(Emailv31.Message.TEXTPART, "My first Mailjet email")
                                         .put(Emailv31.Message.HTMLPART, "<h3>Dear passenger 1, welcome to <a href='https://www.mailjet.com/'>Mailjet</a>!</h3><br />May the delivery force be with you!")
                                         .put(Emailv31.Message.CUSTOMID, "AppGettingStartedTest")));
-                Log.d("email", ": " + "sent");
+                //Log.d("email", ": " + "sent");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -197,8 +195,8 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         });
     }
 
-    public void sendEmail(){
-        Log.i("Send email", "");
+    private void sendEmail(){
+        //Log.i("Send email", "");
 
         String[] TO = {"someone@gmail.com"};
         String[] CC = {"xyz@gmail.com"};
@@ -215,14 +213,14 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         try {
             startActivity(Intent.createChooser(emailIntent, "Send mail..."));
             finish();
-            Log.i("Finished email...", "");
+            //Log.i("Finished email...", "");
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(NonFundedMoneyTransaction.this,
+            Toast.makeText(PreFundedMoneyTransaction.this,
                     "There is no email client installed.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void checkFirebaseUsername(TextInputLayout editTextVal){
+    private void checkFirebaseUsername(TextInputLayout editTextVal){
         //Connect to firebase
         mDatabaseRef = FirebaseDatabase.getInstance();
         mVal = mDatabaseRef.getReference("Users");
@@ -271,13 +269,13 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                                                     String value = (String) query.child("sent_to").getValue();
                                                     System.out.println("Val query check " + value);
                                                     assert value != null;
-                                                    if(value.equals(whoEditText.getEditText().getText().toString())){
+                                                    if(value.equals(Objects.requireNonNull(whoEditText.getEditText()).getText().toString().trim())){
                                                         /**If snapshot is not null we will check
                                                          * to make sure the entered value is not a current
                                                          * sent_to value*/
                                                         noRepeatAlert();
                                                         System.out.println("Query 1: " + query.child("sent_to").getValue());
-                                                    }else if(!value.equals(whoEditText.getEditText().getText().toString())){
+                                                    }else if(!value.equals(whoEditText.getEditText().getText().toString().trim())){
                                                         noRepeatAlert();
                                                         //goodDeedAlert();
                                                     }
@@ -290,7 +288,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                                         });
                                     }
                                 }else{
-                                    Toast.makeText(NonFundedMoneyTransaction.this, "Please make sure all fields are entered", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(PreFundedMoneyTransaction.this, "Please make sure all fields are entered", Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -315,24 +313,24 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                             //Toast.makeText(NonFundedMoneyTransaction.this, "Test 2", Toast.LENGTH_SHORT).show();
 
                             //We will report the deed transaction to firebase
-                            Toast.makeText(NonFundedMoneyTransaction.this, "User Found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PreFundedMoneyTransaction.this, "User Found", Toast.LENGTH_SHORT).show();
 
                             Query applesQuery = mQueryTransactions.orderByChild("sent_to").equalTo(editTextToString);
-                            Log.d("querycheck", "" + applesQuery);
+                            //Log.d("querycheck", "" + applesQuery);
 
                             applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                        Toast.makeText(NonFundedMoneyTransaction.this, "You can not create a transaction with someone " +
+                                        Toast.makeText(PreFundedMoneyTransaction.this, "You can not create a transaction with someone " +
                                                 "who already has a transaction with you.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-                                    Log.e("failed", "onCancelled", databaseError.toException());
-                                    Toast.makeText(NonFundedMoneyTransaction.this, "Query failed", Toast.LENGTH_SHORT).show();
+                                    //Log.e("failed", "onCancelled", databaseError.toException());
+                                    Toast.makeText(PreFundedMoneyTransaction.this, "Query failed", Toast.LENGTH_SHORT).show();
 
                                 }
                             });
@@ -351,10 +349,10 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         }
     }
 
-    public void noRepeatAlert(){
-        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(NonFundedMoneyTransaction.this).create();
+    private void noRepeatAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
 
-        LinearLayout layout = new LinearLayout(NonFundedMoneyTransaction.this);
+        LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
         layout.setOrientation(LinearLayout.VERTICAL);
         noMatchAlert.setView(layout);
 
@@ -370,7 +368,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         noMatchAlert.setTitle("Hmmm?");
         noMatchAlert.setMessage("For now, you can only submit one transaction at a time. Complete the one you have and you can create a new one.");
 
-        MaterialButton confirmButton = new MaterialButton(NonFundedMoneyTransaction.this);
+        MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
         confirmButton.setText(R.string.confirm);
         confirmButton.setBackgroundResource(R.color.colorPrimary);
         layout.addView(confirmButton);
@@ -385,10 +383,10 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         noMatchAlert.show();
     }
 
-    public void checkForSelfAlert(){
-        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(NonFundedMoneyTransaction.this).create();
+    private void checkForSelfAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
 
-        LinearLayout layout = new LinearLayout(NonFundedMoneyTransaction.this);
+        LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
         layout.setOrientation(LinearLayout.VERTICAL);
         noMatchAlert.setView(layout);
 
@@ -404,7 +402,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         noMatchAlert.setTitle("Hmmm?");
         noMatchAlert.setMessage("You can not make a deed transaction with yourself.");
 
-        MaterialButton confirmButton = new MaterialButton(NonFundedMoneyTransaction.this);
+        MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
         confirmButton.setText(R.string.confirm);
         confirmButton.setBackgroundResource(R.color.colorPrimary);
         layout.addView(confirmButton);
@@ -416,10 +414,10 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         });
         noMatchAlert.show();
     }
-    public void noMatchingUserAlert(){
-        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(NonFundedMoneyTransaction.this).create();
+    private void noMatchingUserAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
 
-        LinearLayout layout = new LinearLayout(NonFundedMoneyTransaction.this);
+        LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
         layout.setOrientation(LinearLayout.VERTICAL);
         noMatchAlert.setView(layout);
 
@@ -435,7 +433,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         noMatchAlert.setTitle("One Sec!");
         noMatchAlert.setMessage("There were no matching users with that &Accountname");
 
-        MaterialButton confirmButton = new MaterialButton(NonFundedMoneyTransaction.this);
+        MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
         confirmButton.setText(R.string.confirm);
         confirmButton.setBackgroundResource(R.color.colorPrimary);
         layout.addView(confirmButton);
@@ -447,10 +445,10 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         });
         noMatchAlert.show();
     }
-    public boolean matchingUserAlert(){
-        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(NonFundedMoneyTransaction.this).create();
+    private boolean matchingUserAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
 
-        LinearLayout layout = new LinearLayout(NonFundedMoneyTransaction.this);
+        LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
         layout.setOrientation(LinearLayout.VERTICAL);
         noMatchAlert.setView(layout);
 
@@ -466,7 +464,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         noMatchAlert.setTitle("Match");
         noMatchAlert.setMessage("There was a matching user with that &Accountname");
 
-        MaterialButton confirmButton = new MaterialButton(NonFundedMoneyTransaction.this);
+        MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
         confirmButton.setText(R.string.confirm);
         confirmButton.setBackgroundResource(R.color.colorPrimary);
         layout.addView(confirmButton);
@@ -479,10 +477,10 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         noMatchAlert.show();
         return true;
     }
-    public void calViewAlert(){
-        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(NonFundedMoneyTransaction.this).create();
+    private void calViewAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
 
-        LinearLayout layout = new LinearLayout(NonFundedMoneyTransaction.this);
+        LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
         layout.setOrientation(LinearLayout.VERTICAL);
         noMatchAlert.setView(layout);
 
@@ -498,9 +496,9 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         noMatchAlert.setTitle("WHEN");
         noMatchAlert.setMessage("What date should you be paid back?");
 
-        CalendarView calView = new CalendarView(NonFundedMoneyTransaction.this);
-        MaterialButton confirmButton = new MaterialButton(NonFundedMoneyTransaction.this);
-        TextView whenTextView = new TextView(NonFundedMoneyTransaction.this);
+        CalendarView calView = new CalendarView(PreFundedMoneyTransaction.this);
+        MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
+        TextView whenTextView = new TextView(PreFundedMoneyTransaction.this);
         whenTextView.setText("...");
         whenTextView.setTextSize(20);
         whenTextView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -536,7 +534,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                  * the 'Submitted' children in the database
                  * @// TODO: 10/19/20 This sequence needs to be changed to push a submitted node
                  * But should leave the request node to be sent to the receiver.*/
-                mEventTransactionFirebaseSubmitted.child("sent_to").setValue(String.valueOf(whoEditText.getEditText().getText()));
+                mEventTransactionFirebaseSubmitted.child("sent_to").setValue(String.valueOf(whoEditText.getEditText().getText().toString()));
                 mEventTransactionFirebaseSubmitted.child("description").setValue(Objects.requireNonNull(cashAmountTextView.getText().toString()));
                 mEventTransactionFirebaseSubmitted.child("end_date").setValue(whenTextView.getText().toString());
                 scoreHandler.sessionStartScoreIncrease(.25);
@@ -559,8 +557,8 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                  * returning the user also has the added benefit not allowing the user to be able
                  * to create multiple transactions from the same instance.  */
                 noMatchAlert.dismiss();
-                Intent toMain = new Intent(NonFundedMoneyTransaction.this, MainActivity.class);
-                startService(new Intent(NonFundedMoneyTransaction.this, dateReached.class));
+                Intent toMain = new Intent(PreFundedMoneyTransaction.this, MainActivity.class);
+                startService(new Intent(PreFundedMoneyTransaction.this, dateReached.class));
 
                 startActivity(toMain);
             }
@@ -570,10 +568,10 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
 
     /**Alert the user at every start that this transaction type will allow them to report who they've
      * already lent money to.*/
-    public void lentToWhoAlert(){
-        final AlertDialog whoAlert = new MaterialAlertDialogBuilder(NonFundedMoneyTransaction.this).create();
+    private void lentToWhoAlert(){
+        final AlertDialog whoAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
 
-        LinearLayout layout = new LinearLayout(NonFundedMoneyTransaction.this);
+        LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
         layout.setOrientation(LinearLayout.VERTICAL);
         whoAlert.setView(layout);
 
@@ -591,7 +589,7 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
                 "or digital cash to. Don't forget, use the users &AccountName to report on them. For example, " +
                 "your &AccountName is" + "\n" + accKey.createAccountKey(mCurrentUser.getEmail()));
 
-        MaterialButton confirmButton = new MaterialButton(NonFundedMoneyTransaction.this);
+        MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
         confirmButton.setText(R.string.confirm);
         confirmButton.setBackgroundResource(R.color.colorPrimary);
         layout.addView(confirmButton);
@@ -603,5 +601,4 @@ public class NonFundedMoneyTransaction extends AppCompatActivity {
         });
         whoAlert.show();
     }
-
 }

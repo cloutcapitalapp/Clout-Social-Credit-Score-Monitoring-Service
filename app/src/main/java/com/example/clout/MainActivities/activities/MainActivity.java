@@ -20,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -35,10 +34,8 @@ import com.example.clout.MainActivities.Classes.ScoreHandler;
 import com.example.clout.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
@@ -50,16 +47,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.mailjet.client.Main;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
+import sendinblue.ApiClient;
+import sendinblue.ApiException;
+import sendinblue.Configuration;
+import sendinblue.auth.ApiKeyAuth;
+import sibApi.AccountApi;
+import sibModel.GetAccount;
 
 /*** This activity will house the main-hub. From here you'll have access to the other app activities
  * and you'll be able to see the full transaction history of the entire app.
@@ -174,6 +175,33 @@ public class MainActivity extends AppCompatActivity {
     }
     /***/
 
+    private void transactionalEmailAPI(){
+        /**Start Transactional Email API*/
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+        // Configure API key authorization: api-key
+        ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
+        apiKey.setApiKey("YOUR API KEY");
+        // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+        //apiKey.setApiKeyPrefix("Token");
+
+        // Configure API key authorization: partnerKey
+        ApiKeyAuth partnerKey = (ApiKeyAuth) defaultClient.getAuthentication("partner-key");
+        partnerKey.setApiKey("YOUR API KEY");
+        // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+        //partnerKey.setApiKeyPrefix("Token");
+
+        AccountApi apiInstance = new AccountApi();
+        try {
+            GetAccount result = apiInstance.getAccount();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling AccountApi#getAccount");
+            e.printStackTrace();
+        }
+        /**END - Transactional Email API*/
+    }
+
     /**When the back button was being pressed, the user would be taken back to the launch screen
      * with no animation and the intent was killed so the user wasn't being returned to the */
     @Override
@@ -277,10 +305,7 @@ public class MainActivity extends AppCompatActivity {
                 scrHandle.increaseEndUserScore(userName.trim(), 1);
                 pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
 
-                Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
-                Log.d("querycheck", "" + applesQuery);
-
-                applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                pendingRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
@@ -290,11 +315,12 @@ public class MainActivity extends AppCompatActivity {
 
                             completedTransactionAlert();
                         }
+                        Toast.makeText(MainActivity.this, "" + dataSnapshot, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.e("failed", "onCancelled", databaseError.toException());
+                        //Log.e("failed", "onCancelled", databaseError.toException());
                     }
                 });
 
@@ -309,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
                 pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
 
                 Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
-                Log.d("querycheck", "" + applesQuery);
+                //Log.d("querycheck", "" + applesQuery);
 
                 applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -325,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.e("failed", "onCancelled", databaseError.toException());
+                        //Log.e("failed", "onCancelled", databaseError.toException());
                     }
                 });
 
@@ -340,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
                 pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
 
                 Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
-                Log.d("querycheck", "" + applesQuery);
+                //Log.d("querycheck", "" + applesQuery);
 
                 applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -356,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.e("failed", "onCancelled", databaseError.toException());
+                        //Log.e("failed", "onCancelled", databaseError.toException());
                     }
                 });
 
@@ -371,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
                 pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
 
                 Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
-                Log.d("querycheck", "" + applesQuery);
+                //Log.d("querycheck", "" + applesQuery);
 
                 applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -387,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.e("failed", "onCancelled", databaseError.toException());
+                        //Log.e("failed", "onCancelled", databaseError.toException());
                     }
                 });
 
@@ -481,16 +507,15 @@ public class MainActivity extends AppCompatActivity {
         mEventTransactionsList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("forLoopStart", "Start");
-                Log.d("forLoopStart", "start" + " : " + snapshot);
+                //Log.d("forLoopStart", "Start");
+                //Log.d("forLoopStart", "start" + " : " + snapshot);
 
                 for (DataSnapshot snapshot1 : snapshot.getChildren()){
                     String desc = snapshot1.child("description").getValue(String.class);
-                    String enddate = snapshot1.child("end_date").getValue(String.class);
                     String email = snapshot1.child("sent_to").getValue(String.class);
-                    String allData = desc + "\n" + enddate + "\n" + email;
+                    String allData = desc + "\n\n" + email;
 
-                    Log.d("logValue", "" + allData);
+                    //Log.d("logValue", "" + allData);
                     arrayList.add(allData);
                     adapter.notifyDataSetChanged();
                 }
@@ -506,13 +531,13 @@ public class MainActivity extends AppCompatActivity {
         mEventReceivedTransactionList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("forLoopStart", "Start");
-                Log.d("forLoopStart", "start" + " : " + snapshot);
+                //Log.d("forLoopStart", "Start");
+                //Log.d("forLoopStart", "start" + " : " + snapshot);
 
                 Collections.reverse(arrayListReceived);
 
                 for (DataSnapshot snapshot1 : snapshot.getChildren()){
-                    Log.d("logValue", "" + snapshot1.child("accepted_event").getValue(String.class));
+                    //Log.d("logValue", "" + snapshot1.child("accepted_event").getValue(String.class));
                     arrayListReceived.add(snapshot1.child("accepted_event").getValue(String.class));
                     adapterReceived.notifyDataSetChanged();
                 }
@@ -520,7 +545,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
@@ -602,7 +626,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String value = snapshot.getValue(String.class);
-                Log.d("value", "" + value);
+                //Log.d("value", "" + value);
                 if(!value.equals(null)){
                     if(value.equals("yes")){
                         firstReturnAlertBlock1();
@@ -629,19 +653,10 @@ public class MainActivity extends AppCompatActivity {
     }
     /***/
 
-    /**Currently onDestroy() does not create service
-     * this must be changed*/
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-        //startService(new Intent(this, dateReached.class));
-    }
-    /***/
-
     /**When the user taps on a RecyclerView item they will be prompted with that users information
      * And a follow option will be granted apon accaptance. This may be removed as this may be
      * more information than general users should have access to.*/
-    public void confirmationAlert(/*Selected users account name*/String usersName,
+    private void confirmationAlert(/*Selected users account name*/String usersName,
             /*Selected users clout score*/String usersCloutScore, /*Selected users account email*/String usersEmail){
 
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
@@ -715,7 +730,7 @@ public class MainActivity extends AppCompatActivity {
                 addFriend.AddFriend(usersName);
                 confirm.dismiss();
                 String ripUsersName = usersName.substring(usersName.indexOf(" : ") + 1);
-                Log.d("ripUNCheck", ripUsersName);
+                //Log.d("ripUNCheck", ripUsersName);
                 Toast.makeText(MainActivity.this, usersName + " has been added to your friends list", Toast.LENGTH_SHORT).show();
             }
         });
@@ -750,7 +765,7 @@ public class MainActivity extends AppCompatActivity {
     /***/
 
     /**This view holder is for the Main RecyclerView*/
-    public static class tasksViewHolder extends RecyclerView.ViewHolder{
+    private static class tasksViewHolder extends RecyclerView.ViewHolder{
 
         TextView getTransacting_Users, getDate, getCurrent_date, getLocation, getAmount;
 
@@ -769,7 +784,7 @@ public class MainActivity extends AppCompatActivity {
     /**onStart the usersScore should be checked
      * if there is a score score grab will be called
      * if there is no score a score will be created*/
-    public void initScoreHandling(){
+    private void initScoreHandling(){
         if(mRefUsers.child("Score") != null){
             scoreGrab();
             // Nothing should happen if the value of the score is 200 already
@@ -782,7 +797,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**onStart the users score should be grabed*/
     //init user score
-    public void scoreGrab(){
+    private void scoreGrab(){
         final MaterialButton cloutScore1 = findViewById(R.id.CloutScore);
         // Read from the database to get the users score
         mRefUsers.child("Score").addValueEventListener(new ValueEventListener() {
@@ -800,7 +815,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w("db_ref_failed", "Failed to read value.", error.toException());
+                //Log.w("db_ref_failed", "Failed to read value.", error.toException());
             }
         });
 
@@ -808,7 +823,7 @@ public class MainActivity extends AppCompatActivity {
     /***/
 
     /**When the scorehandler/cloutScore button is tapped go CreateNewSessionStart activity*/
-    public void onClickGoToCreateNewSessionActivity(){
+    private void onClickGoToCreateNewSessionActivity(){
         cloutScore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -822,7 +837,7 @@ public class MainActivity extends AppCompatActivity {
     /**When the cash/money button is tapped the user should be taken to the LoadCash activity
      * The users system should check to see if the user has added banking information,
      * if they have not, the user should be able to use a card*/
-    public void cashButtonHandle(){
+    private void cashButtonHandle(){
         // Read from the database
         money.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -835,7 +850,7 @@ public class MainActivity extends AppCompatActivity {
                         // This method is called once with the initial value and again
                         // whenever data at this location is updated.
                         String value = dataSnapshot.getValue(String.class);
-                        Log.d("CardSuccess", "Value is: " + value);
+                        //Log.d("CardSuccess", "Value is: " + value);
 
                         if(value.equals("NO")){
 
@@ -911,7 +926,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCancelled(DatabaseError error) {
                         // Failed to read value
-                        Log.w("Fail", "Failed to read value.", error.toException());
+                        //Log.w("Fail", "Failed to read value.", error.toException());
                     }
                 });
             }
@@ -928,14 +943,14 @@ public class MainActivity extends AppCompatActivity {
                 // whenever data at this location is updated.
                 for (DataSnapshot snapshot1 : dataSnapshot.getChildren()){
                     String value = snapshot1.getValue(String.class);
-                    Log.d("Success", "Value is: " + value);
+                    //Log.d("Success", "Value is: " + value);
                     money.setText(value);
                 }
             }
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w("Fail", "Failed to read value.", error.toException());
+                //Log.w("Fail", "Failed to read value.", error.toException());
             }
         });
     }
@@ -995,7 +1010,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w("getUNOnStartTest : ", "Failed to read value.", error.toException());
+                //Log.w("getUNOnStartTest : ", "Failed to read value.", error.toException());
             }
         });
     }
@@ -1017,7 +1032,7 @@ public class MainActivity extends AppCompatActivity {
     /**The following three alerts work together to introduce the user to the app
      * Each user object in firebase has an 'isFirstTimeUserIntro' item with a boolean val(TRUE or FALSE)
      * which simply keeps track of weather or not the user has been introduced to the app with the alerts yet*/
-    public void firstReturnAlertBlock1(){
+    private void firstReturnAlertBlock1(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -1050,7 +1065,7 @@ public class MainActivity extends AppCompatActivity {
         });
         confirm.show();
     }
-    public void firstReturnAlertBlock2(){
+    private void firstReturnAlertBlock2(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -1083,7 +1098,7 @@ public class MainActivity extends AppCompatActivity {
         });
         confirm.show();
     }
-    public void firstReturnAlertBlock3(){
+    private void firstReturnAlertBlock3(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -1117,7 +1132,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String value = snapshot.getValue(String.class);
-                        Log.d("value", "" + value);
+                        //Log.d("value", "" + value);
                         if(value.equals("yes")){
                             firstTimeCheckIntro.setValue("no");
                         }else{
@@ -1162,22 +1177,22 @@ public class MainActivity extends AppCompatActivity {
 
         MaterialButton eventTransButton = new MaterialButton(MainActivity.this);
         MaterialButton fundedMoneyTransaction = new MaterialButton(MainActivity.this);
-        MaterialButton nonFundedMoneyTransaction = new MaterialButton(MainActivity.this);
+        MaterialButton PreFundedMoneyTransaction = new MaterialButton(MainActivity.this);
 
         MaterialButton cancelButton = new MaterialButton(MainActivity.this);
 
         eventTransButton.setText(R.string.eventTransaction);
-        nonFundedMoneyTransaction.setText(R.string.nonFunded);
+        PreFundedMoneyTransaction.setText(R.string.nonFunded);
         fundedMoneyTransaction.setText(R.string.funded);
         cancelButton.setText(R.string.cancel);
 
         eventTransButton.setBackgroundResource(R.color.colorPrimary);
-        nonFundedMoneyTransaction.setBackgroundResource(R.color.colorPrimary);
+        PreFundedMoneyTransaction.setBackgroundResource(R.color.colorPrimary);
         fundedMoneyTransaction.setBackgroundResource(R.color.colorPrimary);
         cancelButton.setBackgroundResource(R.color.colorPrimary);
 
         layout.addView(eventTransButton);
-        layout.addView(nonFundedMoneyTransaction);
+        layout.addView(PreFundedMoneyTransaction);
         layout.addView(fundedMoneyTransaction);
         layout.addView(cancelButton);
 
@@ -1191,11 +1206,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        nonFundedMoneyTransaction.setOnClickListener(new View.OnClickListener() {
+        PreFundedMoneyTransaction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 confirm.dismiss();
-                Intent passToNonFundedMoneyTransactionActivity = new Intent(MainActivity.this, NonFundedMoneyTransaction.class);
+                Intent passToNonFundedMoneyTransactionActivity = new Intent(MainActivity.this, PreFundedMoneyTransaction.class);
                 startActivity(passToNonFundedMoneyTransactionActivity);
             }
         });
@@ -1253,7 +1268,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**This method houses 3 animations one for the profileImage, money button and recyclerView
      * These are standard animations meant to attract the user*/
-    public void openAnimations(){
+    private void openAnimations(){
         ObjectAnimator animProfileImage = ObjectAnimator.ofFloat(profileImage, "translationX", 30f);
         animProfileImage.setDuration(500);
         animProfileImage.start();
@@ -1262,6 +1277,8 @@ public class MainActivity extends AppCompatActivity {
         animCashButton.setDuration(500);
         animCashButton.start();
 
+        /**This below block will be kept because the recycler view will be returned to the app when funds
+         * are built out*/
         /*ObjectAnimator animListView = ObjectAnimator.ofFloat(recyclerView, "translationY", -90f);
         animListView.setDuration(500);
         animListView.start();*/
@@ -1289,13 +1306,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }else{
-            //Log.d("ReportImageTarget", "\n " +
-            //"\n " +
-            //"\n " +
-            //"onStart: NOTHING " +
-            //"\n " +
-            //"\n");
-
             Glide.with(MainActivity.this).load(profileImage).into(profileImage);
             //Log.d("load image", "" + mStorageRefPfofPic.toString());
         }
@@ -1303,10 +1313,10 @@ public class MainActivity extends AppCompatActivity {
     /***/
 
     /**This alert will report to the user what the details of an recylerView list item are when tapped*/
-    public void transactionDetialsAlert(/* Get the date from the selected viewHolder */ String date,
+    private void transactionDetialsAlert(/* Get the date from the selected viewHolder */ String date,
             /* Get the rate from the selected viewHolder */ String rate,
             /* Get the description from the selected viewHolder */ String description,
-            /*get usersnames from transacting users*/ String TransactingUsers){
+            /*get username from transacting users*/ String TransactingUsers){
 
         // The below string is a test that grabs the users and isolates the to-Users
         // String FinalRipTUsers = TransactingUsers.substring(TransactingUsers.indexOf(" : ") + 1)
@@ -1327,13 +1337,13 @@ public class MainActivity extends AppCompatActivity {
         transactionDetialsAlert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.d("reversedLog", transUserString);
+                //Log.d("reversedLog", transUserString);
                 mVal.child(transUserString).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String email = snapshot.child("Email").getValue(String.class);
                         String Score = snapshot.child("Score").getValue(String.class);
-                        Log.d("checkForEmail", "" + email);
+                        //Log.d("checkForEmail", "" + email);
                         confirmationAlert(transUserString, Score, email);
                     }
 
@@ -1358,7 +1368,7 @@ public class MainActivity extends AppCompatActivity {
      * Alert will introducse the user to what transactions are*/
 
     /**First time user cloutscore Alert blocks*/
-    public void firstTimeCloutScoreOnClick(){
+    private void firstTimeCloutScoreOnClick(){
         cloutScore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1370,7 +1380,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String value = snapshot.getValue(String.class);
-                        Log.d("value", "" + value);
+                        //Log.d("value", "" + value);
                         if(value.equals("yes")){
                             firstimeCloutScoreOnClickAlert1();
                         }else{
@@ -1386,7 +1396,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    public void firstimeCloutScoreOnClickAlert1(){
+    private void firstimeCloutScoreOnClickAlert1(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -1418,7 +1428,7 @@ public class MainActivity extends AppCompatActivity {
         });
         confirm.show();
     }
-    public void firstimeCloutScoreOnClickAlert2(){
+    private void firstimeCloutScoreOnClickAlert2(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -1450,7 +1460,7 @@ public class MainActivity extends AppCompatActivity {
         });
         confirm.show();
     }
-    public void firstimeCloutScoreOnClickAlert3(){
+    private void firstimeCloutScoreOnClickAlert3(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -1484,7 +1494,7 @@ public class MainActivity extends AppCompatActivity {
         });
         confirm.show();
     }
-    public void firstimeCloutScoreOnClickAlert4(){
+    private void firstimeCloutScoreOnClickAlert4(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(MainActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -1519,7 +1529,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         String value = snapshot.getValue(String.class);
-                        Log.d("value", "" + value);
+                        //Log.d("value", "" + value);
                         if(value.equals("yes")){
                             firstTimeScoreCheck.setValue("no");
                         }else{
@@ -1539,7 +1549,7 @@ public class MainActivity extends AppCompatActivity {
     /**END*/
 
     /**This alert will let the user know the transaction was completed*/
-    public void completedTransactionAlert(){
+    private void completedTransactionAlert(){
         final AlertDialog whoAlert = new MaterialAlertDialogBuilder(MainActivity.this).create();
 
         LinearLayout layout = new LinearLayout(MainActivity.this);

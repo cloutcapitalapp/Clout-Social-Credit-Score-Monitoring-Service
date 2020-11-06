@@ -48,40 +48,40 @@ public class EventTransactionActivity extends AppCompatActivity {
     String snapshotString;
 
     //boolean
-    boolean descPass = false;
-    boolean didPass;
+    private boolean descPass = false;
+    private boolean didPass;
 
     //View
-    View barSeperator;
+    private View barSeperator;
 
     //TextView
-    TextView whenTextView;
+    private TextView whenTextView;
 
     //String
-    String datePicked, newString;
+    private String datePicked, newString;
 
     //Firebase declare
     private FirebaseUser mCurrentUser;
     private FirebaseAuth mAuth;
-    FirebaseDatabase mDatabaseRef;
-    DatabaseReference mVal, mEventTransactionFirebaseReceived, notifications, mEventTransactionFirebaseSubmitted, usersNotify;
+    private FirebaseDatabase mDatabaseRef;
+    private DatabaseReference mVal, mEventTransactionFirebaseReceived, notifications, mEventTransactionFirebaseSubmitted, usersNotify;
 
     //Classes
-    AccountKeyManager accKey = new AccountKeyManager();
-    ScoreHandler scoreHandler = new ScoreHandler();
+    private AccountKeyManager accKey = new AccountKeyManager();
+    private ScoreHandler scoreHandler = new ScoreHandler();
 
     //spinner
-    Spinner eventSpinner;
+    private Spinner eventSpinner;
 
     //Buttons
-    Button submitTransactionsButton;
+    private Button submitTransactionsButton;
 
     //EditText
-    EditText editTextTextPersonName;
-    TextInputLayout description;
+    private EditText editTextTextPersonName;
+    private TextInputLayout description;
 
     //CalannderView
-    CalendarView calView;
+    private CalendarView calView;
     private Date date;
 
     /**This method will house the Events Transaction code
@@ -163,7 +163,7 @@ public class EventTransactionActivity extends AppCompatActivity {
     }
 
     /**At start, the user should be shown an Alert that displays the purpose of thise Deed Transaction.*/
-    public void onStartAlert(){
+    private void onStartAlert(){
         final AlertDialog whoAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
 
         LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
@@ -202,7 +202,6 @@ public class EventTransactionActivity extends AppCompatActivity {
      * @param // TODO: 10/15/20 onClickCheckTransactionsInfo() method*/
     /**START*/
     private void submitTransactionButtonOnClick()
-
     {
         //Check date
         dateSelected();
@@ -242,15 +241,15 @@ public class EventTransactionActivity extends AppCompatActivity {
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 for(DataSnapshot query : snapshot.getChildren()) {
                                     String value = (String) query.child("sent_to").getValue();
-                                    System.out.println("Val query check " + value);
+                                    //System.out.println("Val query check " + value);
                                     assert value != null;
-                                    if(value.equals(editTextTextPersonName.getText().toString())){
+                                    if(value.equals(editTextTextPersonName.getText().toString().trim())){
                                         /**If snapshot is not null we will check
                                          * to make sure the entered value is not a current
                                          * sent_to value*/
                                         noRepeatAlert();
                                         System.out.println("Query 1: " + query.child("sent_to").getValue());
-                                    }else if(!value.equals(editTextTextPersonName.getText().toString())){
+                                    }else if(!value.equals(editTextTextPersonName.getText().toString().trim())){
                                         noRepeatAlert();
                                         //goodDeedAlert();
                                     }
@@ -275,7 +274,7 @@ public class EventTransactionActivity extends AppCompatActivity {
         mSubmitted.addListenerForSingleValueEvent(mSubmitedCheck);
     }
 
-    public void noRepeatAlert(){
+    private void noRepeatAlert(){
         final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
 
         LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
@@ -318,7 +317,7 @@ public class EventTransactionActivity extends AppCompatActivity {
 
     /**This alert will report to the user that they've committed a deed transaction and then creates
      * a notification that alerts the user the score increase amount they've recieved.*/
-    public void goodDeedAlert(){
+    private void goodDeedAlert(){
         final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
 
         LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
@@ -354,15 +353,6 @@ public class EventTransactionActivity extends AppCompatActivity {
 
                 mEventTransactionFirebaseReceived = mDatabaseRef.getReference(String.valueOf(editTextTextPersonName.getText()).trim() + "_" + "event_received").push();
 
-                /**This sequence will generate a firebase realtime database node that will house
-                 * the 'Submitted' children in the database
-                 * @// TODO: 10/19/20 This sequence needs to be changed to push a submitted node
-                 * But should leave the request node to be sent to the receiver.*/
-                mEventTransactionFirebaseSubmitted.child("sent_to").setValue(String.valueOf(editTextTextPersonName.getText()));
-                mEventTransactionFirebaseSubmitted.child("description").setValue(Objects.requireNonNull(description.getEditText()).getText().toString());
-                mEventTransactionFirebaseSubmitted.child("end_date").setValue(whenTextView.getText().toString());
-                scoreHandler.sessionStartScoreIncrease(.25);
-
                 /**Send user notification of score increase*/
                 usersNotify.child("notify").setValue("Great job! You're score increased by .25 points!");
 
@@ -377,9 +367,43 @@ public class EventTransactionActivity extends AppCompatActivity {
                 /**The score will be increase after both submitted and received nodes are sent to firebase*/
                 scoreHandler.sessionStartScoreIncrease(.25);
 
+                /**create alert that tells user we will manage the transaction and notify them*/
+                willHandleAlert();
+
                 /**Next we need to dismiss the Alert and return the user to the MainActivity
                  * returning the user also has the added benefit not allowing the user to be able
                  * to create multiple transactions from the same instance.  */
+                noMatchAlert.dismiss();
+            }
+        });
+        noMatchAlert.show();
+    }
+    private void willHandleAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
+
+        LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        noMatchAlert.setView(layout);
+
+        noMatchAlert.setCancelable(false);
+
+        noMatchAlert.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = noMatchAlert.getWindow();
+        window.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        noMatchAlert.setTitle("We got it");
+        noMatchAlert.setMessage("We will alert the user and let you know if they accept or reject your request");
+
+        MaterialButton confirmButton = new MaterialButton(EventTransactionActivity.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 noMatchAlert.dismiss();
                 Intent toMain = new Intent(EventTransactionActivity.this, MainActivity.class);
                 startService(new Intent(EventTransactionActivity.this, dateReached.class));
@@ -395,7 +419,7 @@ public class EventTransactionActivity extends AppCompatActivity {
 
     /**This method is a TextWatcher that reports to the user when they've typed the &Accountname of
      * a located user.*/
-    public void checkUsername(){
+    private void checkUsername(){
         editTextTextPersonName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             private Handler myHandler;
 
@@ -407,7 +431,7 @@ public class EventTransactionActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             /**Check for user in Us*/
-                            DatabaseReference mTransactionReference = mDatabaseRef.getReference("Users").child(editTextTextPersonName.getText().toString());
+                            DatabaseReference mTransactionReference = mDatabaseRef.getReference("Users").child(editTextTextPersonName.getText().toString().trim());
                             ValueEventListener eventListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -433,7 +457,7 @@ public class EventTransactionActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-                                    Log.d("failed", databaseError.getMessage()); //Don't ignore errors!
+                                    //Log.d("failed", databaseError.getMessage()); //Don't ignore errors!
                                 }
                             };
                             mTransactionReference.addListenerForSingleValueEvent(eventListener);
@@ -449,7 +473,7 @@ public class EventTransactionActivity extends AppCompatActivity {
     /**Searched for self alert
      *
      */
-    public void checkForSelfAlert(){
+    private void checkForSelfAlert(){
         final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
 
         LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
@@ -482,7 +506,7 @@ public class EventTransactionActivity extends AppCompatActivity {
     }
 
     /**Alert for check user check*/
-    public void noMatchingUserAlert(){
+    private void noMatchingUserAlert(){
         final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
 
         LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
@@ -513,7 +537,7 @@ public class EventTransactionActivity extends AppCompatActivity {
         });
         noMatchAlert.show();
     }
-    public boolean matchingUserAlert(){
+    private boolean matchingUserAlert(){
         final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
 
         LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
@@ -548,7 +572,7 @@ public class EventTransactionActivity extends AppCompatActivity {
     }
 
     /**This method will check for the selected spinner value*/
-    public void spinnerItemSelected(){
+    private void spinnerItemSelected(){
         eventSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -562,7 +586,7 @@ public class EventTransactionActivity extends AppCompatActivity {
 
         });
     }
-    public void spinnerItemSelectedConditions(int retrievedID){
+    private void spinnerItemSelectedConditions(int retrievedID){
         // your code here
         int getPosition = retrievedID;
         if(getPosition == 0){
@@ -577,13 +601,13 @@ public class EventTransactionActivity extends AppCompatActivity {
         }else if(getPosition == 4){
             Toast.makeText(EventTransactionActivity.this, "Other", Toast.LENGTH_SHORT).show();
         }
-        Log.d("getIdCheck", "" + (long) getPosition);
+        //Log.d("getIdCheck", "" + (long) getPosition);
     }
 
     /**Description needs to be checked to make sure it is valid
      * rule 1 - Must be over 50 characters in length
      * @return*/
-    public boolean descriptionCheck(String descriptionString){
+    private boolean descriptionCheck(String descriptionString){
         if(descriptionString.length() <= 10
                 && (descriptionString.length() >= 20)){
             Toast.makeText(this, "Description must be at least 10 characters, " +
@@ -599,7 +623,7 @@ public class EventTransactionActivity extends AppCompatActivity {
      * When a date is selected the 'When' textview should set its' text to the chosen date.
      *
      * @param // */
-    public void dateSelected(){
+    private void dateSelected(){
         calView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
@@ -611,7 +635,7 @@ public class EventTransactionActivity extends AppCompatActivity {
     /**END*/
 
     /**This method houses the onCreate animations for this activity*/
-    public void openingAnimation(){
+    private void openingAnimation(){
         ObjectAnimator animCashButton = ObjectAnimator.ofFloat(barSeperator, "translationY", -80f);
         animCashButton.setDuration(500);
         animCashButton.start();

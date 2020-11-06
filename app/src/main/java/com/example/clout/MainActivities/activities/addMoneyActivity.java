@@ -103,7 +103,7 @@ public class addMoneyActivity extends AppCompatActivity {
 
                 if(/*If there is no value present,
                 send to main activity*/ howMuchEditText.getText().toString().equals("")){
-                    Log.d("testValue", "Value is present" + howMuchEditText.getText().toString());
+                    //Log.d("testValue", "Value is present" + howMuchEditText.getText().toString());
                     addCashAlert();
                 }else{
                     // Read from the database
@@ -113,7 +113,7 @@ public class addMoneyActivity extends AppCompatActivity {
                             // This method is called once with the initial value and again
                             // whenever data at this location is updated.
                             String value = dataSnapshot.getValue(String.class);
-                            Log.d("Add Cash Success", "Value is: " + value);
+                            //Log.d("Add Cash Success", "Value is: " + value);
 
                             mAddCashRef.setValue(String.valueOf(Double.parseDouble(valueTextView.getText().toString()
                                     .replace("$", "")) + Double.parseDouble(value)));
@@ -125,7 +125,7 @@ public class addMoneyActivity extends AppCompatActivity {
                         @Override
                         public void onCancelled(DatabaseError error) {
                             // Failed to read value
-                            Log.w("Add Cash Failed", "Failed to read value.", error.toException());
+                            //Log.w("Add Cash Failed", "Failed to read value.", error.toException());
                         }
                     });
                 }
@@ -144,7 +144,7 @@ public class addMoneyActivity extends AppCompatActivity {
                         // This method is called once with the initial value and again
                         // whenever data at this location is updated.
                         String value = dataSnapshot.getValue(String.class);
-                        Log.d("Add Cash Success", "Value is: " + value);
+                        //Log.d("Add Cash Success", "Value is: " + value);
 
                         mAddCashRef.setValue((String.valueOf(df.format(Double.parseDouble(value) -
                                 Double.parseDouble(valueTextView.getText().toString()
@@ -157,7 +157,7 @@ public class addMoneyActivity extends AppCompatActivity {
                     @Override
                     public void onCancelled(DatabaseError error) {
                         // Failed to read value
-                        Log.w("Add Cash Failed", "Failed to read value.", error.toException());
+                        //Log.w("Add Cash Failed", "Failed to read value.", error.toException());
                     }
                 });
             }

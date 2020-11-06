@@ -47,7 +47,6 @@ public class CreateNewSession extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_session);
 
-
         /* Assign Vars */
         mAuth         = FirebaseAuth.getInstance();
         mCurrentUser  = mAuth.getCurrentUser();
@@ -84,7 +83,7 @@ public class CreateNewSession extends AppCompatActivity {
         // after passing into activity status, activity will be marked as complete and activity will
         // be updated as completed on good terms or completed on bad terms.
         mRefActivity.setValue(sessionID);
-        Log.d("sent", "data was sent");
+        //Log.d("sent", "data was sent");
         return sessionID;
     }
     public void selectDateFromDatePickerOnClick() {
@@ -101,7 +100,7 @@ public class CreateNewSession extends AppCompatActivity {
                 String getDate = year + "/" + month + 1 + "/" + "" + dayOfMonth;
                 dateText.setText(getDate);
                 // Create activity session, sessionID and creates child in Firebase Database.
-                Log.d("dataCheck", "" + getDate);
+                //Log.d("dataCheck", "" + getDate);
             }
         });
         alertDialogBuilder.setPositiveButton("OKay", new DialogInterface.OnClickListener() {
@@ -152,7 +151,7 @@ public class CreateNewSession extends AppCompatActivity {
                     Intent returnToMain = new Intent(CreateNewSession.this, MainActivity.class);
                     startActivity(returnToMain);
                 }else{
-                    Log.d("didpass", "failed");
+                    //Log.d("didpass", "failed");
                 }
                 sessionStartIncreaseScore.sessionStartScoreIncrease(0.25);
             }

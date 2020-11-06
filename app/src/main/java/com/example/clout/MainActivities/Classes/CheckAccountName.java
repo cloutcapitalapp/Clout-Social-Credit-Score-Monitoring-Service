@@ -60,15 +60,15 @@ public class CheckAccountName extends Activity {
                         String accKeySanpped = accKey.createAccountKey(snappedEmail);
 
                         if(editTextToString.equals(accKeySanpped)){
-                            Log.d("Match", "Match Found");
-                            Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
+                            //Log.d("Match", "Match Found");
+                            //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
                             isMatchTrue = true;
                             if (isMatchTrue)
                                 //allow pass
                             break;
                         }else{
-                            Log.d("Match", "Match Not Found");
-                            Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
+                            //Log.d("Match", "Match Not Found");
+                            //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
                             isMatchTrue = false;
                             if (!isMatchTrue){
                                 //alert user there is no matching user
@@ -80,11 +80,11 @@ public class CheckAccountName extends Activity {
                 @Override
                 public void onCancelled(DatabaseError error) {
                     // Failed to read value
-                    Log.w("UserCheck", "Failed to read value.", error.toException());
+                    //Log.w("UserCheck", "Failed to read value.", error.toException());
                 }
             });
         }else{
-            Log.d("containsFail", "Fail");
+            //Log.d("containsFail", "Fail");
         }
     }
     public void noMatchingUserAlert(){

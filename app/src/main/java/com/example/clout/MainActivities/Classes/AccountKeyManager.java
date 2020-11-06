@@ -19,11 +19,11 @@ public class AccountKeyManager {
     public String createAccountKey(String emailToPass){
         StringBuilder emailBreak = new StringBuilder(emailToPass);
         String emailAdd = String.valueOf(emailBreak.insert(0, "&")).split("@")[0].toLowerCase();
-        Log.d("accountkeytest", emailAdd);
+        //Log.d("accountkeytest", emailAdd);
         user.setAccountKey(emailAdd);
         myRef.child(emailAdd);
         if(user.getAccountKey() == null){
-            Log.d("nullKey", "Nothing was entered");
+            //Log.d("nullKey", "Nothing was entered");
         }else{
             user.getAccountKey();
         }

@@ -100,7 +100,7 @@ public class CreateNewSession_3 extends AppCompatActivity {
         assert intentExtras != null;
         receiver = intentExtras.getString("toUser");
         getAmount = intentExtras.getString("amount");
-        Log.d("recieverTest", "extras : " + receiver + ", " + getAmount);
+        //Log.d("recieverTest", "extras : " + receiver + ", " + getAmount);
     }
 
     private void FundsNotRequiredForReturnMethod(){
@@ -291,21 +291,21 @@ public class CreateNewSession_3 extends AppCompatActivity {
                 int currentDateCharToInt = Integer.parseInt(String.valueOf(currentDateCharacters));
 
                 if(currentDateCharToInt == 0){
-                    Log.d("charTest",  "character was 0");
+                    //Log.d("charTest",  "character was 0");
                     for(int i = 0; i < currentDatePureString.length(); i++){
-                        Log.d("Check Current Date", "" + remove0BackToString);
-                        Log.d("Check Date Selected", "" + dateSelectedConvert);
+                        //Log.d("Check Current Date", "" + remove0BackToString);
+                        //Log.d("Check Date Selected", "" + dateSelectedConvert);
 
                         if(Integer.parseInt(remove0BackToString) == dateSelectedConvert){
-                            Log.d("dateChecker", "the Dates are equal");
+                            //Log.d("dateChecker", "the Dates are equal");
                         }else{
-                            Log.d("dateChecker", "the Dates are not equal");
+                            //Log.d("dateChecker", "the Dates are not equal");
                         }
                     }
                 }else{
-                    Log.d("charTest",  "character was not 0" + " : " + currentDateCharacters);
+                    //Log.d("charTest",  "character was not 0" + " : " + currentDateCharacters);
                 }
-                Log.d("currentDate", "" + currentDate + " : " + dateSelected + " | " + dateSelectedConvert + " : " + currentDateConvert);
+                //Log.d("currentDate", "" + currentDate + " : " + dateSelected + " | " + dateSelectedConvert + " : " + currentDateConvert);
                 // compare the current date and the date selected to make sure a previous date is not selected
                 date.setText(dateSelected);
             }

@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.clout.MainActivities.Classes.AccountKeyManager;
+import com.example.clout.MainActivities.Classes.ScoreHandler;
 import com.example.clout.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -35,6 +36,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 public class NotificationActivity extends AppCompatActivity {
 
@@ -46,25 +48,25 @@ public class NotificationActivity extends AppCompatActivity {
      * Score Increases or Decreases*/
 
     //firebase database referance
-    DatabaseReference pendingNotifications, mEventReceivedTransactionList;
+    private DatabaseReference pendingNotifications, mEventTransactionFirebaseSubmitted, notifications, mEventReceivedTransactionList;
     private FirebaseUser mCurrentUser;
     private FirebaseAuth mAuth;
 
     //TabLayout
-    TabLayout tabLayout;
+    private TabLayout tabLayout;
 
     //ListView
-    ListView notifListView, pendingDeedListView;
-    ArrayAdapter<String> fbArrayAdapter, pendingAdapter;
-    ArrayList<String> pendingArrayList = new ArrayList<String>();
-    ArrayList<String> fbArrayList = new ArrayList<String>();
+    private ListView notifListView, pendingDeedListView;
+    private ArrayAdapter<String> fbArrayAdapter, pendingAdapter;
+    private ArrayList<String> pendingArrayList = new ArrayList<String>();
+    private ArrayList<String> fbArrayList = new ArrayList<String>();
 
     //set up Firebase
     //init firebase vars
-    FirebaseDatabase database;
-    DatabaseReference myRef, pendingRef;
-    FirebaseUser currentUser;
-    AccountKeyManager accKey;
+    private FirebaseDatabase database;
+    private DatabaseReference myRef, pendingRef;
+    private FirebaseUser currentUser;
+    private AccountKeyManager accKey;
 
     /**This activity will show the users notifications
      * over a listView*/
@@ -105,7 +107,7 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     /**TabLayout - tab layout will show notifications and pending transaction listviews*/
-    public void tabLayoutManager(){
+    private void tabLayoutManager(){
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -140,13 +142,12 @@ public class NotificationActivity extends AppCompatActivity {
     /**Finds Pending_Notifications object and locates mCurrentUser
      * Once the current users object is found in firebase iterate over that users children which will be the
      * users notifications and will be passed into the listView*/
-    public void callPendingData(){
+    private void callPendingData(){
         pendingRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-
                 for (DataSnapshot snapshot1 : dataSnapshot.getChildren()){
                     String desc = snapshot1.child("description").getValue(String.class);
                     String end = snapshot1.child("enddate").getValue(String.class);
@@ -158,18 +159,19 @@ public class NotificationActivity extends AppCompatActivity {
                     pendingArrayList.add(allData);
                     pendingAdapter.notifyDataSetChanged();
                 }
+                //finish();
             }
 
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w("failed", "Failed to read value.", error.toException());
+                //Log.w("failed", "Failed to read value.", error.toException());
             }
         });
     }
 
     /**CallPendingData listView item listener*/
-    public void callPendingDataItemListener(){
+    private void callPendingDataItemListener(){
         pendingDeedListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -181,7 +183,7 @@ public class NotificationActivity extends AppCompatActivity {
         });
     }
     /**Alert the user and ask if they'd like to approve the deed-transaction*/
-    public void pendingAcceptAlert(String fromUser, String itemText){
+    private void pendingAcceptAlert(String fromUser, String itemText){
         final AlertDialog pendingAlert = new MaterialAlertDialogBuilder(NotificationActivity.this).create();
 
         LinearLayout layout = new LinearLayout(NotificationActivity.this);
@@ -220,23 +222,52 @@ public class NotificationActivity extends AppCompatActivity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ScoreHandler scoreHandler = new ScoreHandler();
+                mEventTransactionFirebaseSubmitted = database.getReference(fromUser.trim() + "_" + "event_transactions").push();
+
+                notifications = database.getReference(fromUser + "_" + "Pending_Notifications").push();
+
                 mEventReceivedTransactionList = database.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_received").push();
                 mEventReceivedTransactionList.child("accepted_event").setValue(itemText);
+                notifications = database.getReference(fromUser.trim() + "_" + "Pending_Notifications").push();
 
                 Query applesQuery = pendingRef.orderByChild("sentFrom").equalTo(fromUser);
-                Log.d("querycheck", "" + applesQuery);
 
                 applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
                             appleSnapshot.getRef().removeValue();
+                            finish();
                         }
+
+                        /**May be suitable to just combine the data into one set and go from their.
+                         * no need for too much complexity.*/
+                        notifications.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                String valueDescription = dataSnapshot.child("description").getValue(String.class);
+                                String valueDate = dataSnapshot.child("enddate").getValue(String.class);
+                                Toast.makeText(NotificationActivity.this, "values: " + valueDate + " : " + valueDescription, Toast.LENGTH_SHORT).show();
+                                /**This sequence will generate a firebase realtime database node that will house
+                                 * the 'Submitted' children in the database
+                                 * @// TODO: 10/19/20 This sequence needs to be changed to push a submitted node
+                                 * But should leave the request node to be sent to the receiver.*/
+                                mEventTransactionFirebaseSubmitted.child("sent_to").setValue(accKey.createAccountKey(mCurrentUser.getEmail()));
+                                mEventTransactionFirebaseSubmitted.child("description").setValue(itemText);
+                                scoreHandler.sessionStartScoreIncrease(.25);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.e("failed", "onCancelled", databaseError.toException());
+                        //Log.e("failed", "onCancelled", databaseError.toException());
                     }
                 });
 
@@ -264,7 +295,7 @@ public class NotificationActivity extends AppCompatActivity {
     /**Finds Users_Notificiations object and locates mCurrentUser
      * Once the current users object is found in firebase iterate over that users children which will be the
      * users notifications and will be passed into the listView*/
-    public void callNotificiationsData(){
+    private void callNotificiationsData(){
         myRef.child(accKey.createAccountKey(currentUser.getEmail())).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -273,7 +304,7 @@ public class NotificationActivity extends AppCompatActivity {
 
                 for (DataSnapshot snapshot1 : dataSnapshot.getChildren()){
                     String value = snapshot1.child("notify").getValue(String.class);
-                    Log.d("succeed", "Value is: " + value);
+                    //Log.d("succeed", "Value is: " + value);
                     fbArrayList.add(value);
                     fbArrayAdapter.notifyDataSetChanged();
                 }
@@ -282,13 +313,13 @@ public class NotificationActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
-                Log.w("failed", "Failed to read value.", error.toException());
+                //Log.w("failed", "Failed to read value.", error.toException());
             }
         });
     }
 
     /**callNotificationsData item Listener*/
-    public void callNotificationsDataItemListener(){
+    private void callNotificationsDataItemListener(){
         notifListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -298,7 +329,7 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     /**houses init code for the both listViews*/
-    public void listViewManager(){
+    private void listViewManager(){
         /**ListView adapter for general notifications*/
         fbArrayAdapter = new ArrayAdapter<String>(this,
                 R.layout.notiflistview,

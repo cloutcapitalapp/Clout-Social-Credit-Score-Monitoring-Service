@@ -44,6 +44,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+//TODO Firebase Database paths must not contain '.', '#', '$', '[', or ']
+
 /**The login activity must be attractive as it will be the introduction of the user to the app
  * @param // FIXME: 10/18/20 refactor notes on this activity*/
 public class AuthActivity extends AppCompatActivity {
@@ -102,8 +104,7 @@ public class AuthActivity extends AppCompatActivity {
 
     /**onStart the ad video should play
      * when the add video plays, because its so loud the system volume should be changed to 6*/
-    public void onStartPlayIntroVideo(){
-
+    private void onStartPlayIntroVideo(){
         Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.cloutad);
 
         AudioManager audioManager =
@@ -118,12 +119,12 @@ public class AuthActivity extends AppCompatActivity {
     /**These are animations
      * openingAnimation will run onCreate
      * reverseAnimation will run on return to sign up tab*/
-    public void openingAnimation(){
+    private void openingAnimation(){
         ObjectAnimator animCashButton = ObjectAnimator.ofFloat(submit, "translationY", -90f);
         animCashButton.setDuration(500);
         animCashButton.start();
     }
-    public void reverseAnimation(){
+    private void reverseAnimation(){
         ObjectAnimator animCashButton = ObjectAnimator.ofFloat(submit, "translationY", 90f);
         animCashButton.setDuration(500);
         animCashButton.start();
@@ -135,20 +136,19 @@ public class AuthActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-
-        onStartPlayIntroVideo();
         if (mCurrentUser != null){
             Intent toProfileActivity = new Intent(AuthActivity.this, MainActivity.class);
             startActivity(toProfileActivity);
         }else{
             Toast.makeText(AuthActivity.this, "Please Create Account!", Toast.LENGTH_SHORT).show();
+            onStartPlayIntroVideo();
         }
     } /* If there is no user, user will be prompted to create an account. */
 
     /**Firebase method: if email is properly formatted and passwords match firebase user will be created and cached.
      * The following methods will be for creating an account or signing into one.
      * */
-    public void createAccount(final String email, String password){
+    private void createAccount(final String email, String password){
         if(!email.isEmpty()){
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -213,7 +213,7 @@ public class AuthActivity extends AppCompatActivity {
         }
 
     }
-    public void signInUser(final String email, final String password){
+    private void signInUser(final String email, final String password){
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -241,7 +241,7 @@ public class AuthActivity extends AppCompatActivity {
     /*  */
 
     /**When submit button is clicked, check if passwords match and check email*/
-    public void submitButtonOnClick(){
+    private void submitButtonOnClick(){
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -264,7 +264,7 @@ public class AuthActivity extends AppCompatActivity {
             }
         });
     }
-    public void passwordLengthAlert(){
+    private void passwordLengthAlert(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -296,7 +296,7 @@ public class AuthActivity extends AppCompatActivity {
         });
         confirm.show();
     }
-    public void checkEmailAlert(){
+    private void checkEmailAlert(){
         final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -329,7 +329,7 @@ public class AuthActivity extends AppCompatActivity {
     }
 
     /**Below will be the method used to log the user into his/her account*/
-    public void loginButtonOnClick(){
+    private void loginButtonOnClick(){
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -343,7 +343,7 @@ public class AuthActivity extends AppCompatActivity {
             }
         });
     }
-    public void loginAlert(){
+    private void loginAlert(){
         /**User needs to be warned to check email and password and try again*/
         final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this).create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
@@ -388,7 +388,7 @@ public class AuthActivity extends AppCompatActivity {
     //
     //
 
-    public void tabLayoutManager(){
+    private void tabLayoutManager(){
         logAndSignTab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -439,14 +439,18 @@ public class AuthActivity extends AppCompatActivity {
         protected Object doInBackground(Object[] objects) {
             com.stripe.Stripe.apiKey = "sk_test_51GuYBuLsgkZ2wTkEPW1f3aeAOcqJTWWgDTq2frFZSpsn2dtM1zLtiGQd3E90OGFNo7VPmL9Y2w62zpvwiwf5nwW5007TNe558H";
             FirebaseUser fireUser = mAuth.getCurrentUser();
+            assert fireUser != null;
+            /**Incase of crash - you added - assert fireUser != null;
+             * and you added Objects.requerNonNull to mapUsernameString
+             * of auth bug reports - then reverse these implementations*/
             String accKey = keyGenerator.createAccountKey(fireUser.getEmail());
-            String mapUsernameString = username.getEditText().getText().toString().replace(" ", "");
+            String mapUsernameString = Objects.requireNonNull(username.getEditText()).getText().toString().replace(" ", "");
             Map<String, Object> mapCustomer = new HashMap<String, Object>();
             mapCustomer.put("email", mapUsernameString);
             try {
                 Customer newCustomer = Customer.create(mapCustomer);
                 String custID = newCustomer.getId();
-                Log.d("CustomerID", custID);
+                //Log.d("CustomerID", custID);
                 mRefUsers.child(accKey);
                 mRefUsers.child(accKey).child("stripeCustomerID").setValue(custID);
             } catch (StripeException e) {
@@ -461,7 +465,7 @@ public class AuthActivity extends AppCompatActivity {
      * will be taken out before ship*/
     /* This method doesn't need to be used as it is not delivered Asynchronously */
     /* Create stripe customer */
-    public void createStripeCustomer(){
+    private void createStripeCustomer(){
         com.stripe.Stripe.apiKey = "sk_live_PRhe9eFUANmDRa7KlIqQF2mj00LBHktQVS";
         String mapUsernameString = username.getEditText().getText().toString().replace(" ", "");
         Map <String, Object> mapCustomer = new HashMap<String, Object>();
@@ -469,7 +473,7 @@ public class AuthActivity extends AppCompatActivity {
         try {
             Customer newCustomer = Customer.create(mapCustomer);
             String custID = newCustomer.getId();
-            Log.d("CustomerID", custID);
+            //Log.d("CustomerID", custID);
             mRefUsers.child(mapUsernameString.replace(".", ""));
             mRefUsers.child(mapUsernameString.replace(".", "")).child("customerID").setValue(custID);
         } catch (StripeException e) {

@@ -25,7 +25,7 @@ import static com.example.clout.MainActivities.Classes.notificationHandler.CHANN
 
 public class dateReached extends Service {
 
-    private NotificationManagerCompat notificationManagerCompat;
+    public NotificationManagerCompat notificationManagerCompat;
     FirebaseDatabase mDatabaseRef = FirebaseDatabase.getInstance();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser mCurrentUser = mAuth.getCurrentUser();
@@ -46,7 +46,7 @@ public class dateReached extends Service {
         notificationManagerCompat = NotificationManagerCompat.from(this);
         accKey = new AccountKeyManager();
 
-        Log.d("startService",  "Service has begun");
+        //Log.d("startService",  "Service has begun");
         Notification notification = new NotificationCompat.Builder(dateReached.this, CHANNEL_1_ID)
                 .setSmallIcon(R.drawable.ic_baseline_emoji_emotions_24)
                 .setContentTitle("HEY!")

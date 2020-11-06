@@ -85,7 +85,7 @@ public class CreateNewSession_2 extends AppCompatActivity {
         Bundle intentExtras = getIntent().getExtras();
         assert intentExtras != null;
         receiver = intentExtras.getString("receiver");
-        Log.d("recieverTest", "extras : " + receiver);
+        //Log.d("recieverTest", "extras : " + receiver);
     }
 
     private void continueButtonMethod(){

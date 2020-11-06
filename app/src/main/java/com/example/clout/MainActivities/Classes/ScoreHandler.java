@@ -29,12 +29,12 @@ public class ScoreHandler extends CreateNewSession {
     /**This method will connect to firebase realtime db and increase the current users score*/
     public void sessionStartScoreIncrease(final double valuePlus){
         accKey = new AccountKeyManager();
-        Log.d("testNow", "" + "Test");
+        //Log.d("testNow", "" + "Test");
         mRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("Score").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                Log.d("valueFound", "Found" + ": " + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
+                //Log.d("valueFound", "Found" + ": " + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
 
                 String value = dataSnapshot.getValue(String.class);
 
@@ -58,7 +58,7 @@ public class ScoreHandler extends CreateNewSession {
         mRef.child(endUser).child("Score").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d("valueFound", "Found" + ": " + endUser + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
+                //Log.d("valueFound", "Found" + ": " + endUser + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
 
                 String value = dataSnapshot.getValue(String.class);
 
@@ -80,7 +80,7 @@ public class ScoreHandler extends CreateNewSession {
         mRef.child(endUser.trim()).child("Score").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d("valueFound", "Found" + ": " + endUser + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
+                //Log.d("valueFound", "Found" + ": " + endUser + dataSnapshot.getKey() + " : " + dataSnapshot.getValue());
 
                 String value = dataSnapshot.getValue(String.class);
 

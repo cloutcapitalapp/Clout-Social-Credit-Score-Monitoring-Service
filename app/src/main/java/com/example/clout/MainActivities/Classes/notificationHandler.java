@@ -35,7 +35,6 @@ public class notificationHandler extends Application {
                 NotificationManager manager = getSystemService(NotificationManager.class);
                 manager.createNotificationChannels(Collections.singletonList(channel1));
                 manager.createNotificationChannels(Collections.singletonList(channel2));
-
             }
         }
     }

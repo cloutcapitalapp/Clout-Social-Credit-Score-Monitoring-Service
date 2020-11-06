@@ -159,8 +159,8 @@ public class CreateNewSessionStart extends AppCompatActivity {
                                     startActivity(toStage2);
                                     //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + borrowerET.getEditText().getText());
                                 }else{
-                                    Log.d("containsFail", "Fail");
-                                    Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + borrowerET.getEditText().getText());
+                                    //Log.d("containsFail", "Fail");
+                                    //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + borrowerET.getEditText().getText());
                                     Toast.makeText(CreateNewSessionStart.this, "There are no users by that &AccountName", Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -168,7 +168,7 @@ public class CreateNewSessionStart extends AppCompatActivity {
                         @Override
                         public void onCancelled(DatabaseError error) {
                             // Failed to read value
-                            Log.w("UserCheck", "Failed to read value.", error.toException());
+                            //Log.w("UserCheck", "Failed to read value.", error.toException());
                         }
                     });
                 }else{
@@ -183,7 +183,7 @@ public class CreateNewSessionStart extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
-                Log.d("createtest", "" + " : " + userTrans);
+                //Log.d("createtest", "" + " : " + userTrans);
                 userTrans.child(/*** This needs to be changed to the accountSessionID ***/ sessionActivityId.generateSessionID(
                         accKey.createAccountKey(mCurrentUser.getEmail()), Objects.requireNonNull(borrowerET.getEditText()).getText().toString(), String.valueOf(currentDate)));
                 userTrans.child(/*** This needs to be changed to the accountSessionID ***/ sessionActivityId.generateSessionID(

@@ -232,7 +232,7 @@ public class UserProfileActivity extends AppCompatActivity {
     /**This method will populate the listView with data from the firebase 'User_Friends_List object'
      * */
     public void populateListView(){
-        Log.d("forLoopEnd", "End");
+        //Log.d("forLoopEnd", "End");
         if(!arrayList.contains(null)){
             myHandler = new Handler();
             addedTV.setText("Friends List");
@@ -516,7 +516,7 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Query unfollowQuerry = friendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child(usersName);
-                Log.d("unfollow_Query_Check", "" + unfollowQuerry);
+                //Log.d("unfollow_Query_Check", "" + unfollowQuerry);
 
                 /**When the unfollow button is tapped the follow target shoudld be removed from the users
                  * friends list.*/

@@ -181,7 +181,7 @@ public class LoadCashActivity extends AppCompatActivity {
                         && !eMString.equals("")
                         && !eYString.equals("")
                         && !cvcString.equals("")) {
-                    Log.d("val_test", " " + cNumString + " " + eMString + " " + eYString + " " + cvcString);
+                    //Log.d("val_test", " " + cNumString + " " + eMString + " " + eYString + " " + cvcString);
 
                     new AsyncStripeTask().execute(AsyncStripeTask);
                     confirm.dismiss();
@@ -258,7 +258,7 @@ public class LoadCashActivity extends AppCompatActivity {
                     // This method is called once with the initial value and again
                     // whenever data at this location is updated.
                     String value = dataSnapshot.getValue(String.class);
-                    Log.d("success", "Value is: " + value);
+                    //Log.d("success", "Value is: " + value);
 
                     assert value != null;
 
@@ -296,7 +296,7 @@ public class LoadCashActivity extends AppCompatActivity {
                             Map<String, Object> source = new HashMap<String, Object>();
                             source.put("source", token.getId());
 
-                             Log.d("customerA", "" + customerA);
+                             //Log.d("customerA", "" + customerA);
                             try {
                                 assert customerA != null;
                                 customerA.getSources().create(source);
@@ -313,7 +313,7 @@ public class LoadCashActivity extends AppCompatActivity {
                 @Override
                 public void onCancelled(DatabaseError error) {
                     // Failed to read value
-                    Log.d("failed", "Failed to read value.");
+                    //Log.d("failed", "Failed to read value.");
                 }
             });
             return null;

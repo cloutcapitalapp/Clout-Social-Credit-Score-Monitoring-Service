@@ -32,7 +32,7 @@ public class LauncherActivity extends AppCompatActivity {
 
         letterAnimation();
     }
-    public void letterAnimation(){
+    private void letterAnimation(){
         ObjectAnimator cTextViewAnimation = ObjectAnimator.ofFloat(cTextView, "translationY", 60f);
         cTextViewAnimation.setDuration(1000);
         cTextViewAnimation.start();
