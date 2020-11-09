@@ -20,6 +20,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,11 +50,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
 public class PreFundedMoneyTransaction extends AppCompatActivity {
 
+    private ImageView imageLessonTag;
     private TextInputLayout whoEditText;
     private EditText cashAmountEditText;
     private TextView cashAmountTextView;
@@ -77,6 +81,7 @@ public class PreFundedMoneyTransaction extends AppCompatActivity {
 
         mDatabaseRef = FirebaseDatabase.getInstance();
 
+        imageLessonTag = findViewById(R.id.imageLessonTagView);
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
         submitButton = findViewById(R.id.submitButton);
@@ -87,6 +92,7 @@ public class PreFundedMoneyTransaction extends AppCompatActivity {
         amountUpdater();
         cancelButtonOnClick();
 
+        ImageTagOnClick();
         lentToWhoAlert();
         //sendEmail();
         submitButtonOnClick();
@@ -250,14 +256,14 @@ public class PreFundedMoneyTransaction extends AppCompatActivity {
                         //Log.d("UserCheck", "Value is: " + accKeySanpped + " : " + editTextVal.getText().toString());
                         //alert user there is no matching user
                         noMatchingUserAlert();
-                    }else if(!editTextToString.equals(Objects.requireNonNull(dataSnapshot.getKey()))){
+                    }else if(!editTextToString.trim().equals(Objects.requireNonNull(dataSnapshot.getKey()))){
                         //Toast.makeText(EventTransactionActivity.this, "Were good " + editTextToString + " " + dataSnapshot, Toast.LENGTH_SHORT).show();
                         //matchingUserAlert();
                         DatabaseReference mSubmitted = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail())+"_event_transactions");
                         ValueEventListener mSubmitedCheck = new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshotMain) {
-                                if((!cashAmountTextView.getText().toString().equals("When should this be done?"))){
+                                if((!cashAmountTextView.getText().toString().trim().equals("When should this be done?"))){
                                     if(!snapshotMain.exists()){
                                         calViewAlert();
                                     }else{
@@ -347,6 +353,156 @@ public class PreFundedMoneyTransaction extends AppCompatActivity {
         }else{
             //Log.d("containsFail", "Fail");
         }
+    }
+
+    private void onClickCheckTransactionsInfo(){
+        //matchingUserAlert();
+        DatabaseReference mSubmitted = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail())+"_event_transactions");
+        ValueEventListener mSubmitedCheck = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshotMain) {
+                    if(!snapshotMain.exists()){
+                        goodDeedAlert();
+                    }else{
+                        Query mSubmitterQuery = mSubmitted.orderByChild("sent_to");
+                        mSubmitterQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for(DataSnapshot query : snapshot.getChildren()) {
+                                    String value = (String) query.child("sent_to").getValue();
+                                    //System.out.println("Val query check " + value);
+                                    assert value != null;
+                                    if(value.equals(Objects.requireNonNull(whoEditText.getEditText()).getText().toString().trim())){
+                                        /**If snapshot is not null we will check
+                                         * to make sure the entered value is not a current
+                                         * sent_to value*/
+                                        noRepeatAlert();
+                                        //System.out.println("Query 1: " + query.child("sent_to").getValue());
+                                    }else if(!value.equals(Objects.requireNonNull(whoEditText.getEditText()).getText().toString().trim())){
+                                        noRepeatAlert();
+                                        //goodDeedAlert();
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        mSubmitted.addListenerForSingleValueEvent(mSubmitedCheck);
+    }
+
+    /**This alert will report to the user that they've committed a deed transaction and then creates
+     * a notification that alerts the user the score increase amount they've recieved.*/
+    private void goodDeedAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
+
+        LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        noMatchAlert.setView(layout);
+
+        noMatchAlert.setCancelable(false);
+
+        noMatchAlert.setIcon(R.drawable.ic_baseline_airplanemode_active_24);
+
+        Window window = noMatchAlert.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        noMatchAlert.setTitle("AWESOME!");
+        noMatchAlert.setMessage("Creating deed transactions in clout helps everyone build their score. " +
+                "Keep helping people around you and your score will skyrocket!");
+
+        MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            private Date date;
+
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(this, "Pass", Toast.LENGTH_SHORT).show();
+                date = Calendar.getInstance().getTime();
+                assert mCurrentUser != null;
+
+                notifications = mDatabaseRef.getReference(Objects.requireNonNull(whoEditText.getEditText()).getText().toString().trim() + "_" + "Pending_Notifications").push();
+                usersNotify = mDatabaseRef.getReference("Users_Notifications").child(accKey.createAccountKey(mCurrentUser.getEmail())).push();
+
+                mEventTransactionFirebaseReceived = mDatabaseRef.getReference(String.valueOf(whoEditText.getEditText().getText()).trim() + "_" + "event_received").push();
+
+                /**Send user notification of score increase*/
+                usersNotify.child("notify").setValue("Great job! You're score increased by .25 points!");
+
+                /**This sequence will generate a firebase realtime database node that will house
+                 * the 'Received' children in the database, it will be sent to the pending notifications
+                 * view for approval from the requested user*/
+                notifications.child("description").setValue(cashAmountTextView.getText().toString());
+                notifications.child("sentFrom").setValue(accKey.createAccountKey(mCurrentUser.getEmail()));
+                notifications.child("enddate").setValue(date);
+                notifications.child("read_status").setValue("Unread");
+
+                /**The score will be increase after both submitted and received nodes are sent to firebase*/
+                scoreHandler.sessionStartScoreIncrease(.25);
+
+                /**create alert that tells user we will manage the transaction and notify them*/
+                willHandleAlert();
+
+                /**Next we need to dismiss the Alert and return the user to the MainActivity
+                 * returning the user also has the added benefit not allowing the user to be able
+                 * to create multiple transactions from the same instance.  */
+                noMatchAlert.dismiss();
+            }
+        });
+        noMatchAlert.show();
+    }
+
+    private void willHandleAlert(){
+        final AlertDialog noMatchAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
+
+        LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        noMatchAlert.setView(layout);
+
+        noMatchAlert.setCancelable(false);
+
+        noMatchAlert.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+
+        Window window = noMatchAlert.getWindow();
+        window.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        noMatchAlert.setTitle("We got it");
+        noMatchAlert.setMessage("We will alert the user and let you know if they accept or reject your request");
+
+        MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
+        confirmButton.setText(R.string.confirm);
+        confirmButton.setBackgroundResource(R.color.colorPrimary);
+        layout.addView(confirmButton);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noMatchAlert.dismiss();
+                Intent toMain = new Intent(PreFundedMoneyTransaction.this, MainActivity.class);
+                startService(new Intent(PreFundedMoneyTransaction.this, dateReached.class));
+
+                /**Add the notification to the notifications node
+                 * @// FIXME: 10/19/20 @todo !!*/
+
+                startActivity(toMain);
+            }
+        });
+        noMatchAlert.show();
     }
 
     private void noRepeatAlert(){
@@ -600,5 +756,44 @@ public class PreFundedMoneyTransaction extends AppCompatActivity {
             }
         });
         whoAlert.show();
+    }
+
+    private void ImageTagOnClick(){
+        imageLessonTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tagAlert();
+            }
+
+            private void tagAlert() {
+                final AlertDialog tagAlert = new MaterialAlertDialogBuilder(PreFundedMoneyTransaction.this).create();
+                tagAlert.setTitle("What you should know!");
+                tagAlert.setIcon(R.drawable.ic_baseline_warning_24);
+                tagAlert.setMessage("This deed transaction type will cause the user to create a non " +
+                        "funded money transaction. A non-funded money transaction will be a recording of" +
+                        " a time a user has loaned money to another party. What will be recorded will " +
+                        "be tender of the transaction... IE... did the person who received the loan pay the " +
+                        "loan back with success, or did the user not pay the loan back.");
+
+                LinearLayout layout = new LinearLayout(PreFundedMoneyTransaction.this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                MaterialButton confirmButton = new MaterialButton(PreFundedMoneyTransaction.this);
+                MaterialButton cancelButton = new MaterialButton(PreFundedMoneyTransaction.this);
+
+                confirmButton.setText(R.string.confirm);
+                cancelButton.setText(R.string.cancel);
+
+                layout.addView(confirmButton);
+                layout.addView(cancelButton);
+
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tagAlert.dismiss();
+                    }
+                });
+                tagAlert.show();
+            }
+        });
     }
 }

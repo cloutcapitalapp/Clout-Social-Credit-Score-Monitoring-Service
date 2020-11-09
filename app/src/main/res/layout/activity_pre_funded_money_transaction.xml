@@ -86,6 +86,15 @@
             android:background="@android:color/transparent"
             android:text="Cancel"
             android:textColor="@android:color/holo_red_light" />
+
+        <ImageView
+            android:id="@+id/imageLessonTagView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="160dp"
+            android:layout_marginTop="-50dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_baseline_info_24" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

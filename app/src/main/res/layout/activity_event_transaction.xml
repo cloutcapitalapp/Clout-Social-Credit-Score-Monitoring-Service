@@ -131,4 +131,14 @@
         app:layout_constraintEnd_toStartOf="@+id/submitEventTransactionButton"
         app:layout_constraintTop_toBottomOf="@+id/dateCalView" />
 
+    <ImageView
+        android:id="@+id/infoImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/cancelButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dateCalView"
+        app:srcCompat="@drawable/ic_baseline_info_24" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

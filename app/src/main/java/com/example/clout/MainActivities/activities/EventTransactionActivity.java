@@ -18,6 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -76,6 +78,9 @@ public class EventTransactionActivity extends AppCompatActivity {
     //Buttons
     private Button submitTransactionsButton;
 
+    //Image Button
+    private ImageView infoImageView;
+
     //EditText
     private EditText editTextTextPersonName;
     private TextInputLayout description;
@@ -83,6 +88,7 @@ public class EventTransactionActivity extends AppCompatActivity {
     //CalannderView
     private CalendarView calView;
     private Date date;
+    private ImageButton imageLessonTag;
 
     /**This method will house the Events Transaction code
      * Creating this event transaction should create an entry into firebase that passes
@@ -94,6 +100,8 @@ public class EventTransactionActivity extends AppCompatActivity {
         datePicked = null;
         setContentView(R.layout.activity_event_transaction);
 
+        //Image View
+        infoImageView = findViewById(R.id.infoImageView);
         //View
         barSeperator = findViewById(R.id.barSeperator);
         //TextView
@@ -146,6 +154,9 @@ public class EventTransactionActivity extends AppCompatActivity {
         } else {
             newString= (String) savedInstanceState.getSerializable("username");
         }
+
+        /**ImageView button handler handles info image view*/
+        ImageTagOnClick();
 
         //text watcher
         checkUsername();
@@ -217,6 +228,7 @@ public class EventTransactionActivity extends AppCompatActivity {
         Intent toMain = new Intent(EventTransactionActivity.this, MainActivity.class);
         startActivity(toMain);
     }
+
     /**What needs to be checked?
      * &Accountname needs to be checked against firebase to make sure the user is present
      * Spinner needs to be checked for the item which is selected
@@ -248,7 +260,7 @@ public class EventTransactionActivity extends AppCompatActivity {
                                          * to make sure the entered value is not a current
                                          * sent_to value*/
                                         noRepeatAlert();
-                                        System.out.println("Query 1: " + query.child("sent_to").getValue());
+                                        //System.out.println("Query 1: " + query.child("sent_to").getValue());
                                     }else if(!value.equals(editTextTextPersonName.getText().toString().trim())){
                                         noRepeatAlert();
                                         //goodDeedAlert();
@@ -291,7 +303,7 @@ public class EventTransactionActivity extends AppCompatActivity {
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         noMatchAlert.setTitle("Hmmm?");
-        noMatchAlert.setMessage("For now, you can only submit one transaction at a time. Complete the one you have and you can create a new one.");
+        noMatchAlert.setMessage("For now, you can only submit one transaction at a time. Complete the one you have, and you can create a new one.");
 
         MaterialButton confirmButton = new MaterialButton(EventTransactionActivity.this);
         confirmButton.setText(R.string.confirm);
@@ -326,7 +338,7 @@ public class EventTransactionActivity extends AppCompatActivity {
 
         noMatchAlert.setCancelable(false);
 
-        noMatchAlert.setIcon(R.drawable.ic_baseline_emoji_emotions_24);
+        noMatchAlert.setIcon(R.drawable.ic_baseline_airplanemode_active_24);
 
         Window window = noMatchAlert.getWindow();
         window.setGravity(Gravity.BOTTOM);
@@ -335,7 +347,7 @@ public class EventTransactionActivity extends AppCompatActivity {
 
         noMatchAlert.setTitle("AWESOME!");
         noMatchAlert.setMessage("Creating deed transactions in clout helps everyone build their score. " +
-                "Keeping helping people around you and your score will skyrocket!");
+                "Keep helping people around you and your score will skyrocket!");
 
         MaterialButton confirmButton = new MaterialButton(EventTransactionActivity.this);
         confirmButton.setText(R.string.confirm);
@@ -640,4 +652,42 @@ public class EventTransactionActivity extends AppCompatActivity {
         animCashButton.setDuration(500);
         animCashButton.start();
     }
+
+    private void ImageTagOnClick(){
+        imageLessonTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tagAlert();
+            }
+
+            private void tagAlert() {
+                final AlertDialog tagAlert = new MaterialAlertDialogBuilder(EventTransactionActivity.this).create();
+                tagAlert.setTitle("What you should know!");
+                tagAlert.setIcon(R.drawable.ic_baseline_warning_24);
+                tagAlert.setMessage("This deed transaction will be used to record events with other users. " +
+                        "If you'd like to record how successful a date, a meeting a party ... etc... " +
+                        "then this is the deed transaction you'll need to use.");
+
+                LinearLayout layout = new LinearLayout(EventTransactionActivity.this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                MaterialButton confirmButton = new MaterialButton(EventTransactionActivity.this);
+                MaterialButton cancelButton = new MaterialButton(EventTransactionActivity.this);
+
+                confirmButton.setText(R.string.confirm);
+                cancelButton.setText(R.string.cancel);
+
+                layout.addView(confirmButton);
+                layout.addView(cancelButton);
+
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tagAlert.dismiss();
+                    }
+                });
+                tagAlert.show();
+            }
+        });
+    }
+
 }
