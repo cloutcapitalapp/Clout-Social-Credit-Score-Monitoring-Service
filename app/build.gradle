@@ -9,11 +9,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     defaultConfig {
-        applicationId "com.example.clout"
+        applicationId "com.miware.clout"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -24,6 +24,16 @@ android {
         }
     }
 }
+
+android {
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.github.bumptech.glide:glide:4.11.0'
@@ -52,7 +62,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation "com.sendinblue:sib-api-v3-sdk:4.1.1"
 
-
     implementation group: 'com.mailjet', name: 'mailjet-client', version: '4.2.0'
-
 }

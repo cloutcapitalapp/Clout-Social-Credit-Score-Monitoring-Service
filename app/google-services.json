@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:744697099848:android:3df8bc140639028a234a7d",
         "android_client_info": {
-          "package_name": "com.example.clout"
+          "package_name": "com.miware.clout"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "744697099848-6i3umeoho9m1g2qq56hesm70264kma1s.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.clout",
+            "package_name": "com.miware.clout",
             "certificate_hash": "26e92ebdad714bc1e68ba444fa13a874b6ff0b96"
           }
         },
@@ -47,7 +47,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:744697099848:android:963b487525fa81ef",
         "android_client_info": {
-          "package_name": "com.example.cloutbymoab"
+          "package_name": "com.miware.cloutbymoab"
         }
       },
       "oauth_client": [
@@ -55,7 +55,7 @@
           "client_id": "744697099848-r8unrmak6as8hmsa78aluj3kmqqhq4j7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.cloutbymoab",
+            "package_name": "com.miware.cloutbymoab",
             "certificate_hash": "fdbbb49f6c132fe6adaac5822748d573c1493b61"
           }
         },

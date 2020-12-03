@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.clout.MainActivities.activities.adsActivity">
+    tools:context="com.miware.clout.MainActivities.activities.adsActivity">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

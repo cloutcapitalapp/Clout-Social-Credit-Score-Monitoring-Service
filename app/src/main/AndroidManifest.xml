@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.clout">
+    package="com.miware.clout">
     <!-- Include required permissions for Google Mobile Ads to run. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".MainActivities.Classes.notificationHandler"
+        android:name="com.miware.clout.MainActivities.Classes.notificationHandler"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivities.activities.PreFundedMoneyTransaction"/>
+        <activity android:name="com.miware.clout.MainActivities.activities.PreFundedMoneyTransaction"/>
         <!-- Include the AdActivity configChanges and theme. -->
-        <activity android:name=".MainActivities.activities.EventTransactionActivity"
+        <activity android:name="com.miware.clout.MainActivities.activities.EventTransactionActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".MainActivities.activities.NotificationActivity" />
+        <activity android:name="com.miware.clout.MainActivities.activities.NotificationActivity" />
 
         <service
-            android:name=".MainActivities.activities.dateReached"
+            android:name="com.miware.clout.MainActivities.activities.dateReached"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name=".MainActivities.activities.AuthActivity"
+            android:name="com.miware.clout.MainActivities.activities.AuthActivity"
             android:configChanges="locale"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivities.activities.UserProfileActivity"
+            android:name="com.miware.clout.MainActivities.activities.UserProfileActivity"
             android:configChanges="locale"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivities.activities.addMoneyActivity"
+            android:name="com.miware.clout.MainActivities.activities.addMoneyActivity"
             android:configChanges="locale" />
         <activity
-            android:name=".MainActivities.activities.CreateNewSessionStart"
+            android:name="com.miware.clout.MainActivities.activities.CreateNewSessionStart"
             android:configChanges="locale" />
         <activity
-            android:name=".MainActivities.activities.CreateNewSession_3"
+            android:name="com.miware.clout.MainActivities.activities.CreateNewSession_3"
             android:configChanges="locale" />
         <activity
-            android:name=".MainActivities.activities.CreateNewSession_2"
+            android:name="com.miware.clout.MainActivities.activities.CreateNewSession_2"
             android:configChanges="locale" />
         <activity
-            android:name=".MainActivities.activities.LoadCashActivity"
+            android:name="com.miware.clout.MainActivities.activities.LoadCashActivity"
             android:configChanges="locale" />
         <activity
-            android:name=".MainActivities.activities.CreateNewSession"
+            android:name="com.miware.clout.MainActivities.activities.CreateNewSession"
             android:configChanges="locale" />
         <activity
-            android:name=".MainActivities.activities.LauncherActivity"
+            android:name="com.miware.clout.MainActivities.activities.LauncherActivity"
             android:configChanges="locale"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -62,7 +62,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivities.activities.MainActivity"
+            android:name="com.miware.clout.MainActivities.activities.MainActivity"
             android:configChanges="locale"
             android:screenOrientation="portrait" />
 
