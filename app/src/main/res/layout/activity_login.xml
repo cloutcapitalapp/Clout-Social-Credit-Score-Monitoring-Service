@@ -5,6 +5,7 @@
     android:id="@+id/loginFrame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#CBDFC1"
     tools:context=".MainActivities.activities.AuthActivity">
 
     <TextView
@@ -151,6 +152,7 @@
         android:layout_height="150dp"
         android:layout_marginEnd="80dp"
         android:layout_marginBottom="40dp"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toTopOf="@+id/LogAndSignTab"
         app:layout_constraintEnd_toEndOf="parent" />
 

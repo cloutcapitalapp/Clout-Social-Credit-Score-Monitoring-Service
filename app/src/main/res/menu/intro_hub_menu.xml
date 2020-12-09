@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/welcome_nav"
+        android:icon="@drawable/ic_baseline_emoji_emotions_24"
+        android:title="1"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/description_nav"
+        android:icon="@drawable/ic_monetization_on_black_24dp"
+        android:title="2"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/compliment_nav"
+        android:icon="@drawable/ic_baseline_power_24"
+        android:title="3"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:id="@+id/exit_nav"
+        android:icon="@drawable/ic_check_black_24dp"
+        android:title="4"
+        app:showAsAction="always"
+        />
+
+</menu>

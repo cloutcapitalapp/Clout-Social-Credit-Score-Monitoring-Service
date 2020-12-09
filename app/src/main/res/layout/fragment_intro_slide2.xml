@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".IntroFragments.IntroSlide2"
+    android:background="@drawable/gradient">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/entreText"
+        android:layout_width="306dp"
+        android:layout_height="286dp"
+        android:layout_marginTop="190dp"
+        android:background="@drawable/roundededittext"
+        android:fontFamily="sans-serif-condensed-light"
+        android:text="Entrepenuers can now rest easy knowing they can see whose trust worthy and who is not."
+        android:textAlignment="textStart"
+        android:textColor="#82E0AA"
+        android:textSize="40dp" />
+
+    <TextView
+        android:id="@+id/entreText2"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:background="@drawable/whiteroundedbackground"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:text="Reliability"
+        android:textAlignment="textStart"
+        android:textColor="#FFFFFF"
+        android:textSize="50dp" />
+
+</FrameLayout>

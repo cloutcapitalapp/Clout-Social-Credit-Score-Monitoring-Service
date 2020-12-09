@@ -103,7 +103,7 @@ public class AuthActivity extends AppCompatActivity {
     /**onStart the ad video should play
      * when the add video plays, because its so loud the system volume should be changed to 6*/
     private void onStartPlayIntroVideo(){
-        Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.cloutad);
+        Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.cloutlogoad);
 
         AudioManager audioManager =
                 (AudioManager)getSystemService(AuthActivity.AUDIO_SERVICE);
@@ -194,7 +194,7 @@ public class AuthActivity extends AppCompatActivity {
                                 //
                                 // DONE
 
-                                Intent toMain = new Intent(AuthActivity.this, MainActivity.class);
+                                Intent toMain = new Intent(AuthActivity.this, IntroHubActivity.class);
                                 startActivity(toMain);
                             } else {
                                 // If sign in fails, display a message to the user.

@@ -35,6 +35,7 @@ public class ScoreHandler extends CreateNewSession {
                 String value = dataSnapshot.getValue(String.class);
 
                 //assert value != null;
+                assert value != null;
                 double valueToString = Double.parseDouble(value.replace("CS", "")) + valuePlus;
                 String convertValueToSTringDec = String.format(Locale.ENGLISH,"%.02f", valueToString);
                 String valueSetToString = String.valueOf("CS"+convertValueToSTringDec);

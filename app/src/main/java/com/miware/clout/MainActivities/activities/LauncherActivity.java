@@ -4,14 +4,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.miware.clout.R;
 
 public class LauncherActivity extends AppCompatActivity {
 
+    VideoView videoView;
     Handler myHandler;
     TextView cTextView;
     TextView lTextView;
@@ -24,6 +28,9 @@ public class LauncherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
+        videoView = (VideoView) findViewById(R.id.videoView2);
+
+
         cTextView = findViewById(R.id.cTextView);
         lTextView = findViewById(R.id.lTextView);
         oTextView = findViewById(R.id.oTextView);
@@ -31,6 +38,11 @@ public class LauncherActivity extends AppCompatActivity {
         tTextView = findViewById(R.id.tTextView);
 
         letterAnimation();
+
+        Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.cloutlogoad);
+
+        videoView.setVideoURI(uri);
+        videoView.start();
     }
     private void letterAnimation(){
         ObjectAnimator cTextViewAnimation = ObjectAnimator.ofFloat(cTextView, "translationY", 60f);

@@ -2,20 +2,19 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#62FFA5"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#CBDFC1"
     tools:context=".MainActivities.activities.LauncherActivity">
 
-    <TextView
-        android:id="@+id/uTextView"
+    <VideoView
+        android:id="@+id/videoView2"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="128dp"
-        android:layout_marginTop="340dp"
-        android:text="U"
-        android:textColor="#FFFFFF"
-        android:textSize="45sp"
+        android:layout_height="250dp"
+        android:layout_marginTop="120dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,23 +22,25 @@
         android:id="@+id/tTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="164dp"
-        android:layout_marginTop="340dp"
+        android:layout_marginStart="304dp"
+        android:layout_marginTop="392dp"
+        android:fontFamily="sans-serif-medium"
         android:text="T"
         android:textColor="#FFFFFF"
-        android:textSize="45sp"
+        android:textSize="90sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/oTextView"
+        android:id="@+id/uTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="92dp"
-        android:layout_marginTop="340dp"
-        android:text="O"
+        android:layout_marginStart="240dp"
+        android:layout_marginTop="392dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="U"
         android:textColor="#FFFFFF"
-        android:textSize="45sp"
+        android:textSize="90sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,11 +48,12 @@
         android:id="@+id/cTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="340dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="392dp"
+        android:fontFamily="sans-serif-medium"
         android:text="C"
         android:textColor="#FFFFFF"
-        android:textSize="45sp"
+        android:textSize="90sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -59,11 +61,25 @@
         android:id="@+id/lTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="340dp"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="392dp"
+        android:fontFamily="sans-serif-medium"
         android:text="L"
         android:textColor="#FFFFFF"
-        android:textSize="45sp"
+        android:textSize="90sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/oTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="168dp"
+        android:layout_marginTop="392dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="O"
+        android:textColor="#FFFFFF"
+        android:textSize="90sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
