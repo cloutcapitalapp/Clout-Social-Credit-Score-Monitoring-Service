@@ -7,16 +7,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -48,7 +51,6 @@ import java.util.Objects;
  * @param // FIXME: 10/18/20 refactor notes on this activity*/
 public class AuthActivity extends AppCompatActivity {
     /* Init Vars */
-    VideoView videoView;
     private TextInputLayout username;
     private TextInputLayout password;
     private TextView confirmAssistText;
@@ -62,7 +64,6 @@ public class AuthActivity extends AppCompatActivity {
     private TabLayout logAndSignTab;
     private AccountKeyManager keyGenerator;
     private UserObject userObject;
-
     // onCreate method should be confound to Vars and method calls
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,6 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         /* Assign Vars */
-        videoView = (VideoView) findViewById(R.id.videoView);
         confirmAssistText = findViewById(R.id.confirmAssistText);
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
@@ -91,6 +91,8 @@ public class AuthActivity extends AppCompatActivity {
         tabLayoutManager();
         loginButtonOnClick();
         submitButtonOnClick();
+
+
     }
 
     /**When the back button was being pressed, the user would be taken back to the launch screen
@@ -98,20 +100,6 @@ public class AuthActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //...do nothing
-    }
-
-    /**onStart the ad video should play
-     * when the add video plays, because its so loud the system volume should be changed to 6*/
-    private void onStartPlayIntroVideo(){
-        Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.cloutlogoad);
-
-        AudioManager audioManager =
-                (AudioManager)getSystemService(AuthActivity.AUDIO_SERVICE);
-
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 6, 1);
-
-        videoView.setVideoURI(uri);
-        videoView.start();
     }
 
     /**These are animations
@@ -139,7 +127,6 @@ public class AuthActivity extends AppCompatActivity {
             startActivity(toProfileActivity);
         }else{
             Toast.makeText(AuthActivity.this, "Please Create Account!", Toast.LENGTH_SHORT).show();
-            onStartPlayIntroVideo();
         }
     } /* If there is no user, user will be prompted to create an account. */
 

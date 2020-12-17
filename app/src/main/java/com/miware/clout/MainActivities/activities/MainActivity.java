@@ -6,23 +6,32 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
@@ -71,6 +80,18 @@ import sibModel.GetAccount;
 
 public class MainActivity extends AppCompatActivity {
 
+    int clickedamount = 0;
+    boolean ranBefore;
+
+    RelativeLayout topLevel;
+
+    TextView cloutintro1;
+    TextView cloutintro2;
+    TextView cloutintro3;
+    TextView cloutintro4;
+    TextView profileintro1;
+    ImageView profileimage2;
+
     //TabLayout
     TabLayout tabLayout;
 
@@ -105,13 +126,26 @@ public class MainActivity extends AppCompatActivity {
     //ArrayList
     ArrayList<String> arrayList, arrayListReceived;
 
+    SharedPreferences sharedpreferences;
+    SharedPreferences preferences;
+
     /** onCreate should house initialized variables as well as methods, but no direct code*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        preferences = getPreferences(MODE_PRIVATE);
+        ranBefore = preferences.getBoolean("RanBefore", false);
+
         tabLayout = findViewById(R.id.transactionTabs);
+
+        cloutintro1 = findViewById(R.id.cloutintrotest1);
+        cloutintro2 = findViewById(R.id.cloutintrotest2);
+        cloutintro3 = findViewById(R.id.cloutintrotest3);
+        cloutintro4 = findViewById(R.id.cloutintrotest4);
+        profileintro1 = findViewById(R.id.profileintro1);
+        profileimage2 = findViewById(R.id.profileintro2);
 
         //ListView
         arrayList = new ArrayList<String>();
@@ -171,6 +205,37 @@ public class MainActivity extends AppCompatActivity {
         eventTrasnactionsListView();
         tabLayoutManager();
         receivedListViewOnClick();
+
+        topLevel = findViewById(R.id.top_layout);
+
+        // This algo needs to check to see if the user is returning or if the user opening the app for the first time
+        // The reason this needs to be done is because the firstReturnAlertBlock methods need to not show up anymore after the
+        // alerts have been fully dismissed.
+        DatabaseReference firstTimeCheckIntro = mDatabaseRef.getReference("Users")
+                .child(accKey.createAccountKey(mCurrentUser.getEmail()))
+                .child("isFirstTimeUserIntro");
+
+        firstTimeCheckIntro.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String value = snapshot.getValue(String.class);
+                //Log.d("value", "" + value);
+                if(!value.equals(null)){
+                    if(value.equals("yes")){
+                        cloutScore.setEnabled(false);
+                        topLevel.setVisibility(View.VISIBLE);
+                        introLoop();
+                    }else{
+                        // do nothing
+                        //Toast.makeText(MainActivity.this, "No Go", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
     /***/
 
@@ -1160,6 +1225,12 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         confirm.setView(layout);
+        confirm.getWindow().getAttributes().windowAnimations = R.style.DialogTheme;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("My Dialog");
+
+        builder.setMessage("Check out the transition!");
 
         confirm.setCancelable(false);
         confirm.setCanceledOnTouchOutside(false);
@@ -1578,5 +1649,89 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         whoAlert.show();
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private boolean isFirstTime()
+    {
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        boolean ranBefore = preferences.getBoolean("RanBefore", false);
+        if (!ranBefore) {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("RanBefore", true);
+            editor.apply();
+            topLevel.setVisibility(View.VISIBLE);
+            topLevel.setOnTouchListener(new View.OnTouchListener(){
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    clickedamount = clickedamount+1;
+                    if(clickedamount == 1){
+                        cloutintro1.setVisibility(View.GONE);
+                        cloutintro2.setVisibility(View.VISIBLE);
+                        Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                    }
+                    if(clickedamount == 2){
+                        cloutintro2.setVisibility(View.GONE);
+                        cloutintro3.setVisibility(View.VISIBLE);
+                        Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                    }
+                    if(clickedamount == 3){
+                        cloutintro3.setVisibility(View.GONE);
+                        cloutintro4.setVisibility(View.VISIBLE);
+                        Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                    }
+                    if(clickedamount == 4){
+                        cloutintro4.setVisibility(View.GONE);
+                        profileintro1.setVisibility(View.VISIBLE);
+                        profileimage2.setVisibility(View.VISIBLE);
+                        Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                    }
+                    if(clickedamount == 5){
+                        topLevel.setVisibility(View.INVISIBLE);
+                        Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    return true;
+                }
+
+            });
+        }
+        return ranBefore;
+    }
+    public void introLoop(){
+        topLevel.setVisibility(View.VISIBLE);
+        topLevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickedamount = clickedamount + 1;
+
+                if (clickedamount == 1) {
+                    cloutintro1.setVisibility(View.GONE);
+                    cloutintro2.setVisibility(View.VISIBLE);
+                    Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                }
+                if (clickedamount == 2) {
+                    cloutintro2.setVisibility(View.GONE);
+                    cloutintro3.setVisibility(View.VISIBLE);
+                    Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                }
+                if (clickedamount == 3) {
+                    cloutintro3.setVisibility(View.GONE);
+                    cloutintro4.setVisibility(View.VISIBLE);
+                    Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                }
+                if (clickedamount == 4) {
+                    cloutintro4.setVisibility(View.GONE);
+                    profileintro1.setVisibility(View.VISIBLE);
+                    profileimage2.setVisibility(View.VISIBLE);
+                    Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                }
+                if (clickedamount == 5) {
+                    topLevel.setVisibility(View.INVISIBLE);
+                    Toast.makeText(MainActivity.this, "Clicked Amount : " + clickedamount, Toast.LENGTH_SHORT).show();
+                    cloutScore.setEnabled(true);
+                }
+            }
+        });
     }
 }

@@ -10,19 +10,20 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/CloutScore"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:fontFamily="sans-serif-light"
         android:gravity="center"
         android:text="@string/clout_score"
         android:textColor="#FFFFFF"
         android:textSize="40sp"
         app:backgroundTint="#82E0AA"
-        app:cornerRadius="1dp"
+        app:cornerRadius="7dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view" />
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
 
     <TextView
         android:id="@+id/money"
@@ -34,7 +35,7 @@
         android:gravity="center"
         android:text="@string/zero_value"
         android:textColor="#00CC8F"
-        android:textSize="40dp"
+        android:textSize="40sp"
         android:visibility="gone"
         app:backgroundTint="#378A00"
         app:layout_constraintEnd_toEndOf="parent"
@@ -139,4 +140,113 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/CloutScore" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--Below is the transparent layout positioned at startup -->
+    <RelativeLayout
+        android:id="@+id/top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:background="#88666666"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/cloutintrotest1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="150dp"
+            android:background="@drawable/roundedbackground"
+            android:gravity="center"
+            android:text="  This is your clout score!  "
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/cloutintrotest2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/cloutintrotest1"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/roundedbackground"
+            android:gravity="center"
+            android:text="This score shows the world if you
+are trust worthy."
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/cloutintrotest3"
+            android:layout_width="380dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/cloutintrotest1"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="170dp"
+            android:background="@drawable/roundedbackground"
+            android:gravity="center"
+            android:text="Return debts, show up on time and return items
+ without damage and you score will go up."
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/cloutintrotest4"
+            android:layout_width="380dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/cloutintrotest1"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="160dp"
+            android:layout_marginEnd="11dp"
+            android:background="@drawable/roundedbackground"
+            android:gravity="center"
+            android:text="Click the score button, when you want to create
+a new report on someone."
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/profileintro1"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="70dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/roundedbackground"
+            android:gravity="center"
+            android:src="@drawable/ic_baseline_person_24"
+            android:text="Click here to go to your profile"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/profileintro2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/profileintro1"
+            android:background="@drawable/roundedbackground"
+            android:gravity="center"
+            android:src="@drawable/ic_baseline_arrow_forward_ios_24"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:visibility="gone" />
+
+    </RelativeLayout></androidx.constraintlayout.widget.ConstraintLayout>

@@ -44,7 +44,7 @@ public class IntroHubActivity extends AppCompatActivity {
 
                     IntroSlide1 profileFragment = new IntroSlide1();
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    fragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.hubLayout, profileFragment).commit();
+                    fragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down).replace(R.id.hubLayout, profileFragment).commit();
 
                     /* Check if 'Slide1' fragment is loading properly */
                     Log.d("Fragment_Side1_Awake: ", "Success");
@@ -57,7 +57,7 @@ public class IntroHubActivity extends AppCompatActivity {
 
                     IntroSlide2 timeLineFragment = new IntroSlide2();
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    fragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.hubLayout, timeLineFragment).commit();
+                    fragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down).replace(R.id.hubLayout, timeLineFragment).commit();
 
                     /* Check if 'Slide2' fragment is loading properly */
                     Log.d("Fragment_Side2_Awake", "Success");
@@ -70,7 +70,7 @@ public class IntroHubActivity extends AppCompatActivity {
 
                     IntroSlide3 settingsFragment = new IntroSlide3();
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    fragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.hubLayout, settingsFragment).commit();
+                    fragmentManager.beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down).replace(R.id.hubLayout, settingsFragment).commit();
 
                     /* Check if 'Slide3' fragment is loading properly */
                     Log.d("Fragment_Side3_Awake", "Sucess");
