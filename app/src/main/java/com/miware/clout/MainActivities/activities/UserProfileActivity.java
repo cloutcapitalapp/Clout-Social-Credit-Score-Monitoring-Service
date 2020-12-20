@@ -26,6 +26,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.miware.clout.MainActivities.Classes.AccountKeyManager;
 import com.miware.clout.MainActivities.Classes.AddFriendHandler;
 import com.miware.clout.R;
@@ -128,6 +133,17 @@ public class UserProfileActivity extends AppCompatActivity {
         withdrawOnClick();
         returnToMainOnclick();
         signout();
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        // TODO: Add adView to your view hierarchy.
+
     }
 
     public void returnToMainOnclick(){
@@ -1139,5 +1155,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         confirm.show();
     }
+
+
     /**END*/
 }

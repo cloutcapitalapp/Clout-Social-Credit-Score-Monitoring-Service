@@ -54,8 +54,16 @@
             android:configChanges="locale" />
         <activity
             android:name=".MainActivities.activities.LauncherActivity"
+            android:launchMode="singleTask"
             android:configChanges="locale"
             android:screenOrientation="portrait">
+
+            <!-- Branch URI scheme -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -67,6 +75,15 @@
             android:configChanges="locale"
             android:screenOrientation="portrait" />
 
+        <!-- Branch init -->
+        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_ol7akcYB6Sh0fa8YuM9uPabmxshEzGEr" />
+        <!-- Branch testing (TestMode "true" to simulate fresh installs on dev environment) -->
+        <meta-data android:name="io.branch.sdk.TestMode" android:value="false" />
+
+        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6109818084718757~5783959937"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

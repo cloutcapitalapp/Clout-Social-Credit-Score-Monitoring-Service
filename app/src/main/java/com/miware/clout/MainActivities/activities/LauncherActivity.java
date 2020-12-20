@@ -1,5 +1,6 @@
 package com.miware.clout.MainActivities.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.ObjectAnimator;
@@ -8,10 +9,16 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.miware.clout.R;
+
+import org.json.JSONObject;
+
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
 
 public class LauncherActivity extends AppCompatActivity {
 
@@ -29,7 +36,6 @@ public class LauncherActivity extends AppCompatActivity {
         setContentView(R.layout.activity_launcher);
 
         videoView = (VideoView) findViewById(R.id.videoView2);
-
 
         cTextView = findViewById(R.id.cTextView);
         lTextView = findViewById(R.id.lTextView);

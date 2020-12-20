@@ -421,6 +421,7 @@ public class AuthActivity extends AppCompatActivity {
 
     }
 
+    /**Creates stripe customer*/
     class AsyncStripeTask extends AsyncTask {
         @SuppressLint("WrongThread")
         @Override
@@ -444,28 +445,6 @@ public class AuthActivity extends AppCompatActivity {
             } catch (StripeException e) {
                 e.printStackTrace();
             }            return null;
-        }
-    }
-
-    /**@// TODO: 10/17/20 this method is fixed by the above method which is an async
-     * connection to stripe that creates a customer. They may be both taken out, but
-     * for now the below method @fixme createStripeCustomer()
-     * will be taken out before ship*/
-    /* This method doesn't need to be used as it is not delivered Asynchronously */
-    /* Create stripe customer */
-    private void createStripeCustomer(){
-        com.stripe.Stripe.apiKey = "sk_live_PRhe9eFUANmDRa7KlIqQF2mj00LBHktQVS";
-        String mapUsernameString = username.getEditText().getText().toString().replace(" ", "");
-        Map <String, Object> mapCustomer = new HashMap<String, Object>();
-        mapCustomer.put("email", mapUsernameString);
-        try {
-            Customer newCustomer = Customer.create(mapCustomer);
-            String custID = newCustomer.getId();
-            //Log.d("CustomerID", custID);
-            mRefUsers.child(mapUsernameString.replace(".", ""));
-            mRefUsers.child(mapUsernameString.replace(".", "")).child("customerID").setValue(custID);
-        } catch (StripeException e) {
-            e.printStackTrace();
         }
     }
 }
