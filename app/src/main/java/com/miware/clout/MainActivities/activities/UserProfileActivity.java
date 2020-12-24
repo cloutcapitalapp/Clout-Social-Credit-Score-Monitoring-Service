@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -57,6 +58,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserProfileActivity extends AppCompatActivity {
 
+    AdView adview;
     TextView emptyTextView;
     //ImageButton
     ImageButton signoutButton, returnToMain;
@@ -97,6 +99,7 @@ public class UserProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprfileactivity);
 
+        adview = findViewById(R.id.adView);
         emptyTextView = findViewById(R.id.empty);
         returnToMain = findViewById(R.id.returnToMain);
         signoutButton = findViewById(R.id.signoutButton);
@@ -139,10 +142,6 @@ public class UserProfileActivity extends AppCompatActivity {
             public void onInitializationComplete(InitializationStatus initializationStatus) {
             }
         });
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
-        // TODO: Add adView to your view hierarchy.
 
     }
 
@@ -154,6 +153,8 @@ public class UserProfileActivity extends AppCompatActivity {
                 startActivity(toMain);
             }
         });
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adview.loadAd(adRequest);
     }
 
     /**When the user presses the back button, the user should be taken to the MainActivity.
