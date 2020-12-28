@@ -130,8 +130,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.242"
+        app:layout_constraintEnd_toStartOf="@+id/share_button"
         app:layout_constraintStart_toEndOf="@+id/accountKeyTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_baseline_login_24" />
@@ -152,8 +151,8 @@
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
+        android:layout_width="326dp"
+        android:layout_height="75dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:visibility="visible"
@@ -162,5 +161,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/share_button"
+        android:layout_width="wrap_content"
+        android:layout_height="33dp"
+        android:text="Share"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
