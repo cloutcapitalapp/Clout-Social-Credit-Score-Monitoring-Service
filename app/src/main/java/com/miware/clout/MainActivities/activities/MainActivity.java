@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,15 +16,12 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -80,6 +76,7 @@ import sibModel.GetAccount;
 
 public class MainActivity extends AppCompatActivity {
 
+
     int clickedamount = 0;
     boolean ranBefore;
 
@@ -113,7 +110,15 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mCurrentUser;
     FirebaseDatabase mDatabaseRef, db;
-    DatabaseReference mCrawlUsers, mRefUsers, mVal, mCardInfo, mGetCash, getAccountKeyRef, mEventTransactionsList, mEventReceivedTransactionList, pendingRef;
+    DatabaseReference mCrawlUsers,
+            mRefUsers,
+            mVal,
+            mCardInfo,
+            mGetCash,
+            getAccountKeyRef,
+            mEventTransactionsList,
+            mEventReceivedTransactionList,
+            pendingRef;
 
     //MaterialButton
     MaterialButton cloutScore;
@@ -135,78 +140,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        preferences = getPreferences(MODE_PRIVATE);
-        ranBefore = preferences.getBoolean("RanBefore", false);
-
-        tabLayout = findViewById(R.id.transactionTabs);
-
-        cloutintro1 = findViewById(R.id.cloutintrotest1);
-        cloutintro2 = findViewById(R.id.cloutintrotest2);
-        cloutintro3 = findViewById(R.id.cloutintrotest3);
-        cloutintro4 = findViewById(R.id.cloutintrotest4);
-        profileintro1 = findViewById(R.id.profileintro1);
-        profileimage2 = findViewById(R.id.profileintro2);
-
-        //ListView
-        arrayList = new ArrayList<String>();
-        listView = (ListView) findViewById(R.id.eventTransactionsListView);
-        adapter = new ArrayAdapter<String>(this,R.layout.listview, R.id.listviewitem, arrayList);
-        listView.setAdapter(adapter);
-
-        //receivedListView
-        arrayListReceived = new ArrayList<String>();
-        receivedListView = (ListView) findViewById(R.id.receivedListView);
-        adapterReceived = new ArrayAdapter<String>(this,R.layout.listview, R.id.listviewitem, arrayListReceived);
-        receivedListView.setAdapter(adapterReceived);
+        initVars();
 
         ScoreHandler scoreHandler = new ScoreHandler();
         scoreHandler.sessionStartScoreIncrease(.01);
-        /*transReportObj = new TransactionObject();
-        transReportObj.setId(1323);
-        transReportObj.getId();
-        transReportObj.setAmount(32.80);
-        transReportObj.getAmount();*/
 
-        // T.O.D.O - Change database code to match new user specific divisions.
-        /*** The above T.O.D.O was done ***/
-
-        /////////////////////////////////////////
-        //                                     //
-        //Init Vars and Data Base Connection   //
-        //                                     //
-        /////////////////////////////////////////
-
-        mDatabaseRef = FirebaseDatabase.getInstance();
-        getAccountKeyRef = mDatabaseRef.getReference();
-        mVal = mDatabaseRef.getReference("Users");
-        mCardInfo = mDatabaseRef.getReference("Users");
-        mGetCash = mDatabaseRef.getReference("Users");
-        money = findViewById(R.id.money);
-        recyclerView = findViewById(R.id.recyclerView);
-        mAuth = FirebaseAuth.getInstance();
-        mCurrentUser = mAuth.getCurrentUser();
-        db = FirebaseDatabase.getInstance();
-        mCrawlUsers = db.getReference("User_Transactions");
-        mRefUsers = db.getReference("Users").child(accKey.createAccountKey(mCurrentUser.getEmail()));
-        cloutScore = findViewById(R.id.CloutScore);
-        scrHandle = new ScoreHandler();
-        usernameTextView = findViewById(R.id.usernameTextView);
-        profileImage = findViewById(R.id.profile_image);
-        mEventTransactionsList = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
-        mEventReceivedTransactionList = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_received");
-
-        /**Method | Functionality*/
+        //Call ref to animations
         openAnimations();
+        //When image view is tapped go to user profile
         imageViewButtonToProfile();
+        //
         cashButtonHandle();
         firstTimeCloutScoreOnClick();
-        //listViewListener();
         eventTransactionsReceivedListView();
         eventTrasnactionsListView();
         tabLayoutManager();
         receivedListViewOnClick();
-
-        topLevel = findViewById(R.id.top_layout);
 
         // This algo needs to check to see if the user is returning or if the user opening the app for the first time
         // The reason this needs to be done is because the firstReturnAlertBlock methods need to not show up anymore after the
@@ -238,6 +187,59 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     /***/
+
+    private void initVars(){
+        topLevel = findViewById(R.id.top_layout);
+
+        preferences = getPreferences(MODE_PRIVATE);
+        ranBefore = preferences.getBoolean("RanBefore", false);
+
+        tabLayout = findViewById(R.id.transactionTabs);
+
+        cloutintro1 = findViewById(R.id.cloutintrotest1);
+        cloutintro2 = findViewById(R.id.cloutintrotest2);
+        cloutintro3 = findViewById(R.id.cloutintrotest3);
+        cloutintro4 = findViewById(R.id.cloutintrotest4);
+        profileintro1 = findViewById(R.id.profileintro1);
+        profileimage2 = findViewById(R.id.profileintro2);
+
+        //ListView
+        arrayList = new ArrayList<String>();
+        listView = (ListView) findViewById(R.id.eventTransactionsListView);
+        adapter = new ArrayAdapter<String>(this,R.layout.listview, R.id.listviewitem, arrayList);
+        listView.setAdapter(adapter);
+
+        //receivedListView
+        arrayListReceived = new ArrayList<String>();
+        receivedListView = (ListView) findViewById(R.id.receivedListView);
+        adapterReceived = new ArrayAdapter<String>(this,R.layout.listview, R.id.listviewitem, arrayListReceived);
+        receivedListView.setAdapter(adapterReceived);
+
+        /////////////////////////////////////////
+        //                                     //
+        //Init Vars and Data Base Connection   //
+        //                                     //
+        /////////////////////////////////////////
+
+        mDatabaseRef = FirebaseDatabase.getInstance();
+        getAccountKeyRef = mDatabaseRef.getReference();
+        mVal = mDatabaseRef.getReference("Users");
+        mCardInfo = mDatabaseRef.getReference("Users");
+        mGetCash = mDatabaseRef.getReference("Users");
+        money = findViewById(R.id.money);
+        recyclerView = findViewById(R.id.recyclerView);
+        mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = mAuth.getCurrentUser();
+        db = FirebaseDatabase.getInstance();
+        mCrawlUsers = db.getReference("User_Transactions");
+        mRefUsers = db.getReference("Users").child(accKey.createAccountKey(mCurrentUser.getEmail()));
+        cloutScore = findViewById(R.id.CloutScore);
+        scrHandle = new ScoreHandler();
+        usernameTextView = findViewById(R.id.usernameTextView);
+        profileImage = findViewById(R.id.profile_image);
+        mEventTransactionsList = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+        mEventReceivedTransactionList = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_received");
+    }
 
     private void transactionalEmailAPI(){
         /**Start Transactional Email API*/
@@ -336,7 +338,8 @@ public class MainActivity extends AppCompatActivity {
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         endTransactionAlert.setTitle("DONE?");
-        endTransactionAlert.setMessage("Let us know how " + userName.trim() + " did." + " was " + userName.trim() +
+        endTransactionAlert.setMessage("Let us know how " + userName.trim() + " did." + " was " +
+                userName.trim() +
                 " on-time, positive, and over-all pleasant? If so, let them know!");
 
         MaterialButton greatCompletion = new MaterialButton(MainActivity.this);
@@ -367,7 +370,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 scrHandle.increaseEndUserScore(userName.trim(), 1);
-                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser
+                        .getEmail())
+                        + "_" + "event_transactions");
 
                 pendingRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -379,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
 
                             completedTransactionAlert();
                         }
-                        Toast.makeText(MainActivity.this, "" + dataSnapshot, Toast.LENGTH_SHORT).show();
+                        scrHandle.increaseEndUserScore(userName.trim(), 1);
                     }
 
                     @Override
@@ -396,10 +401,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 scrHandle.increaseEndUserScore(userName.trim(), .50);
-                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser
+                        .getEmail())
+                        + "_" + "event_transactions");
 
                 Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
-                //Log.d("querycheck", "" + applesQuery);
 
                 applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -411,12 +417,13 @@ public class MainActivity extends AppCompatActivity {
 
                             completedTransactionAlert();
                         }
+                        scrHandle.increaseEndUserScore(userName.trim(), .50);
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        //Log.e("failed", "onCancelled", databaseError.toException());
                     }
+
                 });
 
                 endTransactionAlert.dismiss();
@@ -427,10 +434,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 scrHandle.increaseEndUserScore(userName.trim(), -.50);
-                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
+                pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser
+                        .getEmail())
+                        + "_" + "event_transactions");
 
                 Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
-                //Log.d("querycheck", "" + applesQuery);
 
                 applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -442,11 +450,11 @@ public class MainActivity extends AppCompatActivity {
 
                             completedTransactionAlert();
                         }
+                        scrHandle.increaseEndUserScore(userName.trim(), -.50);
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        //Log.e("failed", "onCancelled", databaseError.toException());
                     }
                 });
 
@@ -461,7 +469,6 @@ public class MainActivity extends AppCompatActivity {
                 pendingRef = mDatabaseRef.getReference(accKey.createAccountKey(mCurrentUser.getEmail()) + "_" + "event_transactions");
 
                 Query applesQuery = pendingRef.orderByChild("sent_to").equalTo(userName);
-                //Log.d("querycheck", "" + applesQuery);
 
                 applesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -473,6 +480,7 @@ public class MainActivity extends AppCompatActivity {
 
                             completedTransactionAlert();
                         }
+                        scrHandle.increaseEndUserScore(userName.trim(), -1);
                     }
 
                     @Override
@@ -1065,7 +1073,6 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
                 String key = dataSnapshot.getKey();
                 usernameTextView.setText(key);
                 //Log.d("getUNameOnStartTest: ", "Value is: " + value + " : " + getAccountKeyRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).getKey());

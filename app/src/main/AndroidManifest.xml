@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivities.activities.IntroHubActivity"></activity>
+        <activity android:name=".MainActivities.activities.SocialFeed"></activity>
+        <activity android:name=".MainActivities.activities.IntroHubActivity" />
         <activity android:name=".MainActivities.activities.PreFundedMoneyTransaction" /> <!-- Include the AdActivity configChanges and theme. -->
         <activity
             android:name=".MainActivities.activities.EventTransactionActivity"
@@ -22,7 +23,7 @@
         <activity android:name=".MainActivities.activities.NotificationActivity" />
 
         <service
-            android:name=".MainActivities.activities.dateReached"
+            android:name=".MainActivities.Classes.dateReached"
             android:enabled="true"
             android:exported="true" />
 
@@ -35,32 +36,18 @@
             android:configChanges="locale"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivities.activities.addMoneyActivity"
-            android:configChanges="locale" />
-        <activity
-            android:name=".MainActivities.activities.CreateNewSessionStart"
-            android:configChanges="locale" />
-        <activity
-            android:name=".MainActivities.activities.CreateNewSession_3"
-            android:configChanges="locale" />
-        <activity
-            android:name=".MainActivities.activities.CreateNewSession_2"
-            android:configChanges="locale" />
-        <activity
             android:name=".MainActivities.activities.LoadCashActivity"
             android:configChanges="locale" />
         <activity
-            android:name=".MainActivities.activities.CreateNewSession"
-            android:configChanges="locale" />
-        <activity
             android:name=".MainActivities.activities.LauncherActivity"
-            android:launchMode="singleTask"
             android:configChanges="locale"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait">
 
             <!-- Branch URI scheme -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
@@ -73,17 +60,16 @@
         <activity
             android:name=".MainActivities.activities.MainActivity"
             android:configChanges="locale"
-            android:screenOrientation="portrait" />
-
-        <!-- Branch init -->
-        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_ol7akcYB6Sh0fa8YuM9uPabmxshEzGEr" />
-        <!-- Branch testing (TestMode "true" to simulate fresh installs on dev environment) -->
-        <meta-data android:name="io.branch.sdk.TestMode" android:value="false" />
-
-        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
+            android:screenOrientation="portrait" /> <!-- Branch init -->
+        <meta-data
+            android:name="io.branch.sdk.BranchKey"
+            android:value="key_live_ol7akcYB6Sh0fa8YuM9uPabmxshEzGEr" /> <!-- Branch testing (TestMode "true" to simulate fresh installs on dev environment) -->
+        <meta-data
+            android:name="io.branch.sdk.TestMode"
+            android:value="false" /> <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-6109818084718757~5783959937"/>
+            android:value="ca-app-pub-6109818084718757~5783959937" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

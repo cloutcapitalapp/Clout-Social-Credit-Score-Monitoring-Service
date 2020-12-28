@@ -25,14 +25,18 @@ public class CashHandler {
 
         accKey = new AccountKeyManager();
         //Subtract funds from currentUsersAccount
-        mRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("Cash").addListenerForSingleValueEvent(new ValueEventListener() {
+        mRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("Cash")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String value = snapshot.getValue(String.class);
                 assert value != null;
                 double valueToDouble = Double.parseDouble(value.replace("$", ""));
-                String subtractCash = MessageFormat.format("{0}{1}", "$", String.format(Locale.ENGLISH, "%.2f", valueToDouble - sentCash/100));
-                mRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("Cash").setValue(String.valueOf(subtractCash));
+                String subtractCash = MessageFormat.format("{0}{1}", "$",
+                        String.format(Locale.ENGLISH, "%.2f", valueToDouble
+                                - sentCash/100));
+                mRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("Cash")
+                        .setValue(String.valueOf(subtractCash));
             }
 
             @Override
@@ -43,12 +47,16 @@ public class CashHandler {
 
         //Send update to to-users cash amount
         /** Add sent amount to current to-users cash amount */
-        mRef.child(recievingUser).child("Cash").addListenerForSingleValueEvent(new ValueEventListener() {
+        mRef.child(recievingUser).child("Cash").addListenerForSingleValueEvent
+                (new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String value = snapshot.getValue(String.class);
-                double valueToDouble = Double.parseDouble(value.replace("$", ""));
-                String addCash = MessageFormat.format("{0}{1}", "$", String.format(Locale.ENGLISH, "%.2f", valueToDouble + sentCash/100));
+                double valueToDouble = Double.parseDouble(value
+                        .replace("$", ""));
+                String addCash = MessageFormat.format("{0}{1}", "$",
+                        String.format(Locale.ENGLISH, "%.2f", valueToDouble
+                                + sentCash/100));
                 mRef.child(recievingUser).child("Cash").setValue(String.valueOf(addCash));
             }
 

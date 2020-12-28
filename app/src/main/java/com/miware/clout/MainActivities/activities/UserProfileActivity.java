@@ -58,6 +58,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserProfileActivity extends AppCompatActivity {
 
+    private Button share_button;
     AdView adview;
     TextView emptyTextView;
     //ImageButton
@@ -99,6 +100,7 @@ public class UserProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userprfileactivity);
 
+        share_button = findViewById(R.id.share_button);
         adview = findViewById(R.id.adView);
         emptyTextView = findViewById(R.id.empty);
         returnToMain = findViewById(R.id.returnToMain);
@@ -136,6 +138,7 @@ public class UserProfileActivity extends AppCompatActivity {
         withdrawOnClick();
         returnToMainOnclick();
         signout();
+        shareOnclick();
 
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
@@ -155,6 +158,26 @@ public class UserProfileActivity extends AppCompatActivity {
         });
         AdRequest adRequest = new AdRequest.Builder().build();
         adview.loadAd(adRequest);
+    }
+
+    /**This button will handle the share functionality. OnClick, user should be shown
+     * a list of apps they can share clout with.*/
+    private void shareOnclick(){
+        share_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String caughtAccountKet = accountKey.getText().toString();
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                String shareBody = "Hey! I use this app called clout. It helps users let people know " +
+                        "when the people around them are trust worthy.\nDownload here to get started - " +
+                        "https://cutt.ly/bh5aVEt";
+                String shareSub = "Your Clout Score!";
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(shareIntent, "Share to : "));
+            }
+        });
     }
 
     /**When the user presses the back button, the user should be taken to the MainActivity.
@@ -1156,7 +1179,5 @@ public class UserProfileActivity extends AppCompatActivity {
 
         confirm.show();
     }
-
-
     /**END*/
 }

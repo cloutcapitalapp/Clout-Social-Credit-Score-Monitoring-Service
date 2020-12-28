@@ -44,15 +44,17 @@ public class AddFriendHandler {
      *
      * */
     public void AddFriend(String endingUser){
-        usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //Log.d("chedkAddFriend", "Were good Outer");
                 //String username = snapshot1.child(endingUser).getKey();
                 String value = snapshot.getKey();
                 //Log.d("checkValue", "" + value);
-                usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child(endingUser).setValue("Added");
-
+                usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail()))
+                        .child(endingUser)
+                        .setValue("Added");
             }
 
             @Override
@@ -62,13 +64,15 @@ public class AddFriendHandler {
         });
     }
     public void deleteFriend(){
-        usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).addValueEventListener(new ValueEventListener() {
+        usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail()))
+                .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //Log.d("chedkAddFriend", "Were good Outer");
                 //String username = snapshot1.child(endingUser).getKey();
                 usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail()));
-                usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail())).child("UserName").removeValue();
+                usersFriendRef.child(accKey.createAccountKey(mCurrentUser.getEmail()))
+                        .child("UserName").removeValue();
             }
 
             @Override
