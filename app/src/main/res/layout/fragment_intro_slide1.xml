@@ -9,7 +9,7 @@
     <!-- TODO: Update blank fragment layout -->
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/IntroTitle_One"
         android:layout_width="377dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
@@ -21,14 +21,15 @@
         android:textSize="80dp" />
 
     <TextView
-        android:id="@+id/testText"
+        android:id="@+id/IntroSlide_One"
         android:layout_width="326dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="290dp"
         android:background="@drawable/roundededittext"
         android:fontFamily="sans-serif-condensed-light"
         android:gravity="center"
-        android:text="The first ever social credit score monitoring service!"
+        android:text="The worlds first Peer-To-Peer deed transaction system"
+        android:textAlignment="viewStart"
         android:textColor="#82E0AA"
         android:textSize="50dp" />
 

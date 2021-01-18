@@ -3,29 +3,21 @@ package com.miware.clout.MainActivities.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
-
+import com.google.android.material.snackbar.Snackbar;
 import com.miware.clout.MainActivities.Classes.AccountKeyManager;
-import com.miware.clout.MainActivities.objects.UserObject;
+import com.miware.clout.MainActivities.Classes.AnimationClass;
 import com.miware.clout.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -40,37 +32,71 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-//TODO Firebase Database paths must not contain '.', '#', '$', '[', or ']
+/*
 
-/**The login activity must be attractive as it will be the introduction of the user to the app
+Firebase Database paths must not contain '.', '#', '$', '[', or ']
+
+*/
+
+/**The login activity must be attractive as it will be the
+ * introduction of the user to the app
  * @param // FIXME: 10/18/20 refactor notes on this activity*/
 public class AuthActivity extends AppCompatActivity {
-    /* Init Vars */
-    private TextInputLayout username;
-    private TextInputLayout password;
-    private TextView confirmAssistText;
-    private TextInputLayout retype;
-    private Button submit;
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase db;
-    private DatabaseReference mRefUsers;
-    private FirebaseUser mCurrentUser;
-    private Button loginButton;
+    /* Declare Vars */
+    private AnimationClass animationClass;
     private TabLayout logAndSignTab;
+    private TextInputLayout username, password, retype;
+    private TextView confirmAssistText;
+    private Button submit, loginButton;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
+    private DatabaseReference mRefUsers;
+    private FirebaseDatabase db;
     private AccountKeyManager keyGenerator;
-    private UserObject userObject;
+
     // onCreate method should be confound to Vars and method calls
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Init vars
+        initVars();
+
+        loginButton.setVisibility(View.INVISIBLE);
+        openingAnimation(submit);
+        tabLayoutManager_onClickHandler();
+        loginButtonOnClick();
+        submitButtonOnClick();
+    }
+
+    /*Check if user is signed in (non-null) and update UI accordingly.
+     * If there is a user cached then go to MainActivity,
+     * if not then stay on AuthActivity to sign up or log in*/
+    @Override
+    public void onStart() {
+        super.onStart();
+        //onStart set login button to Invisible
+        loginButton.setVisibility(View.INVISIBLE);
+
+        if (mCurrentUser != null){
+            Intent toProfileActivity = new Intent(AuthActivity.this,
+                    MainActivity.class);
+            startActivity(toProfileActivity);
+        }else{
+            Toast.makeText(AuthActivity.this, "Please Create Account!",
+                    Toast.LENGTH_SHORT).show();
+        }
+    } /* If there is no user, user will be prompted to create an account. */
+
+    // Init application vars
+    private void initVars(){
         /* Assign Vars */
+        animationClass = new AnimationClass();
         confirmAssistText = findViewById(R.id.confirmAssistText);
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
@@ -84,53 +110,22 @@ public class AuthActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
         mRefUsers = db.getReference("Users");
-
-        // App functionality
-        loginButton.setVisibility(View.INVISIBLE);
-        openingAnimation();
-        tabLayoutManager();
-        loginButtonOnClick();
-        submitButtonOnClick();
-
-
     }
 
     /**When the back button was being pressed, the user would be taken back to the launch screen
      * with no animation and the intent was killed so the user wasn't being returned to the */
     @Override
     public void onBackPressed() {
-        //...do nothing
+        /*Do nothing when the back button is pressed to avoid returning to auth activity*/
     }
 
-    /**These are animations
-     * openingAnimation will run onCreate
-     * reverseAnimation will run on return to sign up tab*/
-    private void openingAnimation(){
-        ObjectAnimator animCashButton = ObjectAnimator.ofFloat(submit, "translationY", -90f);
-        animCashButton.setDuration(500);
-        animCashButton.start();
-    }
-    private void reverseAnimation(){
-        ObjectAnimator animCashButton = ObjectAnimator.ofFloat(submit, "translationY", 90f);
-        animCashButton.setDuration(500);
-        animCashButton.start();
+    private void openingAnimation(Button buttonToAnimate){
+        animationClass.openingAnimation(buttonToAnimate);
+        animationClass.reverseAnimation(buttonToAnimate);
     }
 
-    /**Check if user is signed in (non-null) and update UI accordingly.
-     * If there is a user cached then go to MainActivity,
-     * if not then stay on AuthActivity to sign up or log in*/
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (mCurrentUser != null){
-            Intent toProfileActivity = new Intent(AuthActivity.this, MainActivity.class);
-            startActivity(toProfileActivity);
-        }else{
-            Toast.makeText(AuthActivity.this, "Please Create Account!", Toast.LENGTH_SHORT).show();
-        }
-    } /* If there is no user, user will be prompted to create an account. */
-
-    /**Firebase method: if email is properly formatted and passwords match firebase user will be created and cached.
+    /**Firebase method: if email is properly formatted and passwords match firebase user
+     * will be created and cached.
      * The following methods will be for creating an account or signing into one.
      * */
     private void createAccount(final String email, String password){
@@ -148,19 +143,11 @@ public class AuthActivity extends AppCompatActivity {
                                 FirebaseUser fireUser = mAuth.getCurrentUser();
                                 keyGenerator = new AccountKeyManager();
 
-                                /**userObject = new UserObject does not appear to be used
+                                /*userObject = new UserObject does not appear to be used
                                  *@// FIXME: 10/17/20 will fix soon */
-                                userObject = new UserObject();
-
 
                                 String accKey = keyGenerator.createAccountKey(email);
-
-                                //Log.d("New Pass", "" + accKey);
-
-                                // Send a userObject to firebase RTDB
-                                //
-                                //
-
+                                // Send init user data to firebase real time database
                                 mRefUsers.child(accKey);
                                 assert fireUser != null;
                                 mRefUsers.child(accKey).child("Email").setValue(email);
@@ -177,19 +164,18 @@ public class AuthActivity extends AppCompatActivity {
                                 //mRefUsers.child(accKey).child("TransactionList").setValue("Null");
                                 new AsyncStripeTask().execute(AsyncStripeTask);
 
-                                //
-                                //
-                                // DONE
-
-                                Intent toMain = new Intent(AuthActivity.this, IntroHubActivity.class);
+                                Intent toMain = new Intent(AuthActivity.this,
+                                        IntroHubActivity.class);
                                 startActivity(toMain);
                             } else {
                                 // If sign in fails, display a message to the user.
                                 //Log.w("Failed", "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(AuthActivity.this, "Authentication failed.",
+                                Toast.makeText(AuthActivity.this,
+                                        "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
 
-                                Toast.makeText(AuthActivity.this, email + "", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AuthActivity.this, email + "",
+                                        Toast.LENGTH_SHORT).show();
 
                                 checkEmailAlert();
                             }
@@ -197,9 +183,18 @@ public class AuthActivity extends AppCompatActivity {
                         }
                     });
         }else{
-            Toast.makeText(this, "We need an email", Toast.LENGTH_SHORT).show();
+            Snackbar snackbar = Snackbar
+                    .make(getWindow().getDecorView().getRootView(),
+                            "We need an email", Snackbar.LENGTH_LONG);
+            snackbar.setAction("Action", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Refresh layout
+                    finish();
+                    startActivity(getIntent());
+                }
+            }).show();
         }
-
     }
     private void signInUser(final String email, final String password){
         mAuth.signInWithEmailAndPassword(email, password)
@@ -210,43 +205,40 @@ public class AuthActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             //Log.d("isLoggedIn", "signInWithEmail:success");
-                            Intent passToMain = new Intent(AuthActivity.this, MainActivity.class);
+                            Intent passToMain = new Intent(AuthActivity.this,
+                                    MainActivity.class);
                             startActivity(passToMain);
                         } else {
                             // If sign in fails, display a message to the user.
-                            //Log.w("isLoggedIn", "signInWithEmail:failure", task.getException());
-                            //Toast.makeText(AuthActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                             loginAlert();
                         }
                         // ...
                     }
                 });
     }
-    /**End block*/
-
-    /* BUTTON FUNCTIONS */
-    /*  */
-    /*  */
 
     /**When submit button is clicked, check if passwords match and check email*/
     private void submitButtonOnClick(){
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /* Email to store for creation of users account */ String email          = Objects.requireNonNull(username.getEditText()).getText().toString();
+                /* Email to store for creation of users account */ String email = Objects
+                        .requireNonNull(username.getEditText()).getText().toString();
 
-                /* Passwords will be used by if conditional | if passwords match account will be created (assuming email is formated correctly). */
-                /* initial password for comparision */             String passwordMain   = Objects.requireNonNull(password.getEditText()).getText().toString();
-                /* secondary password for comparison */            String passwordRetype = Objects.requireNonNull(retype.getEditText()).getText().toString();
+                /* Passwords will be used by if conditional | if passwords match account will
+                be created (assuming email is formatted correctly). */
+                /* initial password for comparision */ String passwordMain = Objects
+                        .requireNonNull(password.getEditText()).getText().toString();
+                /* secondary password for comparison */String passwordRetype = Objects
+                        .requireNonNull(retype.getEditText()).getText().toString();
 
-                /**Password requirements should be set
+                /*Password requirements should be set
                  * rule 1 - should match - satisfied
                  * rule 2 - should be at least 10 characters @todo check*/
                 if(/*Passwords match*/ passwordMain.equals(passwordRetype)
                         && (/*can NOT be less than 10 characters*/(passwordMain.length() >= 10))){
                     createAccount(email.replace(" ", ""), passwordMain);
                 }else{
-                    //Log.d("SOMETHING: ", "Password check does not match:" + " " + passwordMain + " " + passwordRetype);
                     passwordLengthAlert();
                 }
             }
@@ -269,7 +261,8 @@ public class AuthActivity extends AppCompatActivity {
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         confirm.setTitle("WAIT!");
-        confirm.setMessage("Your password isn't long enough or doesn't match. Please check it and try again. " +
+        confirm.setMessage("Your password isn't long enough or doesn't match." +
+                "Please check it and try again. " +
                 "It just helps keep your account secure.");
 
         MaterialButton button = new MaterialButton(AuthActivity.this);
@@ -285,7 +278,8 @@ public class AuthActivity extends AppCompatActivity {
         confirm.show();
     }
     private void checkEmailAlert(){
-        final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this).create();
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this)
+                .create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         confirm.setView(layout);
@@ -298,7 +292,8 @@ public class AuthActivity extends AppCompatActivity {
         Window window = confirm.getWindow();
         window.setGravity(Gravity.BOTTOM);
 
-        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
 
         confirm.setTitle("WAIT!");
         confirm.setMessage("Please make sure your email is correct and try again!");
@@ -321,10 +316,15 @@ public class AuthActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /* Email to store for creation of users account */ String email          = username.getEditText().getText().toString();
+                /* Email to store for creation
+                of users account */ String email = username
+                        .getEditText().getText().toString();
 
-                /* Passwords will be used by if conditional | if passwords match account will be created (assuming email is formated correctly). */
-                /* initial password for comparision */             String passwordMain   = password.getEditText().getText().toString();
+                /* Passwords will be used by
+                if conditional | if passwords match account
+                will be created (assuming email is formatted correctly). */
+                /* initial password for comparision */ String passwordMain = password
+                        .getEditText().getText().toString();
 
                 signInUser(email.trim(), passwordMain);
                 //Log.d("test login cred", email + " " + passwordMain);
@@ -332,8 +332,9 @@ public class AuthActivity extends AppCompatActivity {
         });
     }
     private void loginAlert(){
-        /**User needs to be warned to check email and password and try again*/
-        final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this).create();
+        /*User needs to be warned to check email and password and try again*/
+        final AlertDialog confirm = new MaterialAlertDialogBuilder(AuthActivity.this)
+                .create();
         LinearLayout layout = new LinearLayout(getApplicationContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         confirm.setView(layout);
@@ -365,46 +366,27 @@ public class AuthActivity extends AppCompatActivity {
         confirm.show();
     }
 
-    /* APP FUNCTIONALITY */
-    /*  */
-    /*  */
-
-    // This section will house any functionality that does not need to be placed inside any * onclicklisteners *
-    // Alternatively, the functionality listed below can be used inside of functions which are housed inside of
-    // onclicklisteners
     //
-    //
-    //
-
-    private void tabLayoutManager(){
+    private void tabLayoutManager_onClickHandler(){
         logAndSignTab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                // called when tab selected
                 int position = tab.getPosition();
-                // Log.d("tabPosition: ", "" + position); /* Log.d test is shown to work index is shown correctly */
-
-                //TODO: if signup tab { index 0 } is selected, all elements should be visible
-                //TODO: if login tab { index 1 } is selected, only username and password should be visible
-
                 if(position == /* check for index 1 which is the login tab */ 1){
-                    //Log.d("isindex1", "onTabSelected: " + true); {test is complete | index0 is true and shows}
-
                     retype.setVisibility(View.INVISIBLE);
                     confirmAssistText.setVisibility(View.INVISIBLE);
                     submit.setVisibility(View.GONE);
                     loginButton.setVisibility(View.VISIBLE);
-                    openingAnimation();
-                    reverseAnimation();
-                }else /* if else, then index 0 is active | index 0 is the sign up tab, and all elements will be available when index 0 is active */{
-                    //Log.d("isindex0", "onTabSelected: " + false); {test is complete | index1 is false and shows}
-
+                    animationClass.openingAnimation(submit);
+                    animationClass.reverseAnimation(submit);
+                }else /* if else, then index 0 is active | index 0 is the sign up tab, and all
+                elements will be available when index 0 is active */{
                     confirmAssistText.setVisibility(View.VISIBLE);
                     retype.setVisibility(View.VISIBLE);
                     submit.setVisibility(View.VISIBLE);
                     loginButton.setVisibility(View.INVISIBLE);
                     submit.setVisibility(View.VISIBLE);
-                    openingAnimation();
+                    animationClass.openingAnimation(submit);
                 }
             }
 
@@ -426,22 +408,26 @@ public class AuthActivity extends AppCompatActivity {
         @SuppressLint("WrongThread")
         @Override
         protected Object doInBackground(Object[] objects) {
-            com.stripe.Stripe.apiKey = "sk_test_51GuYBuLsgkZ2wTkEPW1f3aeAOcqJTWWgDTq2frFZSpsn2dtM1zLtiGQd3E90OGFNo7VPmL9Y2w62zpvwiwf5nwW5007TNe558H";
+            com.stripe.Stripe.apiKey =
+                    getString(R.string.stripekey);
             FirebaseUser fireUser = mAuth.getCurrentUser();
             assert fireUser != null;
-            /**Incase of crash - you added - assert fireUser != null;
-             * and you added Objects.requerNonNull to mapUsernameString
+            /*In case of crash - you added - assert fireUser != null;
+             * and you added Objects.requireNonNull to mapUsernameString
              * of auth bug reports - then reverse these implementations*/
             String accKey = keyGenerator.createAccountKey(fireUser.getEmail());
-            String mapUsernameString = Objects.requireNonNull(username.getEditText()).getText().toString().replace(" ", "");
+            String mapUsernameString = Objects.requireNonNull(username.getEditText())
+                    .getText()
+                    .toString()
+                    .replace(" ", "");
             Map<String, Object> mapCustomer = new HashMap<String, Object>();
             mapCustomer.put("email", mapUsernameString);
             try {
                 Customer newCustomer = Customer.create(mapCustomer);
-                String custID = newCustomer.getId();
-                //Log.d("CustomerID", custID);
+                String customerID = newCustomer.getId();
+                //Log.d("CustomerID", customerID);
                 mRefUsers.child(accKey);
-                mRefUsers.child(accKey).child("stripeCustomerID").setValue(custID);
+                mRefUsers.child(accKey).child("stripeCustomerID").setValue(customerID);
             } catch (StripeException e) {
                 e.printStackTrace();
             }            return null;

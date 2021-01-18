@@ -1,4 +1,4 @@
-package com.miware.clout.MainActivities.adapters;
+package com.miware.clout.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
