@@ -3,18 +3,18 @@
 
     <item android:left="1dp">
         <shape android:shape="rectangle" >
-            <size android:width="1dp"/>
+            <size android:width="2dp"/>
             <size android:height="5dp" />
             <solid android:color="#CD6155" />
-            <corners android:radius="4dp" />
+            <corners android:radius="1dp" />
         </shape>
     </item>
         <item android:right="2dp">
             <shape android:shape="rectangle" >
-                <size android:width="1dp"/>
+                <size android:width="4dp"/>
                 <size android:height="20dp" />
-                <solid android:color="#52BE80" />
-                <corners android:radius="5dp" />
+                <solid android:color="#3498DB" />
+                <corners android:radius="1dp" />
             </shape>
         </item>
 

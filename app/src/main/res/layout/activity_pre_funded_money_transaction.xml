@@ -9,7 +9,7 @@
     android:layout_marginRight="20dp"
     android:layout_marginBottom="10dp"
     android:background="@drawable/roundedbackground"
-    tools:context=".MainActivities.activities.PreFundedMoneyTransaction">
+    tools:context=".SourceCode.activities.PreFundedMoneyTransaction">
 
     <TextView
         android:id="@+id/cashAmountTextView"

@@ -2,21 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frame_Layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#CBDFC1"
-    tools:context=".MainActivities.activities.LauncherActivity">
-
-    <VideoView
-        android:id="@+id/videoView2"
-        android:layout_width="wrap_content"
-        android:layout_height="250dp"
-        android:layout_marginTop="120dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:background="#006FB9"
+    tools:context=".SourceCode.activities.LauncherActivity">
 
     <TextView
         android:id="@+id/tTextView"
@@ -24,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="304dp"
         android:layout_marginTop="392dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/rounded_bold"
         android:text="T"
         android:textColor="#FFFFFF"
         android:textSize="90sp"
@@ -37,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="240dp"
         android:layout_marginTop="392dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/rounded_bold"
         android:text="U"
         android:textColor="#FFFFFF"
         android:textSize="90sp"
@@ -50,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:layout_marginTop="392dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/rounded_bold"
         android:text="C"
         android:textColor="#FFFFFF"
         android:textSize="90sp"
@@ -63,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="112dp"
         android:layout_marginTop="392dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/rounded_bold"
         android:text="L"
         android:textColor="#FFFFFF"
         android:textSize="90sp"
@@ -76,11 +66,22 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="168dp"
         android:layout_marginTop="392dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/rounded_bold"
         android:text="O"
         android:textColor="#FFFFFF"
         android:textSize="90sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="188dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/clout_logo_authback" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

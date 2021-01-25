@@ -6,22 +6,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbarSize="100dp"
-    tools:context=".MainActivities.activities.MainActivity">
+    tools:context=".SourceCode.activities.MainActivity">
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/CloutScore"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:fontFamily="sans-serif-light"
+        android:fontFamily="@font/rounded_bold"
         android:gravity="center"
         android:text="@string/clout_score"
         android:textColor="#FFFFFF"
         android:textSize="40sp"
-        app:backgroundTint="#82E0AA"
+        app:backgroundTint="#2B7EEF"
         app:cornerRadius="7dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintEnd_toStartOf="@+id/toFeed_Button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
 
@@ -44,11 +43,26 @@
         app:layout_constraintTop_toBottomOf="@+id/CloutScore" />
 
     <View
+        android:id="@+id/topView"
+        android:layout_width="wrap_content"
+        android:layout_height="170dp"
+        android:background="@drawable/rectangle_1"
+        android:backgroundTint="#4F94F1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+
+    </View>
+
+    <View
         android:id="@+id/view"
         android:layout_width="wrap_content"
         android:layout_height="80dp"
-        android:background="#A9CCE3"
-        android:backgroundTint="#A9CCE3"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/post"
+        android:backgroundTint="#4F94F1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,10 +74,10 @@
         android:layout_height="57dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-thin"
+        android:fontFamily="@font/rounded_bold"
         android:gravity="center_vertical"
         android:letterSpacing=".46"
-        android:text="AccountKey"
+        android:text="@string/accountkey"
         android:textColor="#FFFFFF"
         android:textSize="19sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -105,26 +119,28 @@
         app:layout_constraintBottom_toTopOf="@+id/transactionTabs"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CloutScore">
+        app:layout_constraintTop_toBottomOf="@+id/topView">
 
     </ListView>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/transactionTabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="382dp"
+        android:layout_height="47dp"
+        android:background="@drawable/post"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submitted" />
+            android:text="@string/submitted" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Received" />
+            android:text="@string/received" />
     </com.google.android.material.tabs.TabLayout>
 
     <ListView
@@ -159,11 +175,11 @@
             android:id="@+id/cloutintrotest1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="100dp"
+            android:layout_marginStart="100dp"
             android:layout_marginTop="150dp"
             android:background="@drawable/roundedbackground"
             android:gravity="center"
-            android:text="  This is your clout score!  "
+            android:text="@string/this_is_your_clout_score"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:visibility="visible" />
@@ -178,8 +194,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/roundedbackground"
             android:gravity="center"
-            android:text="This score shows the world if you
-are trust worthy."
+            android:text="@string/this_score_shows_the_world_if_you_are_trust_worthy"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:visibility="gone" />
@@ -194,8 +209,7 @@ are trust worthy."
             android:layout_marginTop="170dp"
             android:background="@drawable/roundedbackground"
             android:gravity="center"
-            android:text="Return debts, show up on time and return items
- without damage and you score will go up."
+            android:text="@string/return_debts_show_up_on_time_and_return_items_without_damage_and_you_score_will_go_up"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:visibility="gone" />
@@ -212,8 +226,7 @@ are trust worthy."
             android:layout_marginEnd="11dp"
             android:background="@drawable/roundedbackground"
             android:gravity="center"
-            android:text="Click the score button, when you want to create
-a new report on someone."
+            android:text="@string/click_the_score_button_when_you_want_to_create_a_new_report_on_someone"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:visibility="gone" />
@@ -229,7 +242,7 @@ a new report on someone."
             android:background="@drawable/roundedbackground"
             android:gravity="center"
             android:src="@drawable/ic_baseline_person_24"
-            android:text="Click here to go to your profile"
+            android:text="@string/click_here_to_go_to_your_profile"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:visibility="gone" />
@@ -247,6 +260,25 @@ a new report on someone."
             android:src="@drawable/ic_baseline_arrow_forward_ios_24"
             android:textColor="#FFFFFF"
             android:textSize="25sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:contentDescription="@string/todo" />
 
-    </RelativeLayout></androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/toFeed_Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/rounded_bold"
+        android:gravity="center"
+        android:text="@string/to_post_feed"
+        android:textColor="#FFFFFF"
+        android:textSize="40sp"
+        app:backgroundTint="#2B7EEF"
+        app:cornerRadius="7dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

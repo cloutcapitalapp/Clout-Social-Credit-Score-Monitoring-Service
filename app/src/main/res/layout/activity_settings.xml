@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SourceCode.activities.SettingsActivity">
+    <TextView
+        android:id="@+id/title_TextView"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/rounded_bold"
+        android:text="@string/create_random_user_key"
+        android:textSize="30sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/darkMode_Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#34495E"
+        android:fontFamily="@font/rounded_bold"
+        android:text="@string/switch_to_dark_mode"
+        android:textSize="20sp"
+        app:cornerRadius="7dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title2_TextView" />
+
+    <TextView
+        android:id="@+id/title2_TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/rounded_bold"
+        android:text="@string/dark_mode"
+        android:textSize="30sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/saveRandomState_CheckBox" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/generateRandomUserKey_Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#34495E"
+        android:fontFamily="@font/rounded_bold"
+        android:text="@string/generate_random_user_key"
+        android:textSize="20sp"
+        app:cornerRadius="7dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_TextView" />
+
+    <CheckBox
+        android:id="@+id/saveRandomState_CheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/use_random_user_key_for_all_3rd_party_use"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/generateRandomUserKey_Button" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

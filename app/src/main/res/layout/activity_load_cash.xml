@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivities.activities.LoadCashActivity">
+    tools:context=".SourceCode.activities.LoadCashActivity">
 
     <ImageView
         android:id="@+id/imageView"

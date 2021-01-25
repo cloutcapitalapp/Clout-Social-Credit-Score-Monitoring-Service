@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/watch"
+            android:title="WATCH"/>
+        <item
+            android:id="@+id/invite"
+            android:title="INVITE"/>
+        <item
+            android:id="@+id/settings"
+            android:title="SETTINGS"/>
+        <item
+            android:id="@+id/notifications"
+            android:title="NOTIFICATIONS"/>
+        <item
+            android:id="@+id/loutout"
+            android:title="Log Out"/>
+
+    </group>
+</menu>

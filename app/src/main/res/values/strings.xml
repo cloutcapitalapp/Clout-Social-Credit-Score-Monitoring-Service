@@ -66,4 +66,21 @@
     <string name="okay">Ok: +.50 Point Increase</string>
     <string name="unfollow">Unfollow</string>
     <string name="stripekey">sk_test_51GuYBuLsgkZ2wTkEPW1f3aeAOcqJTWWgDTq2frFZSpsn2dtM1zLtiGQd3E90OGFNo7VPmL9Y2w62zpvwiwf5nwW5007TNe558H</string>
+    <string name="open">OPEN</string>
+    <string name="close">CLOSE</string>
+    <string name="generate_random_user_key">Generate Random User Key</string>
+    <string name="create_random_user_key">Create Random User Key</string>
+    <string name="todo">profile image</string>
+    <string name="to_post_feed">P</string>
+    <string name="click_here_to_go_to_your_profile">Click here to go to your profile</string>
+    <string name="click_the_score_button_when_you_want_to_create_a_new_report_on_someone">Click the score button, when you want to create a new report on someone.</string>
+    <string name="return_debts_show_up_on_time_and_return_items_without_damage_and_you_score_will_go_up">Return debts, show up on time and return items without damage and you score will go up.</string>
+    <string name="this_score_shows_the_world_if_you_are_trust_worthy">This score shows the world if you are trust worthy.</string>
+    <string name="this_is_your_clout_score">This is your clout score!</string>
+    <string name="received">Received</string>
+    <string name="submitted">Submitted</string>
+    <string name="accountkey">AccountKey</string>
+    <string name="switch_to_dark_mode">Switch To Dark Mode</string>
+    <string name="use_random_user_key_for_all_3rd_party_use">Use random user key for all 3rd party use</string>
+    <string name="dark_mode">Dark Mode</string>
 </resources>
