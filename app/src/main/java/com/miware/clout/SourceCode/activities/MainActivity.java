@@ -31,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
+import com.google.android.material.snackbar.Snackbar;
 import com.miware.clout.SourceCode.Classes.AccountKeyManager;
 import com.miware.clout.SourceCode.Classes.AddFriendHandler;
 import com.miware.clout.SourceCode.datamodels.MainDataModel;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     int clickedamount = 0;
     boolean ranBefore;
+    SharedPreferences myPrefs;
 
     RelativeLayout topLevel;
 
@@ -158,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayoutManager();
         receivedListViewOnClick();
         toFeed_ButtonOnClickListener();
+        //checkForUserNameStoredOnDevice();
 
         // This algo needs to check to see if the user is returning or if the user opening the app for the first time
         // The reason this needs to be done is because the firstReturnAlertBlock methods need to not show up anymore after the
@@ -283,6 +286,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //...do nothing
+    }
+
+    private String storeUsername(){
+        String userEmail = mCurrentUser.getEmail();
+        String caughtUserEmail = accKey.createAccountKey(userEmail);
+        myPrefs = this.getSharedPreferences("userNamePref", MODE_PRIVATE);
+        SharedPreferences.Editor edit = myPrefs.edit();
+        edit.clear();
+        edit.putString("usernameString", caughtUserEmail);
+        edit.apply();
+        return caughtUserEmail;
+    }
+    private void checkForUserNameStoredOnDevice(){
+        SharedPreferences getPrefs = this.getSharedPreferences("userNamePref", MODE_PRIVATE);
+        String caughtUserKey = getPrefs.getString("usernameString", "No username");
+        if(getPrefs != null){
+            //do nothing
+            Snackbar.make(getWindow().getDecorView().getRootView(), caughtUserKey, Snackbar.LENGTH_INDEFINITE).show();
+        }else{
+            storeUsername();
+            Snackbar.make(getWindow().getDecorView().getRootView(), caughtUserKey, Snackbar.LENGTH_INDEFINITE).show();
+        }
     }
 
     public void tabLayoutManager(){
@@ -873,10 +898,6 @@ public class MainActivity extends AppCompatActivity {
             super(itemView);
 
             getTransacting_Users = itemView.findViewById(R.id.Transacting_Users);
-            getDate         = itemView.findViewById(R.id.date);
-            getCurrent_date  = itemView.findViewById(R.id.current_date);
-            getLocation     = itemView.findViewById(R.id.location);
-            getAmount       = itemView.findViewById(R.id.amount);
         }
     }
     /***/

@@ -41,7 +41,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/rectangle_1"
             android:backgroundTint="#3498DB"
-            app:cardCornerRadius="5" >
+            app:cardCornerRadius="5dp" >
 
             <TextView
                 android:id="@+id/post_TextView"

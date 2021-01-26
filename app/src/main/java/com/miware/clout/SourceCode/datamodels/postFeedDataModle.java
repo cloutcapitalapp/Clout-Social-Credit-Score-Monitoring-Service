@@ -1,16 +1,28 @@
 package com.miware.clout.SourceCode.datamodels;
 
-public class postFeedDataModle {
+import java.io.Serializable;
 
-    private static String postString;
+public class postFeedDataModle implements Serializable {
 
     public postFeedDataModle(){
     }
 
-    private postFeedDataModle(String stringPost){
-        postString = stringPost;
+    public String postString;
+
+    public String userKey;
+
+    public postFeedDataModle(String postString){
+        this.postString = postString;
     }
 
-    public static String getPostString(){return postString;}
-    public void setPostString(String postedString){this.postString = postedString;}
+    public String getPostString(){return postString;}
+    public void setPostString(String postedString){
+        postString = postedString;}
+
+    public String getUserKey() {
+        return userKey;
+    }
+    public void setUserKey(String userKey) {
+        this.userKey = userKey;
+    }
 }

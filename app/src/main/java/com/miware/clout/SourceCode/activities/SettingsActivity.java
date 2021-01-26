@@ -1,5 +1,6 @@
 package com.miware.clout.SourceCode.activities;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -77,10 +78,17 @@ public class SettingsActivity extends AppCompatActivity {
         darkMode_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 //For now create snack bar that alerts : Not ready yet
                 Snackbar.make(getWindow().getDecorView().getRootView(),
                         "This feature is quite ready yet",
-                        Snackbar.LENGTH_LONG);
+                        Snackbar.LENGTH_LONG).show();
+                 */
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(SettingsActivity.this);
+                alert.setTitle("Notice");
+                alert.setMessage("This feature is almost ready");
+                alert.show();
             }
         });
     }

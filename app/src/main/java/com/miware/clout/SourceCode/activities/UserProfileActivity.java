@@ -36,6 +36,7 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.miware.clout.SourceCode.Classes.AccountKeyManager;
 import com.miware.clout.SourceCode.Classes.AddFriendHandler;
 import com.miware.clout.R;
@@ -55,6 +56,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.miware.clout.SourceCode.Classes.ScoreHandler;
 
 import java.util.ArrayList;
 
@@ -1049,6 +1051,9 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
                             Toast.makeText(UserProfileActivity.this, "Upload Success", Toast.LENGTH_SHORT).show();
                             Intent reload = new Intent(UserProfileActivity.this, UserProfileActivity.class);
                             startActivity(reload);
+                            ScoreHandler handleScore = new ScoreHandler();
+                            handleScore.sessionStartScoreIncrease(.02);
+                            Snackbar.make(getWindow().getDecorView().getRootView(), "Your score increased by .02", Snackbar.LENGTH_LONG);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -1101,15 +1106,7 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
                 }
             });
         }else{
-            //Log.d("ReportImageTarget", "\n " +
-            //"\n " +
-            //"\n " +
-            //"onStart: NOTHING " +
-            //"\n " +
-            //"\n");
-
             Glide.with(UserProfileActivity.this).load(profilePic).into(profilePic);
-            //Log.d("load image", "" + mStorageRefPfofPic.toString());
         }
     }
     /**Alerts the user that proceeding will take them to select a profile image*/

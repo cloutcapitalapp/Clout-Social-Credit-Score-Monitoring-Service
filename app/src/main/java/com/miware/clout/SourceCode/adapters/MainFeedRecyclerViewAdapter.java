@@ -67,10 +67,6 @@ public class MainFeedRecyclerViewAdapter extends RecyclerView.Adapter<MainFeedRe
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             getTransacting_Users = itemView.findViewById(R.id.Transacting_Users);
-            getLocation     = itemView.findViewById(R.id.location);
-            getDate         = itemView.findViewById(R.id.date);
-            getCurrent_date  = itemView.findViewById(R.id.current_date);
-            getAmount         = itemView.findViewById(R.id.amount);
         }
     }
 }
