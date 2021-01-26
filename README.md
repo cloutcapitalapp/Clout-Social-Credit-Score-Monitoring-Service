@@ -13,3 +13,8 @@ Every user will start with a score of 200.  Each user, upon accepting or creatin
 a score increase. This score is subject to change based on the out come of those deed-transactions.  At the moment, 
 what is considered a high score and what is considered a low score is not established as this may mean different things, 
 for different users.  
+
+Jan - 25 - 2021 update : 
+The project has been renamed to Clout Social Capital
+many new ieas and concepts are now being planed or implemented.  We want Clout to be a crypto only platform. It'll pave the way for cryptocurency payments accros
+the interweb. I'm extremly excited to get started.  
