@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String userName = (String) listView.getItemAtPosition(position);
-                String userNamePull = userName.substring(userName.indexOf("\n&")+1);
+                String userNamePull = userName.substring(userName.indexOf("\n\n&")+1);
                 receivedListViewOnClickAlert(userNamePull);
                 Toast.makeText(MainActivity.this,
                         "" + userNamePull, Toast.LENGTH_SHORT).show();
@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         endTransactionAlert.setTitle("DONE?");
-        endTransactionAlert.setMessage("Let us know how " + userName.trim() + " did." + " was " +
+        endTransactionAlert.setMessage("Let us know how " + userName.trim() + " did." + " Was " +
                 userName.trim() +
                 " on-time, positive, and over-all pleasant? If so, let them know!");
 
@@ -620,8 +620,6 @@ public class MainActivity extends AppCompatActivity {
         mEventTransactionsList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //Log.d("forLoopStart", "Start");
-                //Log.d("forLoopStart", "start" + " : " + snapshot);
 
                 for (DataSnapshot snapshot1 : snapshot.getChildren()){
                     String desc = snapshot1.child("description").getValue(String.class);
@@ -644,8 +642,6 @@ public class MainActivity extends AppCompatActivity {
         mEventReceivedTransactionList.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //Log.d("forLoopStart", "Start");
-                //Log.d("forLoopStart", "start" + " : " + snapshot);
 
                 Collections.reverse(arrayListReceived);
 
